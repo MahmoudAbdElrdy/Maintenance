@@ -17,8 +17,8 @@ namespace AuthDomain.Entities.Auth {
     public DateTime? UpdatedOn { set; get; }
     public State State { get; set; }
     public virtual ICollection<PermissionRole> PermissionRoles { set; get; }
-    public virtual ICollection<User> Users { set; get; }
+    public virtual HashSet<UserRole> UserRoles { get; set; } = new HashSet<UserRole>();
 
-}
+    }
 
 }

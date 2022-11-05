@@ -6,14 +6,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Maintenance.Domain.Entities.Auth;
 
-namespace Maintenance.Infrastructure.Interfaces
+namespace Maintenance.Domain.Interfaces 
 {
     public interface IDatabaseContext : IDisposable
     {
         public DatabaseFacade Database { get; }
 
-
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<PermissionRole> PermissionRoles { get; set; }
         public ChangeTracker ChangeTracker { get; }
 
         public int SaveChanges();

@@ -6,23 +6,40 @@ using AuthDomain.Entities.Auth;
 using Microsoft.AspNetCore.Identity;
 using Maintenance.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Maintenance.Infrastructure.Interfaces;
+using Maintenance.Domain.Entities.Auth;
 
-namespace Maintenance.Infrastructure.Persistence
+namespace Maintenance.Domain.Persistence 
 {
-    public class AppDbContext : IdentityDbContext<User, Role, string, IdentityUserClaim<string>,
-      UserRole,IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>, IDatabaseContext
+    public class AppDbContext : IdentityDbContext<User, Role, long, IdentityUserClaim<long>,
+      UserRole,IdentityUserLogin<long>, IdentityRoleClaim<long>, IdentityUserToken<long>>, IDatabaseContext
 
     {
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
-
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<PermissionRole> PermissionRoles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<UserRole>().HasKey(p => new { p.UserId, p.RoleId });
-          
+           modelBuilder.Entity<PermissionRole>().HasKey(p => new { p.RoleId, p.PermissionId });
+            modelBuilder.Entity<User>(b =>
+            {
+                b.HasMany(e => e.UserRoles)
+                    .WithOne(e => e.User)
+                    .HasForeignKey(ur => ur.UserId)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity<Role>(b =>
+            {
+                b.HasMany(e => e.UserRoles)
+                    .WithOne(e => e.Role)
+                    .HasForeignKey(ur => ur.RoleId)
+                    .IsRequired();
+            });
         }
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {

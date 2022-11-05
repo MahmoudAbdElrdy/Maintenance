@@ -1,4 +1,4 @@
-﻿using Maintenance.Infrastructure.Interfaces;
+﻿using Maintenance.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;

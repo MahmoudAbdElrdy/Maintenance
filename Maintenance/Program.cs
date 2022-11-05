@@ -18,6 +18,7 @@ using Maintenance.Infrastructure.Persistence;
 using Maintenance.Infrastructure.Persistence.MSSQL;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using Maintenance.Domain.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

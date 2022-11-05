@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Maintenance.Domain.Persistence;
 
 namespace Maintenance.Infrastructure.Persistence.MSSQL
 {
@@ -16,7 +17,7 @@ namespace Maintenance.Infrastructure.Persistence.MSSQL
             var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true)
                 // .AddJsonFile("appsettings.Stage.json", false)
-                .AddJsonFile("appsettings.Development.json", false)
+               // .AddJsonFile("appsettings.Development.json", false)
                 .Build();
 
             var builder = new DbContextOptionsBuilder<AppDbContext>();
