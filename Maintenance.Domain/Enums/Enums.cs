@@ -26,8 +26,10 @@
     }
     public enum UserType
     {
-        Employee,
-        Visitor,
+        Client=1,
+        Technician,
+        Owner ,
+        Consultant
     }
     public enum RequestStatus
     {

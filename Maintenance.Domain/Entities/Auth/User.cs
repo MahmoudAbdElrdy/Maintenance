@@ -20,8 +20,8 @@ namespace AuthDomain.Entities.Auth
         public string DeletedBy { get; set; }
         public DateTime? DeletedDate { get; set; }
       
-        public string Permissions { get; set; }
-
+        public UserType UserType { get; set; } 
+      
         public HashSet<UserRole> UserRoles { get; set; } = new HashSet<UserRole>();
         public DateTime CreatedOn { get ; set ; }
         public DateTime? UpdatedOn { get ; set ; }
