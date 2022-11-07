@@ -10,7 +10,7 @@ namespace Maintenance.Infrastructure.Persistence.MSSQL
 {
     public class MaintenanceSqlContext : AppDbContext
     {
-        public MaintenanceSqlContext(DbContextOptions<AppDbContext> options) : base(options)
+        public MaintenanceSqlContext(DbContextOptions options) : base(options)
         {
         }
     }

@@ -19,6 +19,13 @@ using Maintenance.Infrastructure.Persistence.MSSQL;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Maintenance.Domain.Persistence;
+using Microsoft.AspNetCore.Mvc;
+using Maintenance.Application;
+using Maintenance.API.Helper;
+using Maintenance.Application.GenericRepo;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.FileProviders;
+using Maintenance.Application.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,7 +69,7 @@ builder.Services.AddSingleton(jwtSettings);
 var tokenValidationParameters = new TokenValidationParameters
 {
     ValidateIssuerSigningKey = true,
-    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
+   // IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
     ValidateIssuer = false,
     ValidateAudience = false,
     RequireExpirationTime = false,
@@ -104,13 +111,23 @@ builder.Services
  })
  .AddHttpContextAccessor()
  .AddHttpClient();
+ApplicationServiceRegistration.AddApplicationServices(builder.Services);
 #region Swagger
+builder.Services.AddApiVersioning(config =>
+{
+    // Specify the default API Version as 1.0
+    config.DefaultApiVersion = new ApiVersion(1, 0);
+    // If the client hasn't specified the API version in the request, use the default API version number 
+    config.AssumeDefaultVersionWhenUnspecified = true;
+    // Advertise the API versions supported for the particular endpoint
+    config.ReportApiVersions = true;
+});
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "IntegratedRecruitment APIs Reference",
+        Title = "Maintenance APIs Reference",
     });
 
     c.AddSecurityDefinition(
@@ -142,7 +159,22 @@ builder.Services.AddSwaggerGen(c =>
         );
 });
 #endregion Swagger
+builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(
+    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
+
+
+builder.Services.AddScoped(typeof(IGRepository<>), typeof(GRepository<>));
+
+
+
+builder.Services.AddOptions();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAuthorizationHandler, CustomRequireUserClaim>();
+builder.Services.AddSignalR();
+builder.Services.AddControllers();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

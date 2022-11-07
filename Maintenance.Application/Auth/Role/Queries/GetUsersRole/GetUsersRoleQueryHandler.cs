@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using AuthDomain.Entities.Auth;
+using AutoMapper;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using MediatR;
@@ -9,15 +10,15 @@ namespace Maintenance.Application.Auth.Role.Queries.GetUsersRole
 {
     public class GetUsersRoleQueryHandler : IRequestHandler<GetUsersRoleQuery, ResponseDTO>
     {
-        private readonly IGRepository<Domain.Entities.RoleEntity.Role> _roleRepository;
+        private readonly IGRepository<AuthDomain.Entities.Auth.Role> _roleRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<GetUsersRoleQueryHandler> _logger;
         private readonly ResponseDTO _responseDTO;
-        private readonly IGRepository<Domain.Entities.UserEntity.User> _userRepository;
-        private readonly IGRepository<Domain.Entities.PermissionRoleEntity.PermissionRole> _permissionroleRepository;
+        private readonly IGRepository<User> _userRepository;
+        private readonly IGRepository<Domain.Entities.Auth.PermissionRole> _permissionroleRepository;
 
-        public GetUsersRoleQueryHandler(IGRepository<Domain.Entities.RoleEntity.Role> roleRepository, IMapper mapper, ILogger<GetUsersRoleQueryHandler> logger,
-            IGRepository<Domain.Entities.UserEntity.User> userRepository, IGRepository<Domain.Entities.PermissionRoleEntity.PermissionRole> permissionroleRepository)
+        public GetUsersRoleQueryHandler(IGRepository<AuthDomain.Entities.Auth.Role> roleRepository, IMapper mapper, ILogger<GetUsersRoleQueryHandler> logger,
+            IGRepository<User> userRepository, IGRepository<Domain.Entities.Auth.PermissionRole> permissionroleRepository)
         {
             _roleRepository = roleRepository ?? throw new ArgumentNullException(nameof(roleRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -31,14 +32,11 @@ namespace Maintenance.Application.Auth.Role.Queries.GetUsersRole
         {
             try
             {
-                var entityObjs = _userRepository.GetAll(s => s.State != Domain.Enums.State.Deleted && s.RoleId == request.RoleId).Include(x=>x.Skeleton)
-                    .Include(x=>x.PersonalData).ThenInclude(x => x.JobsManagement).Include(x => x.Role).Select(x=>new GetAllUserRolesDTO()
+                var entityObjs = _userRepository.GetAll(s => s.State != Domain.Enums.State.Deleted && s.Id == request.RoleId)
+                   .Include(x => x.UserRoles).Select(x=>new GetAllUserRolesDTO()
                     {
                         Id = x.Id,
-                        ProfileImage = x.PersonalData.Image,
-                        SkeletonName = x.Skeleton.NameAr,
-                        JobName = x.PersonalData.JobsManagement.JobName,
-                        UserName = x.PersonalData.FirstName + " " + x.PersonalData.FourthName
+                       
                     }).ToList();
                
 

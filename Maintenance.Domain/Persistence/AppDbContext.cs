@@ -15,7 +15,7 @@ namespace Maintenance.Domain.Persistence
 
     {
 
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        public AppDbContext(DbContextOptions options) : base(options)
         {
         }
         public DbSet<Permission> Permissions { get; set; }
@@ -40,6 +40,7 @@ namespace Maintenance.Domain.Persistence
                     .HasForeignKey(ur => ur.RoleId)
                     .IsRequired();
             });
+          
         }
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {

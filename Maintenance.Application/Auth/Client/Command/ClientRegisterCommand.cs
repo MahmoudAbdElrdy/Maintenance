@@ -11,11 +11,11 @@ namespace Maintenance.Application.Auth.Client.Command
     {
         public string FullName { get; set; }
         public UserType UserType { get; set; }
-        public string? MobileNumber { get; set; }
+        public string? PhoneNumber { get; set; }
         public string? IdentityNumber { get; set; }
-        public string? RoomNumber { get; set; }  
         public string[] Roles { get; set; }
-        public  string PhoneNumber { get; set; }
+        public long RoomId { set; get; }
+        public string Password { get; set; }
     }
     class Handler : IRequestHandler<ClientRegisterCommand, ResponseDTO>
     {
@@ -35,25 +35,36 @@ namespace Maintenance.Application.Auth.Client.Command
             {
                 var user = new User()
                 {
-                    UserName = request.FullName.ToLower().Trim(),
+                    UserName = request.FullName.Split(" ")[0],
 
-                    Email = request.FullName,
+                    Email = request.FullName + "@gmail.com",
+                  
+                    FullName = request.FullName,
 
-                    PhoneNumber = request.MobileNumber,
+                    PhoneNumber = request.PhoneNumber,
 
-                    NormalizedEmail = request.FullName.ToUpper(),
+                    NormalizedEmail = request.FullName + "@GMAIL.com",
 
-                    NormalizedUserName = request.FullName.ToUpper(),
+                    NormalizedUserName = request.FullName.Split(" ")[0].ToUpper(),
 
                     CreatedOn = DateTime.Now,
 
                     State = State.NotDeleted,
 
-                    IdentityNumber = request.IdentityNumber
-                };
+                    IdentityNumber = request.IdentityNumber,
 
-                if (request.Roles.Length > 0)
-                    await _userManager.AddToRolesAsync(user, request.Roles);
+                    RoomId = request.RoomId,
+                    
+                };
+                var result = await _userManager.CreateAsync(user, request.Password);
+                if (!result.Succeeded)
+                {
+                    _responseDTO.Result = null;
+                    _responseDTO.StatusEnum = StatusEnum.Exception;
+                    _responseDTO.Message = "anErrorOccurredPleaseContactSystemAdministrator";
+                }
+                 if (request.Roles.Length > 0)
+                 await _userManager.AddToRolesAsync(user, request.Roles);
                 _responseDTO.Result = null;
                 _responseDTO.Message = "userAddedSuccessfully";
                 _responseDTO.StatusEnum = StatusEnum.SavedSuccessfully;

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Maintenance.Infrastructure.Migrations
 {
     [DbContext(typeof(MaintenanceSqlContext))]
-    [Migration("20221105190322_inti")]
-    partial class inti
+    [Migration("20221107220754_inti3")]
+    partial class inti3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -97,7 +97,6 @@ namespace Maintenance.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DeletedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DeletedDate")
@@ -110,22 +109,23 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdentityNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("LoginCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -144,8 +144,17 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<long?>("RoomId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SmsCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("SmsVerify")
+                        .HasColumnType("bit");
 
                     b.Property<int>("State")
                         .HasColumnType("int");
@@ -162,20 +171,12 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserLang")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<int>("UserType")
+                    b.Property<int?>("UserType")
                         .HasColumnType("int");
-
-                    b.Property<string>("WebToken")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -186,6 +187,8 @@ namespace Maintenance.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("RoomId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -261,6 +264,167 @@ namespace Maintenance.Infrastructure.Migrations
                     b.HasIndex("PermissionId");
 
                     b.ToTable("PermissionRoles");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.CarvanEntity.Carvan", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<int>("CarvanNumber")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("RegionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("RegionId");
+
+                    b.ToTable("Carvan");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.OfficeEntity.Office", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OfficeNameAr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OfficeNameEn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.ToTable("Office");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.RegionEntity.Region", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("OfficeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("RegionName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("OfficeId");
+
+                    b.ToTable("Region");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.RoomEntity.Room", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long>("CarvanId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LimittedNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("QRImage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RoomNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarvanId");
+
+                    b.HasIndex("CreatedBy")
+                        .IsUnique()
+                        .HasFilter("[CreatedBy] IS NOT NULL");
+
+                    b.ToTable("Room");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
@@ -351,6 +515,15 @@ namespace Maintenance.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("AuthDomain.Entities.Auth.User", b =>
+                {
+                    b.HasOne("Maintenance.Domain.Entities.RoomEntity.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId");
+
+                    b.Navigation("Room");
+                });
+
             modelBuilder.Entity("AuthDomain.Entities.Auth.UserRole", b =>
                 {
                     b.HasOne("AuthDomain.Entities.Auth.Role", "Role")
@@ -387,6 +560,66 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Navigation("Permission");
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.CarvanEntity.Carvan", b =>
+                {
+                    b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy");
+
+                    b.HasOne("Maintenance.Domain.Entities.RegionEntity.Region", "Region")
+                        .WithMany("Carvans")
+                        .HasForeignKey("RegionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("Region");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.OfficeEntity.Office", b =>
+                {
+                    b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy");
+
+                    b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.RegionEntity.Region", b =>
+                {
+                    b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy");
+
+                    b.HasOne("Maintenance.Domain.Entities.OfficeEntity.Office", "Office")
+                        .WithMany("Regions")
+                        .HasForeignKey("OfficeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("Office");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.RoomEntity.Room", b =>
+                {
+                    b.HasOne("Maintenance.Domain.Entities.CarvanEntity.Carvan", "Carvan")
+                        .WithMany("Rooms")
+                        .HasForeignKey("CarvanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
+                        .WithOne()
+                        .HasForeignKey("Maintenance.Domain.Entities.RoomEntity.Room", "CreatedBy");
+
+                    b.Navigation("Carvan");
+
+                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
@@ -440,6 +673,21 @@ namespace Maintenance.Infrastructure.Migrations
             modelBuilder.Entity("Maintenance.Domain.Entities.Auth.Permission", b =>
                 {
                     b.Navigation("PermissionRoles");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.CarvanEntity.Carvan", b =>
+                {
+                    b.Navigation("Rooms");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.OfficeEntity.Office", b =>
+                {
+                    b.Navigation("Regions");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.RegionEntity.Region", b =>
+                {
+                    b.Navigation("Carvans");
                 });
 #pragma warning restore 612, 618
         }

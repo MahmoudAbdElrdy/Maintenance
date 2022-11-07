@@ -35,7 +35,7 @@ namespace Web.Profiler {
     {
         public void CreateMappings(Profile configuration)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }

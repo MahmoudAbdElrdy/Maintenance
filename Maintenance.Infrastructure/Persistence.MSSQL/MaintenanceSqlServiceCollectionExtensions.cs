@@ -1,4 +1,5 @@
-﻿using Maintenance.Domain.Persistence;
+﻿using Maintenance.Domain.Interfaces;
+using Maintenance.Domain.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -19,7 +20,8 @@ namespace Maintenance.Infrastructure.Persistence.MSSQL
        IConfiguration config = null)
         {
 
-
+            serviceCollection.AddScoped<IDatabaseContext, AppDbContext>();
+           // serviceCollection.AddScoped<IDatabaseContext, MaintenanceSqlContext>();
             serviceCollection.AddDbContext<AppDbContext, MaintenanceSqlContext>(options => {
                 options.UseSqlServer(config.GetConnectionString("DefaultConnection"),
                   b => b

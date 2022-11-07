@@ -4,6 +4,7 @@ using Maintenance.Infrastructure.Persistence.MSSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Maintenance.Infrastructure.Migrations
 {
     [DbContext(typeof(MaintenanceSqlContext))]
-    partial class MaintenanceSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20221107044941_inti")]
+    partial class inti
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -95,6 +97,7 @@ namespace Maintenance.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DeletedBy")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DeletedDate")
@@ -108,6 +111,7 @@ namespace Maintenance.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FullName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IdentityNumber")
@@ -121,9 +125,6 @@ namespace Maintenance.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LoginCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -142,17 +143,15 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<long?>("RegionId")
+                        .HasColumnType("bigint");
+
                     b.Property<long?>("RoomId")
+                        .IsRequired()
                         .HasColumnType("bigint");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SmsCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("SmsVerify")
-                        .HasColumnType("bit");
 
                     b.Property<int>("State")
                         .HasColumnType("int");
@@ -173,7 +172,7 @@ namespace Maintenance.Infrastructure.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<int?>("UserType")
+                    b.Property<int>("UserType")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -185,6 +184,8 @@ namespace Maintenance.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("RegionId");
 
                     b.HasIndex("RoomId");
 
@@ -372,7 +373,9 @@ namespace Maintenance.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
+                    b.HasIndex("CreatedBy")
+                        .IsUnique()
+                        .HasFilter("[CreatedBy] IS NOT NULL");
 
                     b.HasIndex("OfficeId");
 
@@ -515,9 +518,17 @@ namespace Maintenance.Infrastructure.Migrations
 
             modelBuilder.Entity("AuthDomain.Entities.Auth.User", b =>
                 {
+                    b.HasOne("Maintenance.Domain.Entities.RegionEntity.Region", "Region")
+                        .WithMany()
+                        .HasForeignKey("RegionId");
+
                     b.HasOne("Maintenance.Domain.Entities.RoomEntity.Room", "Room")
                         .WithMany()
-                        .HasForeignKey("RoomId");
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Region");
 
                     b.Navigation("Room");
                 });
@@ -589,8 +600,8 @@ namespace Maintenance.Infrastructure.Migrations
             modelBuilder.Entity("Maintenance.Domain.Entities.RegionEntity.Region", b =>
                 {
                     b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedBy");
+                        .WithOne()
+                        .HasForeignKey("Maintenance.Domain.Entities.RegionEntity.Region", "CreatedBy");
 
                     b.HasOne("Maintenance.Domain.Entities.OfficeEntity.Office", "Office")
                         .WithMany("Regions")
