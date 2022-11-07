@@ -65,6 +65,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Auth\Client\Queries\" />
     <Folder Include="Helpers\Permission\" />
   </ItemGroup>
 
