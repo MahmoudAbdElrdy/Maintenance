@@ -45,46 +45,57 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 });
 
-var passwordOption =builder.Configuration?.GetSection(Sections.Password)?.Get<PasswordOption>();
-var identityLockoutOption =builder.Configuration?.GetSection(Sections.IdentityLockout)?.Get<IdentityLockoutOption>();
-
-builder.Services.Configure<IdentityOptions>(options => {
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(identityLockoutOption?.DefaultLockoutTimeSpan ?? 5);
-    options.Lockout.MaxFailedAccessAttempts = identityLockoutOption?.MaxFailedAccessAttempts ?? 5;
-    options.Lockout.AllowedForNewUsers = identityLockoutOption?.AllowedForNewUsers ?? true;
-
-    options.Password.RequiredLength = passwordOption?.RequiredLength ?? 6;
-    options.Password.RequireNonAlphanumeric = passwordOption?.RequireNonAlphanumeric ?? false;
-    options.Password.RequireLowercase = passwordOption?.RequireLowercase ?? false;
-    options.Password.RequireUppercase = passwordOption?.RequireUppercase ?? false;
-    options.Password.RequireDigit = passwordOption?.RequireDigit ?? false;
-});
-//  installers.ForEach(i => i.InstallService(services, Configuration));
-//----------------------------jwtSettings-------------------------------------
-var jwtSettings = new JwtOption();
-builder.Configuration.Bind(nameof(jwtSettings), jwtSettings);
-builder.Services.AddSingleton(jwtSettings);
-//----------------------------end jwtSettings-------------------------------------
-//----------------------------jwtSettings-------------------------------------
-var tokenValidationParameters = new TokenValidationParameters
+builder.Services.Configure<IdentityOptions>(options =>
 {
-    ValidateIssuerSigningKey = true,
-   // IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
-    ValidateIssuer = false,
-    ValidateAudience = false,
-    RequireExpirationTime = false,
-    ValidateLifetime = false
-};
-builder.Services.AddSingleton(tokenValidationParameters);
+    // Password settings
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
+
+    // Lockout settings
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(10);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
+
+    // User settings
+    options.User.RequireUniqueEmail = true;
+});
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(x =>
+})
+.AddJwtBearer(options =>
 {
-    x.SaveToken = true;
-    x.TokenValidationParameters = tokenValidationParameters;
+    var signingKey = Convert.FromBase64String(builder.Configuration["Jwt:Key"]);
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        //      NameClaimType = ClaimTypes.NameIdentifier,
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration.GetValue<string>("Jwt:Issuer"),
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration.GetValue<string>("Jwt:Audience"),
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(signingKey)
+    };
+    //Adding For SignalR
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/MaintenanceHub"))
+            {
+                context.Request.Headers.Add("Authorization", new[] { $"Bearer {accessToken}" });
+            }
+
+            return Task.CompletedTask;
+        }
+    };
 });
 
 var persistenceConfig =builder.Configuration?.GetSection(nameof(Sections.Persistence))?.Get<PersistenceConfiguration>();
@@ -105,13 +116,14 @@ builder.Services
 .ConfigureAndValidateSingleton<ImageOption>(builder.Configuration.GetSection(nameof(Sections.ImageOption)))
 .ConfigureAndValidateSingleton<AppSettings>(builder.Configuration.GetSection(nameof(Sections.AppSettings)))
 ;
+
+ApplicationServiceRegistration.AddApplicationServices(builder.Services);
 builder.Services
  .AddAutoMapper(new Assembly[] {
           typeof(AutoMapperProfile).GetTypeInfo().Assembly,
  })
  .AddHttpContextAccessor()
  .AddHttpClient();
-ApplicationServiceRegistration.AddApplicationServices(builder.Services);
 #region Swagger
 builder.Services.AddApiVersioning(config =>
 {

@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using Maintenance.Application.Features.Account.Commands.Login;
+using Maintenance.Application.Helper;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +19,13 @@ namespace Maintenance.Controllers.V1
         {
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _httpContextAccessor = httpContextAccessor;
+        }
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("Login")]
+        public async Task<ResponseDTO> Login([FromBody] LoginQuery command)
+        {
+            return await _mediator.Send(command);
         }
     }
 }

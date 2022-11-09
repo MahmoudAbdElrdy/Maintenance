@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using AutoMapper;
+using Maintenance.Application.Auth.Login;
 using Maintenance.Domain.Mapper;
 
 namespace Web.Profiler {
@@ -24,18 +25,12 @@ namespace Web.Profiler {
     }
 
     private void LoadCustomMappings() {
-      var assemblies = new List<Assembly>() { (typeof(MappDto).Assembly) };
+      var assemblies = new List<Assembly>() { (typeof(UserDto).Assembly) };
       var mapsFrom = MapperProfileHelper.LoadCustomMappings(assemblies);
       foreach (var map in mapsFrom) {
         map.CreateMappings(this);
       }
     }
   }
-    public class MappDto : IHaveCustomMapping
-    {
-        public void CreateMappings(Profile configuration)
-        {
-            //throw new NotImplementedException();
-        }
-    }
+
 }
