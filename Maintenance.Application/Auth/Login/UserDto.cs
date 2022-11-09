@@ -14,10 +14,8 @@ namespace Maintenance.Application.Auth.Login
     public class UserDto : IHaveCustomMapping
     {
         public long? UserId { get; set; }
-        public string? FullName { get; set; }
         public UserType? UserType { get; set; }
         public string? IdentityNumber { get; set; }
-        public long? RoomId { set; get; }
         public string? Code { get; set; }
         
         public void CreateMappings(Profile configuration)

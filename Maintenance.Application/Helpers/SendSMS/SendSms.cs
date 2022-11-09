@@ -33,6 +33,17 @@ namespace Maintenance.Application.Helpers.SendSms
                 return -1;
             }
         }
-
+        public static string GenerateCode()
+        {
+            var characters = "0123456789";
+            var charsArr = new char[4];
+            var random = new Random();
+            for (int i = 0; i < charsArr.Length; i++)
+            {
+                charsArr[i] = characters[random.Next(characters.Length)];
+            }
+            var segmentString = new String(charsArr);
+            return segmentString;
+        }
     }
 }

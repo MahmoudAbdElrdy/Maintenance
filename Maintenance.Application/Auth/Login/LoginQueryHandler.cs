@@ -54,13 +54,7 @@ namespace Maintenance.Application.Features.Account.Commands.Login
                     return _response;
                 }
                
-                else if (personalUser.Code != request.Code)
-                {
-
-                    _response.Message = "codedon'tMatch";
-                    _response.StatusEnum = StatusEnum.Failed;
-                    return _response;
-                }
+             
                 else if (personalUser.State == Domain.Enums.State.Deleted)
                 {
                     _response.Message = "userAreDeleted";
@@ -76,7 +70,15 @@ namespace Maintenance.Application.Features.Account.Commands.Login
                     return _response;
 
                 }
-
+                personalUser.Code = SendSMS.GenerateCode();
+                var res = await SendSMS.SendMessageUnifonic("رمز التحقق من الجوال : " + personalUser.Code, personalUser.PhoneNumber);
+                if (res == -1)
+                {
+                    _response.Message = "حدث خطا فى ارسال الكود";
+                    _response.StatusEnum = StatusEnum.Failed;
+                    return _response;
+                }
+                await _userManager.UpdateAsync(personalUser);
                 var authorizedUserDto = new AuthorizedUserDTO
                 {
                     User = _mapper.Map<UserDto>(personalUser),

@@ -1,5 +1,6 @@
 ﻿using AuthDomain.Entities.Auth;
 using AutoMapper;
+using Maintenance.Application.Auth.Login;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.SendSms;
 using Maintenance.Domain.Enums;
@@ -10,13 +11,13 @@ namespace Maintenance.Application.Auth.Client.Command
 {
     public class ClientRegisterCommand :  IRequest<ResponseDTO>
     {
-        public string FullName { get; set; }
+        public string? FullName { get; set; }
         public UserType UserType { get; set; }
         public string? PhoneNumber { get; set; }
         public string? IdentityNumber { get; set; }
-        public string[] Roles { get; set; }
+        public string[]? Roles { get; set; }
         public long RoomId { set; get; }
-        public string Password { get; set; }
+        public string? Password { get; set; }
     }
     class Handler : IRequestHandler<ClientRegisterCommand, ResponseDTO>
     {
@@ -68,13 +69,10 @@ namespace Maintenance.Application.Auth.Client.Command
                  if (request.Roles.Length > 0)
                 {
                     await _userManager.AddToRolesAsync(user, request.Roles);
-                    _responseDTO.Result = null;
-                    _responseDTO.Message = "userAddedSuccessfully";
-                    _responseDTO.StatusEnum = StatusEnum.SavedSuccessfully;
+                  
                 }
                
-                user.Code = GenerateCode();
-              
+                user.Code = SendSMS.GenerateCode();
                 var res = await SendSMS.SendMessageUnifonic("رمز التحقق من الجوال : " + user.Code, user.PhoneNumber);
                 if (res == -1)
                 {
@@ -87,7 +85,6 @@ namespace Maintenance.Application.Auth.Client.Command
                     _responseDTO.StatusEnum = StatusEnum.Failed;
                     return _responseDTO;
                 }
-               
                 await _userManager.UpdateAsync(user);
             }
             catch (Exception ex)
@@ -101,24 +98,15 @@ namespace Maintenance.Application.Auth.Client.Command
                 _responseDTO.StatusEnum = StatusEnum.Exception;
                 _responseDTO.Message = "anErrorOccurredPleaseContactSystemAdministrator";
             }
-            
+            _responseDTO.Result = _responseDTO.Result = _mapper.Map<UserDto>(user);
+            _responseDTO.Message = "userAddedSuccessfully";
+            _responseDTO.StatusEnum = StatusEnum.SavedSuccessfully;
 
             return _responseDTO;
 
 
         }
-        public string GenerateCode()
-        {
-            var characters = "0123456789";
-            var charsArr = new char[4];
-            var random = new Random();
-            for (int i = 0; i < charsArr.Length; i++)
-            {
-                charsArr[i] = characters[random.Next(characters.Length)];
-            }
-            var segmentString = new String(charsArr);
-            return segmentString;
-        }
+       
     }
 }
 
