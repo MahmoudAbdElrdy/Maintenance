@@ -15,6 +15,6 @@ namespace Maintenance.Application.Features.Account.Commands.Login
         public string Password { get; set; }
 
        // [Required(ErrorMessage = "Code Required")]
-        public string Code { get; set; } 
+     //   public string Code { get; set; } 
     }
 }

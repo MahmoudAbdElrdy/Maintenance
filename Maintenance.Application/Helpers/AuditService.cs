@@ -65,7 +65,7 @@ namespace Infrastructure
 
         //   public string UserLanguage { get { return GetUserLanguageAsync().Result; }  } 
         //  public string UserLanguage => _httpContext.HttpContext.User.Claims
-        public string UserLanguage => _httpContext.HttpContext.Request.Headers["Lang"].ToString()??"ar";
+        public string UserLanguage => _httpContext.HttpContext.Request.Headers["Accept-Language"].ToString()??"ar";
         public string WebToken => _httpContext.HttpContext.Request.Headers["WebToken"].ToString() ?? "Anonymous";
 
         //private async System.Threading.Tasks.Task<string> GetUserLanguageAsync()

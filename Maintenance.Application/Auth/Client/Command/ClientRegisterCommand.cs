@@ -6,6 +6,7 @@ using Maintenance.Application.Helpers.SendSms;
 using Maintenance.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Maintenance.Application.Auth.Client.Command
 {
@@ -36,17 +37,34 @@ namespace Maintenance.Application.Auth.Client.Command
             var user = new User();
             try
             {
+                var checkExsit= await _userManager.Users.Where(x => x.IdentityNumber == request.IdentityNumber).FirstOrDefaultAsync();
+                if (checkExsit != null)
+                {
+                    _responseDTO.Result = null;
+                    _responseDTO.StatusEnum = StatusEnum.Failed;
+                    _responseDTO.Message = "National Number Found Before";
+                    return _responseDTO;
+                }
+                var phoneExsit = await _userManager.Users.Where(x => x.PhoneNumber == request.PhoneNumber).FirstOrDefaultAsync();
+                if (phoneExsit != null)
+                {
+                    _responseDTO.Result = null;
+                    _responseDTO.StatusEnum = StatusEnum.Failed;
+                    _responseDTO.Message = "Phone Number Found Before";
+                    return _responseDTO;
+                }
+
                  user = new User()
                 {
                     UserName = request.IdentityNumber,
 
-                    Email = request.PhoneNumber,
+                    Email = request.PhoneNumber+"@Gamil.com",
                   
                     FullName = request.FullName,
 
                     PhoneNumber = request.PhoneNumber,
 
-                    NormalizedEmail = request.PhoneNumber,
+                    NormalizedEmail = request.PhoneNumber+ "@Gamil.com",
 
                     NormalizedUserName = request.IdentityNumber,
 
@@ -57,6 +75,8 @@ namespace Maintenance.Application.Auth.Client.Command
                     IdentityNumber = request.IdentityNumber,
 
                     RoomId = request.RoomId,
+
+                    UserType = request.UserType,
                     
                 };
                 var result = await _userManager.CreateAsync(user, request.Password);
@@ -65,6 +85,7 @@ namespace Maintenance.Application.Auth.Client.Command
                     _responseDTO.Result = null;
                     _responseDTO.StatusEnum = StatusEnum.Exception;
                     _responseDTO.Message = "anErrorOccurredPleaseContactSystemAdministrator";
+                    return _responseDTO;
                 }
                  if (request.Roles.Length > 0)
                 {
@@ -98,7 +119,7 @@ namespace Maintenance.Application.Auth.Client.Command
                 _responseDTO.StatusEnum = StatusEnum.Exception;
                 _responseDTO.Message = "anErrorOccurredPleaseContactSystemAdministrator";
             }
-            _responseDTO.Result = _responseDTO.Result = _mapper.Map<UserDto>(user);
+            _responseDTO.Result = _mapper.Map<UserDto>(user);
             _responseDTO.Message = "userAddedSuccessfully";
             _responseDTO.StatusEnum = StatusEnum.SavedSuccessfully;
 

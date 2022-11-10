@@ -26,6 +26,7 @@ using Maintenance.Application.GenericRepo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.FileProviders;
 using Maintenance.Application.Helper;
+using Maintenance.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,11 +49,11 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 builder.Services.Configure<IdentityOptions>(options =>
 {
     // Password settings
-    options.Password.RequireDigit = true;
+    //options.Password.RequireDigit = true;
     options.Password.RequiredLength = 8;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
 
     // Lockout settings
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(10);
@@ -140,8 +141,9 @@ builder.Services.AddSwaggerGen(c =>
     {
         Version = "v1",
         Title = "Maintenance APIs Reference",
+        
     });
-
+    c.OperationFilter<AddRequiredHeaderParameter>();
     c.AddSecurityDefinition(
     "token",
     new OpenApiSecurityScheme
@@ -150,7 +152,8 @@ builder.Services.AddSwaggerGen(c =>
         BearerFormat = "JWT",
         Scheme = "Bearer",
         In = ParameterLocation.Header,
-        Name = HeaderNames.Authorization
+        Name = HeaderNames.Authorization,
+       
     }
         );
     c.AddSecurityRequirement(

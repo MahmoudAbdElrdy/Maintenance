@@ -1,4 +1,5 @@
-﻿using Maintenance.Application.Features.Account.Commands.Login;
+﻿using Maintenance.Application.Auth.VerificationCode.Command;
+using Maintenance.Application.Features.Account.Commands.Login;
 using Maintenance.Application.Helper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,7 @@ namespace Maintenance.Controllers.V1
 {
     [ApiVersion("1.0")]
     [ApiController]
-    public class AccountController : ControllerBase
+    public class AccountController : ApiBaseController
     {
         private readonly IMediator _mediator;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -24,6 +25,13 @@ namespace Maintenance.Controllers.V1
         [HttpPost]
         [Route("Login")]
         public async Task<ResponseDTO> Login([FromBody] LoginQuery command)
+        {
+            return await _mediator.Send(command);
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("VerificationCode")]
+        public async Task<ResponseDTO> VerificationCode([FromBody] VerificationCodeCommand command)
         {
             return await _mediator.Send(command);
         }
