@@ -18,14 +18,14 @@ namespace Maintenance.Helpers
             {
                 operation.Parameters.Add(new OpenApiParameter()
                 {
-                    Name = "Accept-Language",
+                    Name = "Language",
                     In = ParameterLocation.Header,
 
                     Schema = new OpenApiSchema
                     {
                         Type = "String",
-                   //     Default = new OpenApiString("en-US")
-                        Default = new OpenApiString("ar-SA")
+                   //     Default = new OpenApiString("en")
+                        Default = new OpenApiString("ar")
                     },
                     Required = false
                 });

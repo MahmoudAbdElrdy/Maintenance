@@ -4,6 +4,7 @@ using Maintenance.Application.Auth.Login;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.SendSms;
+using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -25,12 +26,15 @@ namespace Maintenance.Application.Features.Account.Commands.Login
         private readonly ResponseDTO _response;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IConfiguration _configuration;
+        
+
         public LoginQueryHandler(
             IMapper mapper, ILogger<LoginQueryHandler> logger,
          
             UserManager<User> userManager,
             IPasswordHasher<User> passwordHasher,
             IConfiguration configuration
+          
         )
         {
           
@@ -40,11 +44,14 @@ namespace Maintenance.Application.Features.Account.Commands.Login
             _response = new ResponseDTO();
             _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+          
+            
         }
         public async Task<ResponseDTO> Handle(LoginQuery request, CancellationToken cancellationToken)
         {
             try
             {
+                
                 var personalUser =  await _userManager.Users.Where(x => x.IdentityNumber == request.IdentityNumber).FirstOrDefaultAsync();
                 if (personalUser == null)
                 {
