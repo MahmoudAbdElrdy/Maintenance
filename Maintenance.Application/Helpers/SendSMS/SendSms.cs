@@ -9,7 +9,7 @@ namespace Maintenance.Application.Helpers.SendSms
             try
             {
 
-                var urc = new UnifonicRestClient("YMRzS2kHKsV620TJckD3uKNT2llkPZ");
+                var urc = new UnifonicRestClient("cUbBK3Be7cZkjIC5NSkvtfAsjP0CTq");
 
                 var sendSmsMessageResult = urc.SendSmsMessage(toNumber, message);
 

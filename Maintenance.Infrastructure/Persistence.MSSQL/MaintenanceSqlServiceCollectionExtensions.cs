@@ -32,18 +32,19 @@ namespace Maintenance.Infrastructure.Persistence.MSSQL
             });
             return serviceCollection;
         }
+        public static bool AllMigrationsApplied(this MaintenanceSqlContext context)
+        {
+            var applied = context.GetService<IHistoryRepository>()
+                .GetAppliedMigrations()
+                .Select(m => m.MigrationId);
+
+            var total = context.GetService<IMigrationsAssembly>()
+                .Migrations
+                .Select(m => m.Key);
+
+            return !total.Except(applied).Any();
+        }
     }
-    //public static bool AllMigrationsApplied(this MaintenanceSqlContext context)
-    //{
-    //    var applied = context.GetService<IHistoryRepository>()
-    //        .GetAppliedMigrations()
-    //        .Select(m => m.MigrationId);
-
-    //    var total = context.GetService<IMigrationsAssembly>()
-    //        .Migrations
-    //        .Select(m => m.Key);
-
-    //    return !total.Except(applied).Any();
-    //}
+    
 }
 

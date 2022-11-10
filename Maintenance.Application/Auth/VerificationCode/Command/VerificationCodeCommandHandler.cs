@@ -48,8 +48,26 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
                     _response.Message = "emailNotFound";
                     return _response;
                 }
-              
-                var token = await _userManager.GeneratePasswordResetTokenAsync(userLogin);
+                var userCode = await _userManager.Users.Where(x => x.Id == request.UserId && x.Code == request.Code).FirstOrDefaultAsync();
+
+                if (userCode == null)
+                {
+                    _response.StatusEnum = StatusEnum.Failed;
+                    _response.Message = "codeNotCorrect";
+                    return _response;
+                }
+              //  var token = await _userManager.GeneratePasswordResetTokenAsync(userLogin);
+
+                var userHasValidPassword = await _userManager.CheckPasswordAsync(userLogin, request.Password);
+
+                if (!userHasValidPassword)
+                {
+                    _response.Message = "PassWordNotCorrect";
+                    _response.StatusEnum = StatusEnum.Failed;
+                    return _response;
+
+                }
+
                 var authorizedUserDto = new AuthorizedUserDTO
                 {
                     User = _mapper.Map<UserDto>(userLogin),

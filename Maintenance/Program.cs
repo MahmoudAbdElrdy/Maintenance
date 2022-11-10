@@ -27,6 +27,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.FileProviders;
 using Maintenance.Application.Helper;
 using Maintenance.Helpers;
+using Maintenance.API.Helpers;
+using Maintenance.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -192,13 +194,53 @@ builder.Services.AddSignalR();
 builder.Services.AddControllers();
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+using (var serviceScope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+
+    serviceScope.ServiceProvider.GetService<AuthorizeByPermissionsAttribute>();
+    var dbContext = serviceScope.ServiceProvider.GetRequiredService<MaintenanceSqlContext>();
+    var serviceProvider = serviceScope.ServiceProvider;
+    if (!serviceScope.ServiceProvider.GetService<MaintenanceSqlContext>().AllMigrationsApplied())
+    {
+        serviceScope.ServiceProvider.GetService<MaintenanceSqlContext>().Migrate();
+    }
+   //ma IntegratedRecruitmentContextSeed.Seed(dbContext, serviceProvider);
 }
 
+// Configure the HTTP request pipeline.
+
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+{
+
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("./v1/swagger.json", " Camel Club"));
+}
+
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+{
+    app.UseDeveloperExceptionPage();
+}
+
+app.UseSwagger();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("./v1/swagger.json", " Camel Club"));
+
+app.UseApiVersioning();
+app.UseDeveloperExceptionPage();
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Uploads")),
+    RequestPath = "/wwwroot/Uploads"
+});
+
+
+app.UseCors("AllowCors");
+
+app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseAuthentication();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
