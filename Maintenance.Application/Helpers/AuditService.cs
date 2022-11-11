@@ -60,7 +60,7 @@ namespace Infrastructure
         }
 
         public string UserName => _httpContext.HttpContext.User?.Identity?.Name ?? "Anonymous";
-        public string UserId => _httpContext.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "Anonymous";
+        public long UserId => long.Parse((_httpContext.HttpContext.User.Claims.Where(c => c.Type == "userLoginId").SingleOrDefault().Value)) ;
         public string RequesterIp => _httpContext.HttpContext.Connection.RemoteIpAddress.ToString();
 
         //   public string UserLanguage { get { return GetUserLanguageAsync().Result; }  } 

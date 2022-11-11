@@ -21,6 +21,7 @@ namespace Maintenance.Infrastructure.Persistence.MSSQL
         {
 
             serviceCollection.AddScoped<IDatabaseContext, AppDbContext>();
+            serviceCollection.AddScoped<IDatabaseContext, MaintenanceSqlContext>();
            // serviceCollection.AddScoped<IDatabaseContext, MaintenanceSqlContext>();
             serviceCollection.AddDbContext<AppDbContext, MaintenanceSqlContext>(options => {
                 options.UseSqlServer(config.GetConnectionString("DefaultConnection"),

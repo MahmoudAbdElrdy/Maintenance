@@ -1,5 +1,6 @@
 ﻿using AuthDomain.Entities.Auth;
 using AutoMapper;
+using Common.Options;
 using Maintenance.Application.Auth.Login;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
@@ -14,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.DirectoryServices;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using Unifonic.NetCore.Exceptions;
 
 namespace Maintenance.Application.Features.Account.Commands.Login
@@ -26,15 +28,16 @@ namespace Maintenance.Application.Features.Account.Commands.Login
         private readonly ResponseDTO _response;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IConfiguration _configuration;
-        
+        private readonly JwtOption _jwtOption;
 
         public LoginQueryHandler(
             IMapper mapper, ILogger<LoginQueryHandler> logger,
          
             UserManager<User> userManager,
             IPasswordHasher<User> passwordHasher,
-            IConfiguration configuration
-          
+            IConfiguration configuration,
+            JwtOption jwtOption
+
         )
         {
           
@@ -44,6 +47,7 @@ namespace Maintenance.Application.Features.Account.Commands.Login
             _response = new ResponseDTO();
             _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _jwtOption = jwtOption;
           
             
         }
@@ -111,31 +115,30 @@ namespace Maintenance.Application.Features.Account.Commands.Login
 
         private string GenerateJSONWebToken(User user)
         {
-            var signingKey = Convert.FromBase64String(_configuration["Jwt:Key"]);
-            var audience = _configuration["Jwt:Audience"];
-            var expiryDuration = int.Parse(_configuration["Jwt:ExpiryDuration"]);
-            var issuer = _configuration["Jwt:Issuer"];
+            var signingKey = Convert.FromBase64String(_configuration["JwtOption:Key"]);
+            var audience = _configuration["JwtOption:Audience"];
+            var expiryDuration = int.Parse(_configuration["JwtOption:ExpiryDuration"]);
+            var issuer = _configuration["JwtOption:Issuer"];
 
-            var claims = new ClaimsIdentity(new List<Claim>() {
+            var claims = (new List<Claim>() {
                     new Claim("userLoginId", user.Id.ToString()),
                     new Claim("identityNumber", user.IdentityNumber),
                     new Claim("FullName", user.FullName),
+                    new Claim("UserType", user.UserType.ToString())
                      });
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Issuer = issuer,              // Not required as no third-party is involved
-                Audience = audience,            // Not required as no third-party is involved
-                IssuedAt = DateTime.UtcNow,
-                NotBefore = DateTime.UtcNow,
-                Expires = DateTime.UtcNow.AddDays(expiryDuration),
-                Subject = claims,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(signingKey), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var jwtTokenHandler = new JwtSecurityTokenHandler();
-            var jwtToken = jwtTokenHandler.CreateJwtSecurityToken(tokenDescriptor);
-            var token = jwtTokenHandler.WriteToken(jwtToken);
-            return token;
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOption.Key));
+            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.Now.AddDays(Convert.ToDouble(_jwtOption.ExpireDays));
+        
+            var tokenDescriptor = new JwtSecurityToken( 
+            _jwtOption.Issuer,
+              _jwtOption.Issuer,
+              claims,
+              expires: expires,
+              signingCredentials: cred
+            );
+          
+            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
     }
 }

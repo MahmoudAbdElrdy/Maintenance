@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Maintenance.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Maintenance.Domain.Entities.Auth;
+using Maintenance.Domain.Entities.Reports;
 
 namespace Maintenance.Domain.Persistence 
 {
@@ -15,13 +16,17 @@ namespace Maintenance.Domain.Persistence
 
     {
 
+       
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<PermissionRole> PermissionRoles { get; set; }
+        public DbSet<CategoryReport> CategoriesReport { get; set; }
         public AppDbContext(DbContextOptions options) : base(options)
         {
         }
-        public DbSet<Permission> Permissions { get; set; }
-        public DbSet<PermissionRole> PermissionRoles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+          
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<UserRole>().HasKey(p => new { p.UserId, p.RoleId });
            modelBuilder.Entity<PermissionRole>().HasKey(p => new { p.RoleId, p.PermissionId });

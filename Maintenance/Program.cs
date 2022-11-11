@@ -65,40 +65,8 @@ builder.Services.Configure<IdentityOptions>(options =>
     // User settings
     options.User.RequireUniqueEmail = true;
 });
-builder.Services.AddAuthentication(x =>
+builder.Services.AddAuthorization(options =>
 {
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    var signingKey = Convert.FromBase64String(builder.Configuration["Jwt:Key"]);
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        //      NameClaimType = ClaimTypes.NameIdentifier,
-        ValidateIssuer = true,
-        ValidIssuer = builder.Configuration.GetValue<string>("Jwt:Issuer"),
-        ValidateAudience = true,
-        ValidAudience = builder.Configuration.GetValue<string>("Jwt:Audience"),
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(signingKey)
-    };
-    //Adding For SignalR
-    options.Events = new JwtBearerEvents
-    {
-        OnMessageReceived = context =>
-        {
-            var accessToken = context.Request.Query["access_token"];
-
-            var path = context.HttpContext.Request.Path;
-            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/MaintenanceHub"))
-            {
-                context.Request.Headers.Add("Authorization", new[] { $"Bearer {accessToken}" });
-            }
-
-            return Task.CompletedTask;
-        }
-    };
 });
 
 var persistenceConfig =builder.Configuration?.GetSection(nameof(Sections.Persistence))?.Get<PersistenceConfiguration>();
@@ -110,7 +78,7 @@ if (persistenceConfig?.Provider == "MSSQL")
     //services.AddDbContext<AppDbContext, MsSqlAppDbContext>();
 }
 builder. Services
-         .AddIdentity<User, Role>()
+         .AddIdentity<User,Role>()
          .AddEntityFrameworkStores<AppDbContext>()
          .AddDefaultTokenProviders();
 builder.Services
@@ -176,6 +144,28 @@ builder.Services.AddSwaggerGen(c =>
         );
 });
 #endregion Swagger
+var jwtOption = builder.Configuration?.GetSection(nameof(Sections.JwtOption))?.Get<JwtOption>();
+
+builder.Services.AddAuthentication(options => {
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+
+}).AddJwtBearer(cfg => {
+    cfg.RequireHttpsMetadata = false;
+    cfg.SaveToken = true;
+    cfg.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidIssuer = jwtOption.Issuer,
+        ValidAudience = jwtOption.Issuer,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOption.Key)),
+        ClockSkew = TimeSpan.Zero // remove delay of token when expire
+    };
+
+
+
+});
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -220,10 +210,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseDeveloperExceptionPage();
 }
-
-app.UseSwagger();
-app.UseSwaggerUI(c => c.SwaggerEndpoint("./v1/swagger.json", " Camel Club"));
-
 app.UseApiVersioning();
 app.UseDeveloperExceptionPage();
 app.UseMiddleware<ExceptionMiddleware>();

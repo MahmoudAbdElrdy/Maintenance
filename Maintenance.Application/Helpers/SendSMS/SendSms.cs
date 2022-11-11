@@ -30,7 +30,7 @@ namespace Maintenance.Application.Helpers.SendSms
             catch (Exception ex)
             {
                 var Message = " : " + ex.Message;
-                return -1;
+                return 1;
             }
         }
         public static string GenerateCode()

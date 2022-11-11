@@ -6,7 +6,7 @@
     T UpdateEntity<T>(T entity);
     T DeleteEntity<T>(T entity);
     string UserName { get; }
-    string UserId { get; }
+    long UserId { get; }
     string UserLanguage { get;  }
     string WebToken { get;  }
     }

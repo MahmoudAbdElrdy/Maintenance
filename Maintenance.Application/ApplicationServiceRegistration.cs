@@ -1,13 +1,19 @@
-﻿using FluentValidation;
+﻿using Common.Options;
+using FluentValidation;
 using Infrastructure;
 using Maintenance.Application.Behaviours;
 using Maintenance.Application.Helper;
 using Maintenance.Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 
 using System.Reflection;
+using static System.Collections.Specialized.BitVector32;
+
+using System.Text;
+
 namespace Maintenance.Application
 {
   public static class ApplicationServiceRegistration
@@ -24,9 +30,11 @@ namespace Maintenance.Application
       
       services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
       services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
-      services.AddSingleton<IFileProvider>(new PhysicalFileProvider(
+            services.AddSingleton<IFileProvider>(new PhysicalFileProvider(
           Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
-      return services;
+
+           
+            return services;
     }
   }
 }
