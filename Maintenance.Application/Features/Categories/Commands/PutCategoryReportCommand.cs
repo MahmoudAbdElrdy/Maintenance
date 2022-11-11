@@ -14,7 +14,8 @@ namespace Maintenance.Application.Features.Categories.Commands
         public long Id { get; set; }
         public string? NameAr { get; set; }
         public string? NameEn { get; set; }
-        public string? Description { get; set; }
+        public string? DescriptionAr { get; set; }
+        public string? DescriptionEn { get; set; }
         class PutCategoryReport : IRequestHandler<PutCategoryReportCommand, ResponseDTO>
         {
             private readonly IGRepository<CategoryReport> _CategoryReportRepository;
@@ -45,7 +46,8 @@ namespace Maintenance.Application.Features.Categories.Commands
                     {
                         UpdatedBy = _auditService.UserId,
                         UpdatedOn = DateTime.Now,
-                        Description = request.Description,
+                        DescriptionAr = request.DescriptionAr,
+                        DescriptionEn = request.DescriptionEn,
                         NameAr = request.NameAr,
                         NameEn = request.NameEn,
                         Id=request.Id

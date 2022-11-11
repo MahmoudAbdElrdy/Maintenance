@@ -17,7 +17,8 @@ namespace Maintenance.Domain.Interfaces
 
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<PermissionRole> PermissionRoles { get; set; }
-        public DbSet<CategoryReport> CategoriesReport { get; set; }  
+        public DbSet<CategoryReport> CategoriesReport { get; set; }
+        public DbSet<CheckListReport> CheckListsReport { get; set; }
         public ChangeTracker ChangeTracker { get; }
 
         public int SaveChanges();

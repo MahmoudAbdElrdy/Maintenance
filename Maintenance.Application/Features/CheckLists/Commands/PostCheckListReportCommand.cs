@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Maintenance.Application.Features.Categories.Dto;
+using Maintenance.Application.Features.CheckLists.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Domain.Entities.Reports;
@@ -7,58 +7,67 @@ using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Maintenance.Application.Features.Categories.Commands
+namespace Maintenance.Application.Features.CheckLists.Commands
 {
-    public class PostCategoryReportCommand : IRequest<ResponseDTO>
+    public class PostCheckListReportCommand : IRequest<ResponseDTO>
     {
+      
+        public long? CategoryReportId { set; get; }
         public string? NameAr { get; set; }
         public string? NameEn { get; set; }
         public string? DescriptionAr { get; set; }
         public string? DescriptionEn { get; set; }
-        class PostCategoryReport : IRequestHandler<PostCategoryReportCommand, ResponseDTO>
+        class PostCheckListReport : IRequestHandler<PostCheckListReportCommand, ResponseDTO>
         {
-            private readonly IGRepository<CategoryReport> _CategoryReportRepository;
-            private readonly ILogger<PostCategoryReportCommand> _logger;
+            private readonly IGRepository<CheckListReport> _CheckListReportRepository;
+            private readonly ILogger<PostCheckListReportCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
             private readonly IMapper _mapper;
-            public PostCategoryReport(
+            public PostCheckListReport(
 
-                IGRepository<CategoryReport> CategoryReportRepository,
-                ILogger<PostCategoryReportCommand> logger,
+                IGRepository<CheckListReport> CheckListReportRepository,
+                ILogger<PostCheckListReportCommand> logger,
                 IAuditService auditService,
                 IMapper mapper
             )
             {
-                _CategoryReportRepository = CategoryReportRepository;
+                _CheckListReportRepository = CheckListReportRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _auditService = auditService;
                 _response = new ResponseDTO();
                 _mapper = mapper;
 
             }
-            public async Task<ResponseDTO> Handle(PostCategoryReportCommand request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(PostCheckListReportCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
-
-                    var CategoryReport = new CategoryReport()
+                    if (request.CategoryReportId == null)
+                    {
+                        _response.StatusEnum = StatusEnum.Failed;
+                        _response.Message = "MustSelectCategory";
+                        _response.Result = null;
+                        return _response;
+                    }
+                    var CheckListReport = new CheckListReport()
                     {
                         CreatedBy = _auditService.UserId,
                         CreatedOn = DateTime.Now,
                         State = Domain.Enums.State.NotDeleted,
                         DescriptionAr = request.DescriptionAr,
-                        DescriptionEn= request.DescriptionEn,
+                        DescriptionEn = request.DescriptionEn,
                         NameAr = request.NameAr,
-                        NameEn = request.NameEn
+                        NameEn = request.NameEn,
+                        CategoryReportId=request.CategoryReportId
                     };
 
-                    await _CategoryReportRepository.AddAsync(CategoryReport);
-                    _CategoryReportRepository.Save();
+                    await _CheckListReportRepository.AddAsync(CheckListReport);
+                    _CheckListReportRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = "CategoryReportSavedSuccessfully";
-                    _response.Result = _mapper.Map<CategoryReportDto>(CategoryReport);
+                    _response.Message = "CheckListReportSavedSuccessfully";
+                    _response.Result = _mapper.Map<CheckListReportDto>(CheckListReport);
                     return _response;
                 }
                 catch (Exception ex)

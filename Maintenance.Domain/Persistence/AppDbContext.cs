@@ -20,6 +20,7 @@ namespace Maintenance.Domain.Persistence
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<PermissionRole> PermissionRoles { get; set; }
         public DbSet<CategoryReport> CategoriesReport { get; set; }
+        public DbSet<CheckListReport> CheckListsReport { get; set; } 
         public AppDbContext(DbContextOptions options) : base(options)
         {
         }

@@ -1,5 +1,5 @@
-﻿using Maintenance.Application.Features.Categories.Commands;
-using Maintenance.Application.Features.Categories.Queries;
+﻿using Maintenance.Application.Features.CheckLists.Commands;
+using Maintenance.Application.Features.CheckLists.Queries;
 using Maintenance.Application.Helper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -10,13 +10,13 @@ namespace Maintenance.Controllers.V1
 {
     [ApiVersion("1.0")]
     [Authorize]
-    public class CategoryReportController : ApiBaseController
+    public class CheckListReportController : ApiBaseController
     {
         private readonly IMediator _mediator;
         private readonly IHttpContextAccessor _httpContextAccessor;
         public long _loggedInUserId;
 
-        public CategoryReportController(IMediator mediator, IHttpContextAccessor httpContextAccessor)
+        public CheckListReportController(IMediator mediator, IHttpContextAccessor httpContextAccessor)
         {
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _httpContextAccessor = httpContextAccessor;
@@ -26,7 +26,7 @@ namespace Maintenance.Controllers.V1
         [HttpGet]
         public async Task<ResponseDTO> GetAll(int pageNumber, int pageSize)
         {
-            return await _mediator.Send(new GetAllCategoryReportQuery()
+            return await _mediator.Send(new GetAllCheckListReportQuery()
             {
                 PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
                 {
@@ -38,14 +38,14 @@ namespace Maintenance.Controllers.V1
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ResponseDTO> GetCategoryReportQueryById(long id) 
+        public async Task<ResponseDTO> GetCheckListReportQueryById(long id) 
         {
-            return await _mediator.Send(new GetCategoryReportQueryById() { Id = id });
+            return await _mediator.Send(new GetCheckListReportQueryById() { Id = id });
         }
 
-        [HttpPost("PostCategoryReport")]
+        [HttpPost("PostCheckListReport")]
       
-        public async Task<ResponseDTO> PostCategoryReport([FromBody] PostCategoryReportCommand command)
+        public async Task<ResponseDTO> PostCheckListReport([FromBody] PostCheckListReportCommand command)
         {
             if (!ModelState.IsValid)
             {
@@ -57,9 +57,9 @@ namespace Maintenance.Controllers.V1
             }
             return await _mediator.Send(command);
         }
-      
-        [HttpPut("PutCategoryReport")]
-        public async Task<ResponseDTO> PutCategoryReport( [FromBody] PutCategoryReportCommand command)
+       
+        [HttpPut("PutCheckListReport")]
+        public async Task<ResponseDTO> PutCheckListReport( [FromBody] PutCheckListReportCommand command)
         {
             if (!ModelState.IsValid)
             {
@@ -77,7 +77,7 @@ namespace Maintenance.Controllers.V1
         [Route("{id}")]
         public async Task<ResponseDTO> Delete(long id)
         {
-            return await _mediator.Send(new DeleteCategoryReportCommand() { Id = id });
+            return await _mediator.Send(new DeleteCheckListReportCommand() { Id = id });
         }
     }
 }
