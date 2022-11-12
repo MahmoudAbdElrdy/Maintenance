@@ -50,7 +50,7 @@ namespace Maintenance.Application.Helpers.UploadHelper
             try
             {
                 var file = formFile;
-                var folderName = Path.Combine("wwwroot/Uploads");
+                var folderName = Path.Combine("wwwroot/Uploads/Reports");
                 // Check if directory exist or not
                 if (!Directory.Exists(folderName))
                 {

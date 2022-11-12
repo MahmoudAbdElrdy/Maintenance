@@ -8,7 +8,7 @@ using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Maintenance.Application.Features.Categories.Commands
+namespace Maintenance.Application.Features.RequestsReport.Commands
 {
     public class PutRequestReportCommand : IRequest<ResponseDTO>
     {
@@ -20,6 +20,8 @@ namespace Maintenance.Application.Features.Categories.Commands
         class PutRequestReport : IRequestHandler<PutRequestReportCommand, ResponseDTO>
         {
             private readonly IGRepository<RequestReport> _RequestReportRepository;
+            private readonly IGRepository<CheckListRequest> _CheckListRequestRepository;
+            private readonly IGRepository<AttachmentReport> _AttachmentReportRepository;
             private readonly ILogger<PutRequestReportCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
@@ -27,12 +29,16 @@ namespace Maintenance.Application.Features.Categories.Commands
             public PutRequestReport(
 
                 IGRepository<RequestReport> RequestReportRepository,
+                IGRepository<CheckListRequest> CheckListRequestRepository,
+                IGRepository<AttachmentReport> AttachmentReportRepository,
                 ILogger<PutRequestReportCommand> logger,
                 IAuditService auditService,
                 IMapper  mapper
             )
             {
                 _RequestReportRepository = RequestReportRepository;
+                _CheckListRequestRepository = CheckListRequestRepository;
+                _AttachmentReportRepository = AttachmentReportRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _auditService = auditService;
                 _response = new ResponseDTO();

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Maintenance.Application.Features.Categories.Commands
+namespace Maintenance.Application.Features.RequestsReport.Commands 
 {
     public class DeleteRequestReportCommand : IRequest<ResponseDTO>
     {
