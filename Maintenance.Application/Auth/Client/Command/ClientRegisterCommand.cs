@@ -17,7 +17,7 @@ namespace Maintenance.Application.Auth.Client.Command
         public string? PhoneNumber { get; set; }
         public string? IdentityNumber { get; set; }
         public string[]? Roles { get; set; }
-        public long RoomId { set; get; }
+        public long RoomNumber { set; get; }
         public string? Password { get; set; }
     }
     class Handler : IRequestHandler<ClientRegisterCommand, ResponseDTO>
@@ -74,7 +74,7 @@ namespace Maintenance.Application.Auth.Client.Command
 
                     IdentityNumber = request.IdentityNumber,
 
-                    RoomId = request.RoomId,
+                    RoomId = request.RoomNumber,
 
                     UserType = request.UserType,
                     

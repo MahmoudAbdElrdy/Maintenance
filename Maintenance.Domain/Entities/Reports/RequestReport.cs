@@ -21,10 +21,7 @@ namespace Maintenance.Domain.Entities.Reports
         [ForeignKey("Creator")]
         public long? CreatedBy { set; get; }
         public virtual User Creator { get; set; }
-        public string? NameAr { get; set; }
-        public string? NameEn { get; set; }
-        public string? DescriptionAr { get; set; }
-        public string? DescriptionEn { get; set; }
+        public string? Description { get; set; }
         public virtual ICollection<CheckListRequest> CheckListRequests { get; set; } = new List<CheckListRequest>();
         public virtual ICollection<AttachmentReport> AttachmentsReport { get; set; } = new List<AttachmentReport>();
     }
