@@ -19,6 +19,6 @@ namespace Maintenance.Domain.Entities.Reports
         public string? NameEn { get; set; }
         public string? DescriptionAr { get; set; }
         public string? DescriptionEn { get; set; }
-
+        public virtual ICollection<CheckListReport> CheckListsReport { get; set; } = new List<CheckListReport>();
     }
 }

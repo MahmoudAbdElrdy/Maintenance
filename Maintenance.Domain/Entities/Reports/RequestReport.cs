@@ -3,6 +3,7 @@ using Maintenance.Domain.Enums;
 using Maintenance.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Maintenance.Domain.Entities.Reports
 {
-    public class CheckListReport : IBaseEntity, IAuditable, ISoftDelete 
+    public class RequestReport : IBaseEntity, IAuditable, ISoftDelete
     {
         public long Id { get; set; }
         public DateTime CreatedOn { get; set; }
@@ -24,10 +25,7 @@ namespace Maintenance.Domain.Entities.Reports
         public string? NameEn { get; set; }
         public string? DescriptionAr { get; set; }
         public string? DescriptionEn { get; set; }
-        [ForeignKey("CategoryReport")]
-        public long? CategoryReportId { set; get; }
-        public virtual CategoryReport? CategoryReport { get; set; }
         public virtual ICollection<CheckListRequest> CheckListRequests { get; set; } = new List<CheckListRequest>();
-
+        public virtual ICollection<AttachmentReport> AttachmentsReport { get; set; } = new List<AttachmentReport>();
     }
 }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Maintenance.Domain.Entities.Reports
 {
-    public class CheckListReport : IBaseEntity, IAuditable, ISoftDelete 
+    public class CheckListRequest : IBaseEntity, IAuditable, ISoftDelete
     {
         public long Id { get; set; }
         public DateTime CreatedOn { get; set; }
@@ -20,14 +20,14 @@ namespace Maintenance.Domain.Entities.Reports
         [ForeignKey("Creator")]
         public long? CreatedBy { set; get; }
         public virtual User Creator { get; set; }
-        public string? NameAr { get; set; }
-        public string? NameEn { get; set; }
-        public string? DescriptionAr { get; set; }
-        public string? DescriptionEn { get; set; }
-        [ForeignKey("CategoryReport")]
-        public long? CategoryReportId { set; get; }
-        public virtual CategoryReport? CategoryReport { get; set; }
-        public virtual ICollection<CheckListRequest> CheckListRequests { get; set; } = new List<CheckListRequest>();
 
+        [ForeignKey("RequestReport")]
+        public long? RequestReportId { set; get; }
+        public virtual RequestReport RequestReport { get; set; }
+
+        [ForeignKey("CheckListReport")]
+        public long? CheckListReportId { set; get; } 
+        public virtual CheckListReport CheckListReport { get; set; }
     }
+    
 }
