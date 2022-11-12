@@ -93,7 +93,8 @@ namespace Maintenance.Application.Auth.Client.Command
                   
                 }
                
-                user.Code = SendSMS.GenerateCode();
+                //user.Code = SendSMS.GenerateCode();
+                user.Code = "1234";
                 var res = await SendSMS.SendMessageUnifonic("رمز التحقق من الجوال : " + user.Code, user.PhoneNumber);
                 if (res == -1)
                 {

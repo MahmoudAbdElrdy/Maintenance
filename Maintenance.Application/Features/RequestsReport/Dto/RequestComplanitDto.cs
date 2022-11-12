@@ -13,15 +13,12 @@ using System.Threading.Tasks;
 
 namespace Maintenance.Application.Features.RequestsComplanit.Dto 
 {
-    public class RequestComplanitDto:IHaveCustomMapping
+    public class RequestComplanitDto
     {
-        public long Id { get; set; }
+       
         public string? Description { get; set; }
         public long []? CheckListsRequest { get; set; }
-        public long []? AttachmentsComplanit { get; set; } 
-        public void CreateMappings(Profile configuration)
-        {
-            configuration.CreateMap<RequestComplanit,RequestComplanitDto>().ReverseMap();
-        }
+        public string []? AttachmentsComplanit { get; set; } 
+       
     }
 }

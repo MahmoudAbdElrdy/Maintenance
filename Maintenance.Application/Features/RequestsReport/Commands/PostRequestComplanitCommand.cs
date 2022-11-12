@@ -12,11 +12,11 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 {
     public class PostRequestComplanitCommand : IRequest<ResponseDTO>
     {
-        public string? NameAr { get; set; }
-        public string? NameEn { get; set; }
-        public string? Description { get; set; }
-        public long[]? CheckListsRequest { get; set; }
-        public string[]? AttachmentsComplanit { get; set; }
+        
+        //public string? Description { get; set; }
+        //public long[]? CheckListsRequest { get; set; }
+        //public string[]? AttachmentsComplanit { get; set; }
+        public List<RequestComplanitDto> requests { get; set; }
         class PostRequestComplanit : IRequestHandler<PostRequestComplanitCommand, ResponseDTO>
         {
             private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;
@@ -43,36 +43,42 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
             {
                 try
                 {
+                    var RequestComplanitList = new List<RequestComplanit>();
 
-                    var RequestComplanit = new RequestComplanit()
+                    foreach (var requestObj in request.requests)
                     {
-                        CreatedBy = _auditService.UserId,
-                        CreatedOn = DateTime.Now,
-                        State = Domain.Enums.State.NotDeleted,
-                        Description = request.Description,
-                    };
-               
-                 
-                    foreach (var item in request.AttachmentsComplanit)
-                    {
-                        RequestComplanit.AttachmentsComplanit.Add(new AttachmentComplanit() { 
-                            Path = item,
+                        var RequestComplanit = new RequestComplanit()
+                        {
                             CreatedBy = _auditService.UserId,
                             CreatedOn = DateTime.Now,
-                        });
+                            State = Domain.Enums.State.NotDeleted,
+                            Description = requestObj.Description,
+                        };
+
+                        foreach (var item in requestObj.AttachmentsComplanit)
+                        {
+                            RequestComplanit.AttachmentsComplanit.Add(new AttachmentComplanit()
+                            {
+                                Path = item,
+                                CreatedBy = _auditService.UserId,
+                                CreatedOn = DateTime.Now,
+                            });
+                        }
+                        foreach (var item in requestObj.CheckListsRequest)
+                        {
+                            RequestComplanit.CheckListRequests.Add(new CheckListRequest()
+                            {
+                                CheckListComplanitId = item,
+                                CreatedBy = _auditService.UserId,
+                                CreatedOn = DateTime.Now,
+                            });
+                        }
+                        RequestComplanitList.Add(RequestComplanit);
+
                     }
-                    foreach (var item in request.CheckListsRequest)
-                    {
-                        RequestComplanit.CheckListRequests.Add(new CheckListRequest() {
-                            CheckListComplanitId = item,
-                            CreatedBy = _auditService.UserId,
-                            CreatedOn = DateTime.Now,
-                        });
-                    }
-                  
-                    
-                    
-                    await _RequestComplanitRepository.AddAsync(RequestComplanit);
+
+
+                    await _RequestComplanitRepository.AddRangeAsync(RequestComplanitList);
                     _RequestComplanitRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
@@ -82,22 +88,27 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 }
                 catch (Exception ex)
                 {
-                    if (request.AttachmentsComplanit.Length > 0)
+                    foreach (var requestObj in request.requests)
                     {
-                        var folderName = Path.Combine("wwwroot/Uploads/Complanits");
-
-                        foreach (var fileRemove in request.AttachmentsComplanit)
+                        if (requestObj.AttachmentsComplanit.Length > 0)
                         {
-                            var file = System.IO.Path.Combine(folderName, fileRemove);
-                            try
+                            var folderName = Path.Combine("wwwroot/Uploads/Complanits");
+
+                            foreach (var fileRemove in requestObj.AttachmentsComplanit)
                             {
-                                System.IO.File.Delete(file);
+                                var file = System.IO.Path.Combine(folderName, fileRemove);
+                                try
+                                {
+                                    System.IO.File.Delete(file);
+                                }
+                                catch { }
                             }
-                            catch { }
+
+
                         }
+
+                    }
                        
-               
-              }
                     _response.StatusEnum = StatusEnum.Exception;
                     _response.Result = null;
                     _response.Message = ex != null && ex.InnerException != null ? ex.InnerException.Message : ex.Message;
