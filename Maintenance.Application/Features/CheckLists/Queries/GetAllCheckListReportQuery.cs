@@ -4,7 +4,7 @@ using Maintenance.Application.Features.CheckLists.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.Paginations;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -12,30 +12,30 @@ using Microsoft.Extensions.Logging;
 
 namespace Maintenance.Application.Features.CheckLists.Queries
 {
-    public class GetAllCheckListReportQuery : IRequest<ResponseDTO>
+    public class GetAllCheckListComplanitQuery : IRequest<ResponseDTO>
     {
-        public GetAllCheckListReportQuery() 
+        public GetAllCheckListComplanitQuery() 
         {
             PaginatedInputModel = new PaginatedInputModel();
         }
         public PaginatedInputModel PaginatedInputModel { get; set; }
-        class GetAllCheckListReport : IRequestHandler<GetAllCheckListReportQuery, ResponseDTO>
+        class GetAllCheckListComplanit : IRequestHandler<GetAllCheckListComplanitQuery, ResponseDTO>
         {
-            private readonly IGRepository<CheckListReport> _CheckListReportRepository;
+            private readonly IGRepository<CheckListComplanit> _CheckListComplanitRepository;
             private readonly IGRepository<User> _userRepository;
-            private readonly ILogger<GetAllCheckListReportQuery> _logger;
+            private readonly ILogger<GetAllCheckListComplanitQuery> _logger;
             private readonly ResponseDTO _response;
             public long _loggedInUserId;
             private readonly IMapper _mapper;
-            public GetAllCheckListReport(
+            public GetAllCheckListComplanit(
                 IHttpContextAccessor _httpContextAccessor,
-                IGRepository<CheckListReport> CheckListReportRepository,
-                ILogger<GetAllCheckListReportQuery> logger, IMapper mapper,
+                IGRepository<CheckListComplanit> CheckListComplanitRepository,
+                ILogger<GetAllCheckListComplanitQuery> logger, IMapper mapper,
                 IGRepository<User> userRepository
             )
             {
                 _mapper = mapper;
-                _CheckListReportRepository = CheckListReportRepository;
+                _CheckListComplanitRepository = CheckListComplanitRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _response = new ResponseDTO();
                 _userRepository = userRepository;
@@ -49,7 +49,7 @@ namespace Maintenance.Application.Features.CheckLists.Queries
                 }
 
             }
-            public async Task<ResponseDTO> Handle(GetAllCheckListReportQuery request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(GetAllCheckListComplanitQuery request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -61,14 +61,14 @@ namespace Maintenance.Application.Features.CheckLists.Queries
                         _response.Message = "userNotFound";
                     }
 
-                    var entityJobs = _CheckListReportRepository.GetAll(x => x.State != Domain.Enums.State.Deleted).ToList();
+                    var entityJobs = _CheckListComplanitRepository.GetAll(x => x.State != Domain.Enums.State.Deleted).ToList();
 
-                    var paginatedObjs = await PaginationUtility.Paging(request.PaginatedInputModel, _mapper.Map<List<CheckListReportDto>>(entityJobs));
+                    var paginatedObjs = await PaginationUtility.Paging(request.PaginatedInputModel, _mapper.Map<List<CheckListComplanitDto>>(entityJobs));
 
                     _response.setPaginationData(paginatedObjs);
                     _response.Result = paginatedObjs;
                     _response.StatusEnum = StatusEnum.Success;
-                    _response.Message = "CheckListReportRetrievedSuccessfully";
+                    _response.Message = "CheckListComplanitRetrievedSuccessfully";
 
                     return _response;
                 }

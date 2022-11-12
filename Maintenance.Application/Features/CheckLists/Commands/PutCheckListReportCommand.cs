@@ -2,48 +2,48 @@
 using Maintenance.Application.Features.CheckLists.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Maintenance.Application.Features.CheckLists.Commands
 {
-    public class PutCheckListReportCommand : IRequest<ResponseDTO>
+    public class PutCheckListComplanitCommand : IRequest<ResponseDTO>
     {
         public long Id { get; set; }
-        public long? CategoryReportId { set; get; }
+        public long? CategoryComplanitId { set; get; }
         public string? NameAr { get; set; }
         public string? NameEn { get; set; }
         public string? DescriptionAr { get; set; }
         public string? DescriptionEn { get; set; }
-        class PutCheckListReport : IRequestHandler<PutCheckListReportCommand, ResponseDTO>
+        class PutCheckListComplanit : IRequestHandler<PutCheckListComplanitCommand, ResponseDTO>
         {
-            private readonly IGRepository<CheckListReport> _CheckListReportRepository;
-            private readonly ILogger<PutCheckListReportCommand> _logger;
+            private readonly IGRepository<CheckListComplanit> _CheckListComplanitRepository;
+            private readonly ILogger<PutCheckListComplanitCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
             private readonly IMapper _mapper;
-            public PutCheckListReport(
+            public PutCheckListComplanit(
 
-                IGRepository<CheckListReport> CheckListReportRepository,
-                ILogger<PutCheckListReportCommand> logger,
+                IGRepository<CheckListComplanit> CheckListComplanitRepository,
+                ILogger<PutCheckListComplanitCommand> logger,
                 IAuditService auditService,
                 IMapper  mapper
             )
             {
-                _CheckListReportRepository = CheckListReportRepository;
+                _CheckListComplanitRepository = CheckListComplanitRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _auditService = auditService;
                 _response = new ResponseDTO();
                 _mapper = mapper;
             }
-            public async Task<ResponseDTO> Handle(PutCheckListReportCommand request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(PutCheckListComplanitCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
 
-                    var CheckListReport = new CheckListReport()
+                    var CheckListComplanit = new CheckListComplanit()
                     {
                         UpdatedBy = _auditService.UserId,
                         UpdatedOn = DateTime.Now,
@@ -52,14 +52,14 @@ namespace Maintenance.Application.Features.CheckLists.Commands
                         NameAr = request.NameAr,
                         NameEn = request.NameEn,
                         Id=request.Id,
-                        CategoryReportId = request.CategoryReportId
+                        CategoryComplanitId = request.CategoryComplanitId
                     };
 
-                     _CheckListReportRepository.Update(CheckListReport);
-                    _CheckListReportRepository.Save();
-                    _response.Result = _mapper.Map<CheckListReportDto>(CheckListReport);
+                     _CheckListComplanitRepository.Update(CheckListComplanit);
+                    _CheckListComplanitRepository.Save();
+                    _response.Result = _mapper.Map<CheckListComplanitDto>(CheckListComplanit);
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = "CheckListReportUpdatedSuccessfully";
+                    _response.Message = "CheckListComplanitUpdatedSuccessfully";
 
                     return _response;
                 }

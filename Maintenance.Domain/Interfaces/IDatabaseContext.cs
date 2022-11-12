@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Maintenance.Domain.Entities.Auth;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 
 namespace Maintenance.Domain.Interfaces 
 {
@@ -17,8 +17,8 @@ namespace Maintenance.Domain.Interfaces
 
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<PermissionRole> PermissionRoles { get; set; }
-        public DbSet<CategoryReport> CategoriesReport { get; set; }
-        public DbSet<CheckListReport> CheckListsReport { get; set; }
+        public DbSet<CategoryComplanit> CategoriesComplanit { get; set; }
+        public DbSet<CheckListComplanit> CheckListsComplanit { get; set; }
         public ChangeTracker ChangeTracker { get; }
 
         public int SaveChanges();

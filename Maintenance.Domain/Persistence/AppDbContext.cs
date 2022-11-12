@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Maintenance.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Maintenance.Domain.Entities.Auth;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 
 namespace Maintenance.Domain.Persistence 
 {
@@ -19,8 +19,8 @@ namespace Maintenance.Domain.Persistence
        
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<PermissionRole> PermissionRoles { get; set; }
-        public DbSet<CategoryReport> CategoriesReport { get; set; }
-        public DbSet<CheckListReport> CheckListsReport { get; set; } 
+        public DbSet<CategoryComplanit> CategoriesComplanit { get; set; }
+        public DbSet<CheckListComplanit> CheckListsComplanit { get; set; } 
         public AppDbContext(DbContextOptions options) : base(options)
         {
         }

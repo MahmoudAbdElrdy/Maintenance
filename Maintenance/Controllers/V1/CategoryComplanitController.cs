@@ -10,13 +10,13 @@ namespace Maintenance.Controllers.V1
 {
     [ApiVersion("1.0")]
     [Authorize]
-    public class CategoryReportController : ApiBaseController
+    public class CategoryComplanitController : ApiBaseController
     {
         private readonly IMediator _mediator;
         private readonly IHttpContextAccessor _httpContextAccessor;
         public long _loggedInUserId;
 
-        public CategoryReportController(IMediator mediator, IHttpContextAccessor httpContextAccessor)
+        public CategoryComplanitController(IMediator mediator, IHttpContextAccessor httpContextAccessor)
         {
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _httpContextAccessor = httpContextAccessor;
@@ -26,7 +26,7 @@ namespace Maintenance.Controllers.V1
         [HttpGet]
         public async Task<ResponseDTO> GetAll(int pageNumber, int pageSize)
         {
-            return await _mediator.Send(new GetAllCategoryReportQuery()
+            return await _mediator.Send(new GetAllCategoryComplanitQuery()
             {
                 PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
                 {
@@ -38,14 +38,14 @@ namespace Maintenance.Controllers.V1
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ResponseDTO> GetCategoryReportQueryById(long id) 
+        public async Task<ResponseDTO> GetCategoryComplanitQueryById(long id) 
         {
-            return await _mediator.Send(new GetCategoryReportQueryById() { Id = id });
+            return await _mediator.Send(new GetCategoryComplanitQueryById() { Id = id });
         }
 
-        [HttpPost("PostCategoryReport")]
+        [HttpPost("PostCategoryComplanit")]
       
-        public async Task<ResponseDTO> PostCategoryReport([FromBody] PostCategoryReportCommand command)
+        public async Task<ResponseDTO> PostCategoryComplanit([FromBody] PostCategoryComplanitCommand command)
         {
             if (!ModelState.IsValid)
             {
@@ -58,8 +58,8 @@ namespace Maintenance.Controllers.V1
             return await _mediator.Send(command);
         }
       
-        [HttpPut("PutCategoryReport")]
-        public async Task<ResponseDTO> PutCategoryReport( [FromBody] PutCategoryReportCommand command)
+        [HttpPut("PutCategoryComplanit")]
+        public async Task<ResponseDTO> PutCategoryComplanit( [FromBody] PutCategoryComplanitCommand command)
         {
             if (!ModelState.IsValid)
             {
@@ -77,7 +77,7 @@ namespace Maintenance.Controllers.V1
         [Route("{id}")]
         public async Task<ResponseDTO> Delete(long id)
         {
-            return await _mediator.Send(new DeleteCategoryReportCommand() { Id = id });
+            return await _mediator.Send(new DeleteCategoryComplanitCommand() { Id = id });
         }
     }
 }

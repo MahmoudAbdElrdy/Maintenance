@@ -1,6 +1,6 @@
 ﻿using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -9,48 +9,48 @@ using Microsoft.Extensions.Logging;
 
 namespace Maintenance.Application.Features.Categories.Commands
 {
-    public class DeleteCategoryReportCommand : IRequest<ResponseDTO>
+    public class DeleteCategoryComplanitCommand : IRequest<ResponseDTO>
     {
         public long Id { get; set; }
-        class DeleteCategoryReport : IRequestHandler<DeleteCategoryReportCommand, ResponseDTO>
+        class DeleteCategoryComplanit : IRequestHandler<DeleteCategoryComplanitCommand, ResponseDTO>
         {
-            private readonly IGRepository<CategoryReport> _CategoryReportRepository;
-            private readonly ILogger<DeleteCategoryReportCommand> _logger;
+            private readonly IGRepository<CategoryComplanit> _CategoryComplanitRepository;
+            private readonly ILogger<DeleteCategoryComplanitCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
-            public DeleteCategoryReport(
+            public DeleteCategoryComplanit(
               
-                IGRepository<CategoryReport> CategoryReportRepository,
-                ILogger<DeleteCategoryReportCommand> logger,
+                IGRepository<CategoryComplanit> CategoryComplanitRepository,
+                ILogger<DeleteCategoryComplanitCommand> logger,
                  IAuditService auditService
             )
             {
-                _CategoryReportRepository = CategoryReportRepository;
+                _CategoryComplanitRepository = CategoryComplanitRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _response = new ResponseDTO();
                 _auditService = auditService;
 
             }
-            public async Task<ResponseDTO> Handle(DeleteCategoryReportCommand request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(DeleteCategoryComplanitCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
-                    var entityObj = await _CategoryReportRepository.GetAll(x => x.Id == request.Id).FirstOrDefaultAsync();
+                    var entityObj = await _CategoryComplanitRepository.GetAll(x => x.Id == request.Id).FirstOrDefaultAsync();
                     if (entityObj == null)
                     {
 
                         _response.StatusEnum = StatusEnum.FailedToFindTheObject;
-                        _response.Message = "CategoryReportNotFound";
+                        _response.Message = "CategoryComplanitNotFound";
                     }
 
                     entityObj.UpdatedBy = _auditService.UserId;
                     entityObj.UpdatedOn = DateTime.Now;
                     entityObj.State = Domain.Enums.State.Deleted;
-                    _CategoryReportRepository.Update(entityObj);
-                    _CategoryReportRepository.Save();
+                    _CategoryComplanitRepository.Update(entityObj);
+                    _CategoryComplanitRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = "CategoryReportRemovedSuccessfully";
+                    _response.Message = "CategoryComplanitRemovedSuccessfully";
 
                     return _response;
                 }

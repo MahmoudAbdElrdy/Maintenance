@@ -1,56 +1,56 @@
 ﻿using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Maintenance.Application.Features.RequestsReport.Commands 
+namespace Maintenance.Application.Features.RequestsComplanit.Commands 
 {
-    public class DeleteRequestReportCommand : IRequest<ResponseDTO>
+    public class DeleteRequestComplanitCommand : IRequest<ResponseDTO>
     {
         public long Id { get; set; }
-        class DeleteRequestReport : IRequestHandler<DeleteRequestReportCommand, ResponseDTO>
+        class DeleteRequestComplanit : IRequestHandler<DeleteRequestComplanitCommand, ResponseDTO>
         {
-            private readonly IGRepository<RequestReport> _RequestReportRepository;
-            private readonly ILogger<DeleteRequestReportCommand> _logger;
+            private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;
+            private readonly ILogger<DeleteRequestComplanitCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
-            public DeleteRequestReport(
+            public DeleteRequestComplanit(
               
-                IGRepository<RequestReport> RequestReportRepository,
-                ILogger<DeleteRequestReportCommand> logger,
+                IGRepository<RequestComplanit> RequestComplanitRepository,
+                ILogger<DeleteRequestComplanitCommand> logger,
                  IAuditService auditService
             )
             {
-                _RequestReportRepository = RequestReportRepository;
+                _RequestComplanitRepository = RequestComplanitRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _response = new ResponseDTO();
                 _auditService = auditService;
 
             }
-            public async Task<ResponseDTO> Handle(DeleteRequestReportCommand request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(DeleteRequestComplanitCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
-                    var entityObj = await _RequestReportRepository.GetAll(x => x.Id == request.Id).FirstOrDefaultAsync();
+                    var entityObj = await _RequestComplanitRepository.GetAll(x => x.Id == request.Id).FirstOrDefaultAsync();
                     if (entityObj == null)
                     {
 
                         _response.StatusEnum = StatusEnum.FailedToFindTheObject;
-                        _response.Message = "RequestReportNotFound";
+                        _response.Message = "RequestComplanitNotFound";
                     }
 
                     entityObj.UpdatedBy = _auditService.UserId;
                     entityObj.UpdatedOn = DateTime.Now;
                     entityObj.State = Domain.Enums.State.Deleted;
-                    _RequestReportRepository.Update(entityObj);
-                    _RequestReportRepository.Save();
+                    _RequestComplanitRepository.Update(entityObj);
+                    _RequestComplanitRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = "RequestReportRemovedSuccessfully";
+                    _response.Message = "RequestComplanitRemovedSuccessfully";
 
                     return _response;
                 }

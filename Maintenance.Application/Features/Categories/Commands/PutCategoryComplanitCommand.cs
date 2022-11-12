@@ -2,63 +2,63 @@
 using Maintenance.Application.Features.Categories.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Maintenance.Application.Features.Categories.Commands
 {
-    public class PostCategoryReportCommand : IRequest<ResponseDTO>
+    public class PutCategoryComplanitCommand : IRequest<ResponseDTO>
     {
+        public long Id { get; set; }
         public string? NameAr { get; set; }
         public string? NameEn { get; set; }
         public string? DescriptionAr { get; set; }
         public string? DescriptionEn { get; set; }
-        class PostCategoryReport : IRequestHandler<PostCategoryReportCommand, ResponseDTO>
+        class PutCategoryComplanit : IRequestHandler<PutCategoryComplanitCommand, ResponseDTO>
         {
-            private readonly IGRepository<CategoryReport> _CategoryReportRepository;
-            private readonly ILogger<PostCategoryReportCommand> _logger;
+            private readonly IGRepository<CategoryComplanit> _CategoryComplanitRepository;
+            private readonly ILogger<PutCategoryComplanitCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
             private readonly IMapper _mapper;
-            public PostCategoryReport(
+            public PutCategoryComplanit(
 
-                IGRepository<CategoryReport> CategoryReportRepository,
-                ILogger<PostCategoryReportCommand> logger,
+                IGRepository<CategoryComplanit> CategoryComplanitRepository,
+                ILogger<PutCategoryComplanitCommand> logger,
                 IAuditService auditService,
-                IMapper mapper
+                IMapper  mapper
             )
             {
-                _CategoryReportRepository = CategoryReportRepository;
+                _CategoryComplanitRepository = CategoryComplanitRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _auditService = auditService;
                 _response = new ResponseDTO();
                 _mapper = mapper;
-
             }
-            public async Task<ResponseDTO> Handle(PostCategoryReportCommand request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(PutCategoryComplanitCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
 
-                    var CategoryReport = new CategoryReport()
+                    var CategoryComplanit = new CategoryComplanit()
                     {
-                        CreatedBy = _auditService.UserId,
-                        CreatedOn = DateTime.Now,
-                        State = Domain.Enums.State.NotDeleted,
+                        UpdatedBy = _auditService.UserId,
+                        UpdatedOn = DateTime.Now,
                         DescriptionAr = request.DescriptionAr,
-                        DescriptionEn= request.DescriptionEn,
+                        DescriptionEn = request.DescriptionEn,
                         NameAr = request.NameAr,
-                        NameEn = request.NameEn
+                        NameEn = request.NameEn,
+                        Id=request.Id
                     };
 
-                    await _CategoryReportRepository.AddAsync(CategoryReport);
-                    _CategoryReportRepository.Save();
-
+                     _CategoryComplanitRepository.Update(CategoryComplanit);
+                    _CategoryComplanitRepository.Save();
+                    _response.Result = _mapper.Map<CategoryComplanitDto>(CategoryComplanit);
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = "CategoryReportSavedSuccessfully";
-                    _response.Result = _mapper.Map<CategoryReportDto>(CategoryReport);
+                    _response.Message = "CategoryComplanitUpdatedSuccessfully";
+
                     return _response;
                 }
                 catch (Exception ex)

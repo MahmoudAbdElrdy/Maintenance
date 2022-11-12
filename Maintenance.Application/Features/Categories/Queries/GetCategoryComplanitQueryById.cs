@@ -3,7 +3,7 @@ using AutoMapper;
 using Maintenance.Application.Features.Categories.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -15,26 +15,26 @@ using System.Threading.Tasks;
 
 namespace Maintenance.Application.Features.Categories.Queries
 {
-    public class GetCategoryReportQueryById : IRequest<ResponseDTO>
+    public class GetCategoryComplanitQueryById : IRequest<ResponseDTO>
     {
         public long Id { get; set; }
-        class GetCategoryReportByIdQueryHandler : IRequestHandler<GetCategoryReportQueryById, ResponseDTO>
+        class GetCategoryComplanitByIdQueryHandler : IRequestHandler<GetCategoryComplanitQueryById, ResponseDTO>
         {
-            private readonly IGRepository<CategoryReport> _CategoryReportRepository;
+            private readonly IGRepository<CategoryComplanit> _CategoryComplanitRepository;
             private readonly IGRepository<User> _userRepository;
-            private readonly ILogger<GetCategoryReportByIdQueryHandler> _logger;
+            private readonly ILogger<GetCategoryComplanitByIdQueryHandler> _logger;
             private readonly ResponseDTO _response;
             public long _loggedInUserId;
             private readonly IMapper _mapper;
-            public GetCategoryReportByIdQueryHandler(
+            public GetCategoryComplanitByIdQueryHandler(
                 IHttpContextAccessor _httpContextAccessor,
-                IGRepository<CategoryReport> CategoryReportRepository,
-                ILogger<GetCategoryReportByIdQueryHandler> logger, IMapper mapper,
+                IGRepository<CategoryComplanit> CategoryComplanitRepository,
+                ILogger<GetCategoryComplanitByIdQueryHandler> logger, IMapper mapper,
                 IGRepository<User> userRepository
             )
             {
                 _mapper = mapper;
-                _CategoryReportRepository = CategoryReportRepository;
+                _CategoryComplanitRepository = CategoryComplanitRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _response = new ResponseDTO();
                 _userRepository = userRepository;
@@ -48,7 +48,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                 }
 
             }
-            public async Task<ResponseDTO> Handle(GetCategoryReportQueryById request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(GetCategoryComplanitQueryById request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -60,17 +60,17 @@ namespace Maintenance.Application.Features.Categories.Queries
                         _response.Message = "userNotFound";
                     }
 
-                    var entityCategoryReport = _CategoryReportRepository.GetAll(x => x.State != Domain.Enums.State.Deleted).FirstOrDefault();
-                    if (entityCategoryReport == null)
+                    var entityCategoryComplanit = _CategoryComplanitRepository.GetAll(x => x.State != Domain.Enums.State.Deleted).FirstOrDefault();
+                    if (entityCategoryComplanit == null)
                     {
 
                         _response.StatusEnum = StatusEnum.Failed;
-                        _response.Message = "CategoryReportNotFound";
+                        _response.Message = "CategoryComplanitNotFound";
                     }
-                    var mappedObj = _mapper.Map<CategoryReportDto>(entityCategoryReport);
+                    var mappedObj = _mapper.Map<CategoryComplanitDto>(entityCategoryComplanit);
                     _response.Result = mappedObj;
                     _response.StatusEnum = StatusEnum.Success;
-                    _response.Message = "CategoryReportRetrievedSuccessfully";
+                    _response.Message = "CategoryComplanitRetrievedSuccessfully";
 
                     return _response;
                 }

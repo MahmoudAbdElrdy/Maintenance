@@ -4,7 +4,7 @@ using Maintenance.Application.Features.Categories.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.Paginations;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -12,30 +12,30 @@ using Microsoft.Extensions.Logging;
 
 namespace Maintenance.Application.Features.Categories.Queries
 {
-    public class GetAllCategoryReportQuery : IRequest<ResponseDTO>
+    public class GetAllCategoryComplanitQuery : IRequest<ResponseDTO>
     {
-        public GetAllCategoryReportQuery() 
+        public GetAllCategoryComplanitQuery() 
         {
             PaginatedInputModel = new PaginatedInputModel();
         }
         public PaginatedInputModel PaginatedInputModel { get; set; }
-        class GetAllCategoryReport : IRequestHandler<GetAllCategoryReportQuery, ResponseDTO>
+        class GetAllCategoryComplanit : IRequestHandler<GetAllCategoryComplanitQuery, ResponseDTO>
         {
-            private readonly IGRepository<CategoryReport> _CategoryReportRepository;
+            private readonly IGRepository<CategoryComplanit> _CategoryComplanitRepository;
             private readonly IGRepository<User> _userRepository;
-            private readonly ILogger<GetAllCategoryReportQuery> _logger;
+            private readonly ILogger<GetAllCategoryComplanitQuery> _logger;
             private readonly ResponseDTO _response;
             public long _loggedInUserId;
             private readonly IMapper _mapper;
-            public GetAllCategoryReport(
+            public GetAllCategoryComplanit(
                 IHttpContextAccessor _httpContextAccessor,
-                IGRepository<CategoryReport> CategoryReportRepository,
-                ILogger<GetAllCategoryReportQuery> logger, IMapper mapper,
+                IGRepository<CategoryComplanit> CategoryComplanitRepository,
+                ILogger<GetAllCategoryComplanitQuery> logger, IMapper mapper,
                 IGRepository<User> userRepository
             )
             {
                 _mapper = mapper;
-                _CategoryReportRepository = CategoryReportRepository;
+                _CategoryComplanitRepository = CategoryComplanitRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _response = new ResponseDTO();
                 _userRepository = userRepository;
@@ -49,7 +49,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                 }
 
             }
-            public async Task<ResponseDTO> Handle(GetAllCategoryReportQuery request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(GetAllCategoryComplanitQuery request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -61,14 +61,14 @@ namespace Maintenance.Application.Features.Categories.Queries
                         _response.Message = "userNotFound";
                     }
 
-                    var entityJobs = _CategoryReportRepository.GetAll(x => x.State != Domain.Enums.State.Deleted).ToList();
+                    var entityJobs = _CategoryComplanitRepository.GetAll(x => x.State != Domain.Enums.State.Deleted).ToList();
 
-                    var paginatedObjs = await PaginationUtility.Paging(request.PaginatedInputModel, _mapper.Map<List<CategoryReportDto>>(entityJobs));
+                    var paginatedObjs = await PaginationUtility.Paging(request.PaginatedInputModel, _mapper.Map<List<CategoryComplanitDto>>(entityJobs));
 
                     _response.setPaginationData(paginatedObjs);
                     _response.Result = paginatedObjs;
                     _response.StatusEnum = StatusEnum.Success;
-                    _response.Message = "CategoryReportRetrievedSuccessfully";
+                    _response.Message = "CategoryComplanitRetrievedSuccessfully";
 
                     return _response;
                 }

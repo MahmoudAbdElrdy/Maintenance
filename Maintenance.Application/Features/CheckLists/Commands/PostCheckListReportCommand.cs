@@ -2,55 +2,55 @@
 using Maintenance.Application.Features.CheckLists.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Maintenance.Application.Features.CheckLists.Commands
 {
-    public class PostCheckListReportCommand : IRequest<ResponseDTO>
+    public class PostCheckListComplanitCommand : IRequest<ResponseDTO>
     {
       
-        public long? CategoryReportId { set; get; }
+        public long? CategoryComplanitId { set; get; }
         public string? NameAr { get; set; }
         public string? NameEn { get; set; }
         public string? DescriptionAr { get; set; }
         public string? DescriptionEn { get; set; }
-        class PostCheckListReport : IRequestHandler<PostCheckListReportCommand, ResponseDTO>
+        class PostCheckListComplanit : IRequestHandler<PostCheckListComplanitCommand, ResponseDTO>
         {
-            private readonly IGRepository<CheckListReport> _CheckListReportRepository;
-            private readonly ILogger<PostCheckListReportCommand> _logger;
+            private readonly IGRepository<CheckListComplanit> _CheckListComplanitRepository;
+            private readonly ILogger<PostCheckListComplanitCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
             private readonly IMapper _mapper;
-            public PostCheckListReport(
+            public PostCheckListComplanit(
 
-                IGRepository<CheckListReport> CheckListReportRepository,
-                ILogger<PostCheckListReportCommand> logger,
+                IGRepository<CheckListComplanit> CheckListComplanitRepository,
+                ILogger<PostCheckListComplanitCommand> logger,
                 IAuditService auditService,
                 IMapper mapper
             )
             {
-                _CheckListReportRepository = CheckListReportRepository;
+                _CheckListComplanitRepository = CheckListComplanitRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _auditService = auditService;
                 _response = new ResponseDTO();
                 _mapper = mapper;
 
             }
-            public async Task<ResponseDTO> Handle(PostCheckListReportCommand request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(PostCheckListComplanitCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
-                    if (request.CategoryReportId == null)
+                    if (request.CategoryComplanitId == null)
                     {
                         _response.StatusEnum = StatusEnum.Failed;
                         _response.Message = "MustSelectCategory";
                         _response.Result = null;
                         return _response;
                     }
-                    var CheckListReport = new CheckListReport()
+                    var CheckListComplanit = new CheckListComplanit()
                     {
                         CreatedBy = _auditService.UserId,
                         CreatedOn = DateTime.Now,
@@ -59,15 +59,15 @@ namespace Maintenance.Application.Features.CheckLists.Commands
                         DescriptionEn = request.DescriptionEn,
                         NameAr = request.NameAr,
                         NameEn = request.NameEn,
-                        CategoryReportId=request.CategoryReportId
+                        CategoryComplanitId=request.CategoryComplanitId
                     };
 
-                    await _CheckListReportRepository.AddAsync(CheckListReport);
-                    _CheckListReportRepository.Save();
+                    await _CheckListComplanitRepository.AddAsync(CheckListComplanit);
+                    _CheckListComplanitRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = "CheckListReportSavedSuccessfully";
-                    _response.Result = _mapper.Map<CheckListReportDto>(CheckListReport);
+                    _response.Message = "CheckListComplanitSavedSuccessfully";
+                    _response.Result = _mapper.Map<CheckListComplanitDto>(CheckListComplanit);
                     return _response;
                 }
                 catch (Exception ex)

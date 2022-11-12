@@ -9,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Maintenance.Domain.Entities.Reports
+namespace Maintenance.Domain.Entities.Complanits
 {
-    public class AttachmentReport : IBaseEntity, IAuditable, ISoftDelete
+    public class AttachmentComplanit : IBaseEntity, IAuditable, ISoftDelete
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity), Key]
         public long Id { set; get; }
@@ -27,9 +27,9 @@ namespace Maintenance.Domain.Entities.Reports
         public long? CreatedBy { set; get; }
         public virtual User Creator { get; set; }
 
-        [ForeignKey("RequestReport")]
-        public long RequestReportId { set; get; }
-        public virtual RequestReport RequestReport { set; get; }
+        [ForeignKey("RequestComplanit")]
+        public long RequestComplanitId { set; get; }
+        public virtual RequestComplanit RequestComplanit { set; get; }
 
 
     }

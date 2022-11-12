@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Maintenance.Infrastructure.Migrations
 {
     [DbContext(typeof(MaintenanceSqlContext))]
-    [Migration("20221111144353_CategoryReport")]
-    partial class CategoryReport
+    [Migration("20221112191115_inti")]
+    partial class inti
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -249,7 +249,7 @@ namespace Maintenance.Infrastructure.Migrations
                     b.ToTable("PermissionRoles");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.CategoryReport", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.AttachmentComplanit", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -263,7 +263,53 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<long>("RequestComplanitId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("RequestComplanitId");
+
+                    b.ToTable("AttachmentComplanit");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CategoryComplanit", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DescriptionEn")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NameAr")
@@ -285,7 +331,128 @@ namespace Maintenance.Infrastructure.Migrations
 
                     b.HasIndex("CreatedBy");
 
-                    b.ToTable("CategoriesReport");
+                    b.ToTable("CategoriesComplanit");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CheckListComplanit", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long?>("CategoryComplanitId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DescriptionEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameAr")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryComplanitId");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.ToTable("CheckListsComplanit");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CheckListRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long?>("CheckListComplanitId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("RequestComplanitId")
+                        .IsRequired()
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CheckListComplanitId");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("RequestComplanitId");
+
+                    b.ToTable("CheckListRequest");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.RequestComplanit", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.ToTable("RequestComplanit");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
@@ -414,7 +581,71 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.CategoryReport", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.AttachmentComplanit", b =>
+                {
+                    b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy");
+
+                    b.HasOne("Maintenance.Domain.Entities.Complanits.RequestComplanit", "RequestComplanit")
+                        .WithMany("AttachmentsComplanit")
+                        .HasForeignKey("RequestComplanitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("RequestComplanit");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CategoryComplanit", b =>
+                {
+                    b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy");
+
+                    b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CheckListComplanit", b =>
+                {
+                    b.HasOne("Maintenance.Domain.Entities.Complanits.CategoryComplanit", "CategoryComplanit")
+                        .WithMany("CheckListsComplanit")
+                        .HasForeignKey("CategoryComplanitId");
+
+                    b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy");
+
+                    b.Navigation("CategoryComplanit");
+
+                    b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CheckListRequest", b =>
+                {
+                    b.HasOne("Maintenance.Domain.Entities.Complanits.CheckListComplanit", "CheckListComplanit")
+                        .WithMany("CheckListRequests")
+                        .HasForeignKey("CheckListComplanitId");
+
+                    b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy");
+
+                    b.HasOne("Maintenance.Domain.Entities.Complanits.RequestComplanit", "RequestComplanit")
+                        .WithMany("CheckListRequests")
+                        .HasForeignKey("RequestComplanitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CheckListComplanit");
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("RequestComplanit");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.RequestComplanit", b =>
                 {
                     b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
                         .WithMany()
@@ -474,6 +705,23 @@ namespace Maintenance.Infrastructure.Migrations
             modelBuilder.Entity("Maintenance.Domain.Entities.Auth.Permission", b =>
                 {
                     b.Navigation("PermissionRoles");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CategoryComplanit", b =>
+                {
+                    b.Navigation("CheckListsComplanit");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CheckListComplanit", b =>
+                {
+                    b.Navigation("CheckListRequests");
+                });
+
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.RequestComplanit", b =>
+                {
+                    b.Navigation("AttachmentsComplanit");
+
+                    b.Navigation("CheckListRequests");
                 });
 #pragma warning restore 612, 618
         }

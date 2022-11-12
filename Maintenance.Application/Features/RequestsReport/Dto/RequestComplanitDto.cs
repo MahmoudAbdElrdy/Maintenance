@@ -1,7 +1,7 @@
 ﻿using AuthDomain.Entities.Auth;
 using AutoMapper;
 using Maintenance.Application.Features.Categories.Dto;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Enums;
 using Maintenance.Domain.Mapper;
 using System;
@@ -11,17 +11,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Maintenance.Application.Features.RequestsReport.Dto 
+namespace Maintenance.Application.Features.RequestsComplanit.Dto 
 {
-    public class RequestReportDto:IHaveCustomMapping
+    public class RequestComplanitDto:IHaveCustomMapping
     {
         public long Id { get; set; }
         public string? Description { get; set; }
         public long []? CheckListsRequest { get; set; }
-        public long []? AttachmentsReport { get; set; } 
+        public long []? AttachmentsComplanit { get; set; } 
         public void CreateMappings(Profile configuration)
         {
-            configuration.CreateMap<RequestReport,RequestReportDto>().ReverseMap();
+            configuration.CreateMap<RequestComplanit,RequestComplanitDto>().ReverseMap();
         }
     }
 }

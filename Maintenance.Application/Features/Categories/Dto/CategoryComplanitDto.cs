@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Mapper;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Maintenance.Application.Features.Categories.Dto
 {
-    public class CategoryReportDto : IHaveCustomMapping
+    public class CategoryComplanitDto : IHaveCustomMapping
     {
         public string? NameAr { get; set; }
         public string? NameEn { get; set; }
@@ -18,7 +18,7 @@ namespace Maintenance.Application.Features.Categories.Dto
         public long Id { get; set; }
         public void CreateMappings(Profile configuration)
         {
-            configuration.CreateMap<CategoryReport, CategoryReportDto>().ReverseMap();
+            configuration.CreateMap<CategoryComplanit, CategoryComplanitDto>().ReverseMap();
         }
     }
 }

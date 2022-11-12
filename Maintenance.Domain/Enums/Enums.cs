@@ -67,7 +67,7 @@
         Medium,
         Weak
     } 
-    public enum ReportTypeEnum
+    public enum ComplanitTypeEnum
     {
         NotSecret,
         Secret
@@ -105,7 +105,7 @@
     }
     public enum FavType
     {
-        Report,
+        Complanit,
         DataApi
     }
     public enum DataApiOwnerType
@@ -114,7 +114,7 @@
         Beneficiary,
         None
     }
-    public enum ReportUserType
+    public enum ComplanitUserType
     {
         Owner,
         HasAccess,

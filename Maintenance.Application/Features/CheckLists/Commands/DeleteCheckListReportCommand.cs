@@ -1,6 +1,6 @@
 ﻿using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -9,48 +9,48 @@ using Microsoft.Extensions.Logging;
 
 namespace Maintenance.Application.Features.CheckLists.Commands
 {
-    public class DeleteCheckListReportCommand : IRequest<ResponseDTO>
+    public class DeleteCheckListComplanitCommand : IRequest<ResponseDTO>
     {
         public long Id { get; set; }
-        class DeleteCheckListReport : IRequestHandler<DeleteCheckListReportCommand, ResponseDTO>
+        class DeleteCheckListComplanit : IRequestHandler<DeleteCheckListComplanitCommand, ResponseDTO>
         {
-            private readonly IGRepository<CheckListReport> _CheckListReportRepository;
-            private readonly ILogger<DeleteCheckListReportCommand> _logger;
+            private readonly IGRepository<CheckListComplanit> _CheckListComplanitRepository;
+            private readonly ILogger<DeleteCheckListComplanitCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
-            public DeleteCheckListReport(
+            public DeleteCheckListComplanit(
               
-                IGRepository<CheckListReport> CheckListReportRepository,
-                ILogger<DeleteCheckListReportCommand> logger,
+                IGRepository<CheckListComplanit> CheckListComplanitRepository,
+                ILogger<DeleteCheckListComplanitCommand> logger,
                  IAuditService auditService
             )
             {
-                _CheckListReportRepository = CheckListReportRepository;
+                _CheckListComplanitRepository = CheckListComplanitRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _response = new ResponseDTO();
                 _auditService = auditService;
 
             }
-            public async Task<ResponseDTO> Handle(DeleteCheckListReportCommand request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(DeleteCheckListComplanitCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
-                    var entityObj = await _CheckListReportRepository.GetAll(x => x.Id == request.Id).FirstOrDefaultAsync();
+                    var entityObj = await _CheckListComplanitRepository.GetAll(x => x.Id == request.Id).FirstOrDefaultAsync();
                     if (entityObj == null)
                     {
 
                         _response.StatusEnum = StatusEnum.FailedToFindTheObject;
-                        _response.Message = "CheckListReportNotFound";
+                        _response.Message = "CheckListComplanitNotFound";
                     }
 
                     entityObj.UpdatedBy = _auditService.UserId;
                     entityObj.UpdatedOn = DateTime.Now;
                     entityObj.State = Domain.Enums.State.Deleted;
-                    _CheckListReportRepository.Update(entityObj);
-                    _CheckListReportRepository.Save();
+                    _CheckListComplanitRepository.Update(entityObj);
+                    _CheckListComplanitRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = "CheckListReportRemovedSuccessfully";
+                    _response.Message = "CheckListComplanitRemovedSuccessfully";
 
                     return _response;
                 }

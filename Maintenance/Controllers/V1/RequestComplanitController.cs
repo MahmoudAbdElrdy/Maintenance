@@ -1,6 +1,6 @@
 ﻿using Maintenance.Application.Features.Categories.Commands;
-using Maintenance.Application.Features.RequestsReport;
-using Maintenance.Application.Features.RequestsReport.Commands;
+using Maintenance.Application.Features.RequestsComplanit;
+using Maintenance.Application.Features.RequestsComplanit.Commands;
 using Maintenance.Application.Helper;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -10,13 +10,13 @@ namespace Maintenance.Controllers.V1
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RequestReportController : ApiBaseController
+    public class RequestComplanitController : ApiBaseController
     {
         private readonly IMediator _mediator;
         private readonly IHttpContextAccessor _httpContextAccessor;
         public long _loggedInUserId;
 
-        public RequestReportController(IMediator mediator, IHttpContextAccessor httpContextAccessor)
+        public RequestComplanitController(IMediator mediator, IHttpContextAccessor httpContextAccessor)
         {
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _httpContextAccessor = httpContextAccessor;
@@ -26,7 +26,7 @@ namespace Maintenance.Controllers.V1
         //[HttpGet]
         //public async Task<ResponseDTO> GetAll(int pageNumber, int pageSize)
         //{
-        //    return await _mediator.Send(new GetAllRequestReportQuery()
+        //    return await _mediator.Send(new GetAllRequestComplanitQuery()
         //    {
         //        PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
         //        {
@@ -38,14 +38,14 @@ namespace Maintenance.Controllers.V1
 
         //[HttpGet]
         //[Route("{id}")]
-        //public async Task<ResponseDTO> GetRequestReportQueryById(long id)
+        //public async Task<ResponseDTO> GetRequestComplanitQueryById(long id)
         //{
-        //    return await _mediator.Send(new GetRequestReportQueryById() { Id = id });
+        //    return await _mediator.Send(new GetRequestComplanitQueryById() { Id = id });
         //}
 
-        [HttpPost("PostRequestReport")]
+        [HttpPost("PostRequestComplanit")]
 
-        public async Task<ResponseDTO> PostRequestReport([FromBody] PostRequestReportCommand command)
+        public async Task<ResponseDTO> PostRequestComplanit([FromBody] PostRequestComplanitCommand command)
         {
             if (!ModelState.IsValid)
             {
@@ -58,8 +58,8 @@ namespace Maintenance.Controllers.V1
             return await _mediator.Send(command);
         }
 
-        [HttpPut("PutRequestReport")]
-        public async Task<ResponseDTO> PutRequestReport([FromBody] PutRequestReportCommand command)
+        [HttpPut("PutRequestComplanit")]
+        public async Task<ResponseDTO> PutRequestComplanit([FromBody] PutRequestComplanitCommand command)
         {
             if (!ModelState.IsValid)
             {
@@ -77,7 +77,7 @@ namespace Maintenance.Controllers.V1
         [Route("{id}")]
         public async Task<ResponseDTO> Delete(long id)
         {
-            return await _mediator.Send(new DeleteRequestReportCommand() { Id = id });
+            return await _mediator.Send(new DeleteRequestComplanitCommand() { Id = id });
         }
     }
 }

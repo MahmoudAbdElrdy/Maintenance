@@ -3,7 +3,7 @@ using AutoMapper;
 using Maintenance.Application.Features.CheckLists.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -15,26 +15,26 @@ using System.Threading.Tasks;
 
 namespace Maintenance.Application.Features.CheckLists.Queries
 {
-    public class GetCheckListReportQueryById : IRequest<ResponseDTO>
+    public class GetCheckListComplanitQueryById : IRequest<ResponseDTO>
     {
         public long Id { get; set; }
-        class GetCheckListReportByIdQueryHandler : IRequestHandler<GetCheckListReportQueryById, ResponseDTO>
+        class GetCheckListComplanitByIdQueryHandler : IRequestHandler<GetCheckListComplanitQueryById, ResponseDTO>
         {
-            private readonly IGRepository<CheckListReport> _CheckListReportRepository;
+            private readonly IGRepository<CheckListComplanit> _CheckListComplanitRepository;
             private readonly IGRepository<User> _userRepository;
-            private readonly ILogger<GetCheckListReportByIdQueryHandler> _logger;
+            private readonly ILogger<GetCheckListComplanitByIdQueryHandler> _logger;
             private readonly ResponseDTO _response;
             public long _loggedInUserId;
             private readonly IMapper _mapper;
-            public GetCheckListReportByIdQueryHandler(
+            public GetCheckListComplanitByIdQueryHandler(
                 IHttpContextAccessor _httpContextAccessor,
-                IGRepository<CheckListReport> CheckListReportRepository,
-                ILogger<GetCheckListReportByIdQueryHandler> logger, IMapper mapper,
+                IGRepository<CheckListComplanit> CheckListComplanitRepository,
+                ILogger<GetCheckListComplanitByIdQueryHandler> logger, IMapper mapper,
                 IGRepository<User> userRepository
             )
             {
                 _mapper = mapper;
-                _CheckListReportRepository = CheckListReportRepository;
+                _CheckListComplanitRepository = CheckListComplanitRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _response = new ResponseDTO();
                 _userRepository = userRepository;
@@ -48,7 +48,7 @@ namespace Maintenance.Application.Features.CheckLists.Queries
                 }
 
             }
-            public async Task<ResponseDTO> Handle(GetCheckListReportQueryById request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(GetCheckListComplanitQueryById request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -60,17 +60,17 @@ namespace Maintenance.Application.Features.CheckLists.Queries
                         _response.Message = "userNotFound";
                     }
 
-                    var entityCheckListReport = _CheckListReportRepository.GetAll(x => x.State != Domain.Enums.State.Deleted).FirstOrDefault();
-                    if (entityCheckListReport == null)
+                    var entityCheckListComplanit = _CheckListComplanitRepository.GetAll(x => x.State != Domain.Enums.State.Deleted).FirstOrDefault();
+                    if (entityCheckListComplanit == null)
                     {
 
                         _response.StatusEnum = StatusEnum.Failed;
-                        _response.Message = "CheckListReportNotFound";
+                        _response.Message = "CheckListComplanitNotFound";
                     }
-                    var mappedObj = _mapper.Map<CheckListReportDto>(entityCheckListReport);
+                    var mappedObj = _mapper.Map<CheckListComplanitDto>(entityCheckListComplanit);
                     _response.Result = mappedObj;
                     _response.StatusEnum = StatusEnum.Success;
-                    _response.Message = "CheckListReportRetrievedSuccessfully";
+                    _response.Message = "CheckListComplanitRetrievedSuccessfully";
 
                     return _response;
                 }

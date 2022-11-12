@@ -10,13 +10,13 @@ namespace Maintenance.Controllers.V1
 {
     [ApiVersion("1.0")]
     [Authorize]
-    public class CheckListReportController : ApiBaseController
+    public class CheckListComplanitController : ApiBaseController
     {
         private readonly IMediator _mediator;
         private readonly IHttpContextAccessor _httpContextAccessor;
         public long _loggedInUserId;
 
-        public CheckListReportController(IMediator mediator, IHttpContextAccessor httpContextAccessor)
+        public CheckListComplanitController(IMediator mediator, IHttpContextAccessor httpContextAccessor)
         {
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _httpContextAccessor = httpContextAccessor;
@@ -26,7 +26,7 @@ namespace Maintenance.Controllers.V1
         [HttpGet]
         public async Task<ResponseDTO> GetAll(int pageNumber, int pageSize)
         {
-            return await _mediator.Send(new GetAllCheckListReportQuery()
+            return await _mediator.Send(new GetAllCheckListComplanitQuery()
             {
                 PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
                 {
@@ -38,14 +38,14 @@ namespace Maintenance.Controllers.V1
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ResponseDTO> GetCheckListReportQueryById(long id) 
+        public async Task<ResponseDTO> GetCheckListComplanitQueryById(long id) 
         {
-            return await _mediator.Send(new GetCheckListReportQueryById() { Id = id });
+            return await _mediator.Send(new GetCheckListComplanitQueryById() { Id = id });
         }
 
-        [HttpPost("PostCheckListReport")]
+        [HttpPost("PostCheckListComplanit")]
       
-        public async Task<ResponseDTO> PostCheckListReport([FromBody] PostCheckListReportCommand command)
+        public async Task<ResponseDTO> PostCheckListComplanit([FromBody] PostCheckListComplanitCommand command)
         {
             if (!ModelState.IsValid)
             {
@@ -58,8 +58,8 @@ namespace Maintenance.Controllers.V1
             return await _mediator.Send(command);
         }
        
-        [HttpPut("PutCheckListReport")]
-        public async Task<ResponseDTO> PutCheckListReport( [FromBody] PutCheckListReportCommand command)
+        [HttpPut("PutCheckListComplanit")]
+        public async Task<ResponseDTO> PutCheckListComplanit( [FromBody] PutCheckListComplanitCommand command)
         {
             if (!ModelState.IsValid)
             {
@@ -77,7 +77,7 @@ namespace Maintenance.Controllers.V1
         [Route("{id}")]
         public async Task<ResponseDTO> Delete(long id)
         {
-            return await _mediator.Send(new DeleteCheckListReportCommand() { Id = id });
+            return await _mediator.Send(new DeleteCheckListComplanitCommand() { Id = id });
         }
     }
 }

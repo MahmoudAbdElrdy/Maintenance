@@ -1,50 +1,50 @@
 ﻿using AutoMapper;
 using Maintenance.Application.Features.Categories.Dto;
-using Maintenance.Application.Features.RequestsReport.Dto;
+using Maintenance.Application.Features.RequestsComplanit.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Maintenance.Application.Features.RequestsReport.Commands
+namespace Maintenance.Application.Features.RequestsComplanit.Commands
 {
-    public class PostRequestReportCommand : IRequest<ResponseDTO>
+    public class PostRequestComplanitCommand : IRequest<ResponseDTO>
     {
         public string? NameAr { get; set; }
         public string? NameEn { get; set; }
         public string? Description { get; set; }
         public long[]? CheckListsRequest { get; set; }
-        public string[]? AttachmentsReport { get; set; }
-        class PostRequestReport : IRequestHandler<PostRequestReportCommand, ResponseDTO>
+        public string[]? AttachmentsComplanit { get; set; }
+        class PostRequestComplanit : IRequestHandler<PostRequestComplanitCommand, ResponseDTO>
         {
-            private readonly IGRepository<RequestReport> _RequestReportRepository;
-            private readonly ILogger<PostRequestReportCommand> _logger;
+            private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;
+            private readonly ILogger<PostRequestComplanitCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
             private readonly IMapper _mapper;
-            public PostRequestReport(
+            public PostRequestComplanit(
 
-                IGRepository<RequestReport> RequestReportRepository,
-                ILogger<PostRequestReportCommand> logger,
+                IGRepository<RequestComplanit> RequestComplanitRepository,
+                ILogger<PostRequestComplanitCommand> logger,
                 IAuditService auditService,
                 IMapper mapper
             )
             {
-                _RequestReportRepository = RequestReportRepository;
+                _RequestComplanitRepository = RequestComplanitRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _auditService = auditService;
                 _response = new ResponseDTO();
                 _mapper = mapper;
 
             }
-            public async Task<ResponseDTO> Handle(PostRequestReportCommand request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(PostRequestComplanitCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
 
-                    var RequestReport = new RequestReport()
+                    var RequestComplanit = new RequestComplanit()
                     {
                         CreatedBy = _auditService.UserId,
                         CreatedOn = DateTime.Now,
@@ -53,9 +53,9 @@ namespace Maintenance.Application.Features.RequestsReport.Commands
                     };
                
                  
-                    foreach (var item in request.AttachmentsReport)
+                    foreach (var item in request.AttachmentsComplanit)
                     {
-                        RequestReport.AttachmentsReport.Add(new AttachmentReport() { 
+                        RequestComplanit.AttachmentsComplanit.Add(new AttachmentComplanit() { 
                             Path = item,
                             CreatedBy = _auditService.UserId,
                             CreatedOn = DateTime.Now,
@@ -63,8 +63,8 @@ namespace Maintenance.Application.Features.RequestsReport.Commands
                     }
                     foreach (var item in request.CheckListsRequest)
                     {
-                        RequestReport.CheckListRequests.Add(new CheckListRequest() {
-                            CheckListReportId = item,
+                        RequestComplanit.CheckListRequests.Add(new CheckListRequest() {
+                            CheckListComplanitId = item,
                             CreatedBy = _auditService.UserId,
                             CreatedOn = DateTime.Now,
                         });
@@ -72,21 +72,21 @@ namespace Maintenance.Application.Features.RequestsReport.Commands
                   
                     
                     
-                    await _RequestReportRepository.AddAsync(RequestReport);
-                    _RequestReportRepository.Save();
+                    await _RequestComplanitRepository.AddAsync(RequestComplanit);
+                    _RequestComplanitRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = "RequestReportSavedSuccessfully";
+                    _response.Message = "RequestComplanitSavedSuccessfully";
                     _response.Result = null;
                     return _response;
                 }
                 catch (Exception ex)
                 {
-                    if (request.AttachmentsReport.Length > 0)
+                    if (request.AttachmentsComplanit.Length > 0)
                     {
-                        var folderName = Path.Combine("wwwroot/Uploads/Reports");
+                        var folderName = Path.Combine("wwwroot/Uploads/Complanits");
 
-                        foreach (var fileRemove in request.AttachmentsReport)
+                        foreach (var fileRemove in request.AttachmentsComplanit)
                         {
                             var file = System.IO.Path.Combine(folderName, fileRemove);
                             try

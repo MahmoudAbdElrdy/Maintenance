@@ -9,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Maintenance.Domain.Entities.Reports
+namespace Maintenance.Domain.Entities.Complanits
 {
-    public class RequestReport : IBaseEntity, IAuditable, ISoftDelete
+    public class RequestComplanit : IBaseEntity, IAuditable, ISoftDelete
     {
         public long Id { get; set; }
         public DateTime CreatedOn { get; set; }
@@ -23,6 +23,6 @@ namespace Maintenance.Domain.Entities.Reports
         public virtual User Creator { get; set; }
         public string? Description { get; set; }
         public virtual ICollection<CheckListRequest> CheckListRequests { get; set; } = new List<CheckListRequest>();
-        public virtual ICollection<AttachmentReport> AttachmentsReport { get; set; } = new List<AttachmentReport>();
+        public virtual ICollection<AttachmentComplanit> AttachmentsComplanit { get; set; } = new List<AttachmentComplanit>();
     }
 }

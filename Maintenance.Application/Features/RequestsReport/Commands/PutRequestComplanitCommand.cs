@@ -1,55 +1,55 @@
 ﻿using AutoMapper;
 using Maintenance.Application.Features.Categories.Dto;
-using Maintenance.Application.Features.RequestsReport.Dto;
+using Maintenance.Application.Features.RequestsComplanit.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Maintenance.Application.Features.RequestsReport.Commands
+namespace Maintenance.Application.Features.RequestsComplanit.Commands
 {
-    public class PutRequestReportCommand : IRequest<ResponseDTO>
+    public class PutRequestComplanitCommand : IRequest<ResponseDTO>
     {
         public long Id { get; set; }
         public string? NameAr { get; set; }
         public string? NameEn { get; set; }
         public string? Description { get; set; }
 
-        class PutRequestReport : IRequestHandler<PutRequestReportCommand, ResponseDTO>
+        class PutRequestComplanit : IRequestHandler<PutRequestComplanitCommand, ResponseDTO>
         {
-            private readonly IGRepository<RequestReport> _RequestReportRepository;
+            private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;
             private readonly IGRepository<CheckListRequest> _CheckListRequestRepository;
-            private readonly IGRepository<AttachmentReport> _AttachmentReportRepository;
-            private readonly ILogger<PutRequestReportCommand> _logger;
+            private readonly IGRepository<AttachmentComplanit> _AttachmentComplanitRepository;
+            private readonly ILogger<PutRequestComplanitCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
             private readonly IMapper _mapper;
-            public PutRequestReport(
+            public PutRequestComplanit(
 
-                IGRepository<RequestReport> RequestReportRepository,
+                IGRepository<RequestComplanit> RequestComplanitRepository,
                 IGRepository<CheckListRequest> CheckListRequestRepository,
-                IGRepository<AttachmentReport> AttachmentReportRepository,
-                ILogger<PutRequestReportCommand> logger,
+                IGRepository<AttachmentComplanit> AttachmentComplanitRepository,
+                ILogger<PutRequestComplanitCommand> logger,
                 IAuditService auditService,
                 IMapper  mapper
             )
             {
-                _RequestReportRepository = RequestReportRepository;
+                _RequestComplanitRepository = RequestComplanitRepository;
                 _CheckListRequestRepository = CheckListRequestRepository;
-                _AttachmentReportRepository = AttachmentReportRepository;
+                _AttachmentComplanitRepository = AttachmentComplanitRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _auditService = auditService;
                 _response = new ResponseDTO();
                 _mapper = mapper;
             }
-            public async Task<ResponseDTO> Handle(PutRequestReportCommand request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(PutRequestComplanitCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
 
-                    var RequestReport = new RequestReport()
+                    var RequestComplanit = new RequestComplanit()
                     {
                         UpdatedBy = _auditService.UserId,
                         UpdatedOn = DateTime.Now,
@@ -57,11 +57,11 @@ namespace Maintenance.Application.Features.RequestsReport.Commands
                         Id =request.Id
                     };
 
-                     _RequestReportRepository.Update(RequestReport);
-                    _RequestReportRepository.Save();
-                    _response.Result = _mapper.Map<RequestReportDto>(RequestReport);
+                     _RequestComplanitRepository.Update(RequestComplanit);
+                    _RequestComplanitRepository.Save();
+                    _response.Result = _mapper.Map<RequestComplanitDto>(RequestComplanit);
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = "RequestReportUpdatedSuccessfully";
+                    _response.Message = "RequestComplanitUpdatedSuccessfully";
 
                     return _response;
                 }

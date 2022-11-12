@@ -247,7 +247,7 @@ namespace Maintenance.Infrastructure.Migrations
                     b.ToTable("PermissionRoles");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.AttachmentReport", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.AttachmentComplanit", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -269,7 +269,7 @@ namespace Maintenance.Infrastructure.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
-                    b.Property<long>("RequestReportId")
+                    b.Property<long>("RequestComplanitId")
                         .HasColumnType("bigint");
 
                     b.Property<int>("State")
@@ -285,12 +285,12 @@ namespace Maintenance.Infrastructure.Migrations
 
                     b.HasIndex("CreatedBy");
 
-                    b.HasIndex("RequestReportId");
+                    b.HasIndex("RequestComplanitId");
 
-                    b.ToTable("AttachmentReport");
+                    b.ToTable("AttachmentComplanit");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.CategoryReport", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CategoryComplanit", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -329,10 +329,10 @@ namespace Maintenance.Infrastructure.Migrations
 
                     b.HasIndex("CreatedBy");
 
-                    b.ToTable("CategoriesReport");
+                    b.ToTable("CategoriesComplanit");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.CheckListReport", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CheckListComplanit", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -340,7 +340,7 @@ namespace Maintenance.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<long?>("CategoryReportId")
+                    b.Property<long?>("CategoryComplanitId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("CreatedBy")
@@ -372,14 +372,14 @@ namespace Maintenance.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryReportId");
+                    b.HasIndex("CategoryComplanitId");
 
                     b.HasIndex("CreatedBy");
 
-                    b.ToTable("CheckListsReport");
+                    b.ToTable("CheckListsComplanit");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.CheckListRequest", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CheckListRequest", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -387,7 +387,7 @@ namespace Maintenance.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<long?>("CheckListReportId")
+                    b.Property<long?>("CheckListComplanitId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("CreatedBy")
@@ -396,7 +396,7 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("RequestReportId")
+                    b.Property<long?>("RequestComplanitId")
                         .IsRequired()
                         .HasColumnType("bigint");
 
@@ -411,16 +411,16 @@ namespace Maintenance.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CheckListReportId");
+                    b.HasIndex("CheckListComplanitId");
 
                     b.HasIndex("CreatedBy");
 
-                    b.HasIndex("RequestReportId");
+                    b.HasIndex("RequestComplanitId");
 
                     b.ToTable("CheckListRequest");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.RequestReport", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.RequestComplanit", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -450,7 +450,7 @@ namespace Maintenance.Infrastructure.Migrations
 
                     b.HasIndex("CreatedBy");
 
-                    b.ToTable("RequestReport");
+                    b.ToTable("RequestComplanit");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
@@ -579,24 +579,24 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.AttachmentReport", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.AttachmentComplanit", b =>
                 {
                     b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatedBy");
 
-                    b.HasOne("Maintenance.Domain.Entities.Reports.RequestReport", "RequestReport")
-                        .WithMany("AttachmentsReport")
-                        .HasForeignKey("RequestReportId")
+                    b.HasOne("Maintenance.Domain.Entities.Complanits.RequestComplanit", "RequestComplanit")
+                        .WithMany("AttachmentsComplanit")
+                        .HasForeignKey("RequestComplanitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Creator");
 
-                    b.Navigation("RequestReport");
+                    b.Navigation("RequestComplanit");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.CategoryReport", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CategoryComplanit", b =>
                 {
                     b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
                         .WithMany()
@@ -605,45 +605,45 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.CheckListReport", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CheckListComplanit", b =>
                 {
-                    b.HasOne("Maintenance.Domain.Entities.Reports.CategoryReport", "CategoryReport")
-                        .WithMany("CheckListsReport")
-                        .HasForeignKey("CategoryReportId");
+                    b.HasOne("Maintenance.Domain.Entities.Complanits.CategoryComplanit", "CategoryComplanit")
+                        .WithMany("CheckListsComplanit")
+                        .HasForeignKey("CategoryComplanitId");
 
                     b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatedBy");
 
-                    b.Navigation("CategoryReport");
+                    b.Navigation("CategoryComplanit");
 
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.CheckListRequest", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CheckListRequest", b =>
                 {
-                    b.HasOne("Maintenance.Domain.Entities.Reports.CheckListReport", "CheckListReport")
+                    b.HasOne("Maintenance.Domain.Entities.Complanits.CheckListComplanit", "CheckListComplanit")
                         .WithMany("CheckListRequests")
-                        .HasForeignKey("CheckListReportId");
+                        .HasForeignKey("CheckListComplanitId");
 
                     b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatedBy");
 
-                    b.HasOne("Maintenance.Domain.Entities.Reports.RequestReport", "RequestReport")
+                    b.HasOne("Maintenance.Domain.Entities.Complanits.RequestComplanit", "RequestComplanit")
                         .WithMany("CheckListRequests")
-                        .HasForeignKey("RequestReportId")
+                        .HasForeignKey("RequestComplanitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CheckListReport");
+                    b.Navigation("CheckListComplanit");
 
                     b.Navigation("Creator");
 
-                    b.Navigation("RequestReport");
+                    b.Navigation("RequestComplanit");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.RequestReport", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.RequestComplanit", b =>
                 {
                     b.HasOne("AuthDomain.Entities.Auth.User", "Creator")
                         .WithMany()
@@ -705,19 +705,19 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Navigation("PermissionRoles");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.CategoryReport", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CategoryComplanit", b =>
                 {
-                    b.Navigation("CheckListsReport");
+                    b.Navigation("CheckListsComplanit");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.CheckListReport", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.CheckListComplanit", b =>
                 {
                     b.Navigation("CheckListRequests");
                 });
 
-            modelBuilder.Entity("Maintenance.Domain.Entities.Reports.RequestReport", b =>
+            modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.RequestComplanit", b =>
                 {
-                    b.Navigation("AttachmentsReport");
+                    b.Navigation("AttachmentsComplanit");
 
                     b.Navigation("CheckListRequests");
                 });

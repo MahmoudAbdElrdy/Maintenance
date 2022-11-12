@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Maintenance.Domain.Entities.Reports;
+using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Mapper;
 using System;
 using System.Collections.Generic;
@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Maintenance.Application.Features.CheckLists.Dto
 {
-    public class CheckListReportDto : IHaveCustomMapping
+    public class CheckListComplanitDto : IHaveCustomMapping
     {
         public long Id { get; set; }
-        public long? CategoryReportId { set; get; }
+        public long? CategoryComplanitId { set; get; }
         public string? NameAr { get; set; }
         public string? NameEn { get; set; }
         public string? DescriptionAr { get; set; }
@@ -20,7 +20,7 @@ namespace Maintenance.Application.Features.CheckLists.Dto
 
         public void CreateMappings(Profile configuration)
         {
-            configuration.CreateMap<CheckListReport, CheckListReportDto>().ReverseMap();
+            configuration.CreateMap<CheckListComplanit, CheckListComplanitDto>().ReverseMap();
         }
     }
 }
