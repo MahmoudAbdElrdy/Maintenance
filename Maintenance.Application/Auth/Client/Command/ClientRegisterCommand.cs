@@ -4,9 +4,11 @@ using Maintenance.Application.Auth.Login;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.SendSms;
 using Maintenance.Domain.Enums;
+using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Refit;
 
 namespace Maintenance.Application.Auth.Client.Command
 {
@@ -26,18 +28,36 @@ namespace Maintenance.Application.Auth.Client.Command
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
         private readonly ResponseDTO _responseDTO;
-        public Handler(UserManager<User> userManager, IMapper mapper)
+        private readonly IRoom _room;
+        public Handler(UserManager<User> userManager, IMapper mapper, IRoom room)
         {
             _userManager = userManager;
             _mapper = mapper;
             _responseDTO = new ResponseDTO();
+            _room = room;
         }
         public async Task<ResponseDTO> Handle(ClientRegisterCommand request, CancellationToken cancellationToken)
         {
             var user = new User();
             try
             {
+                var room = 0;
+                try
+                {
+                   room = await _room.GetRoomId(request.RoomNumber);
+                }
+                catch (ApiException)
+                {
+                    _responseDTO.Result = null;
+                   
+                    _responseDTO.StatusEnum = StatusEnum.Failed;
+                   
+                    _responseDTO.Message = "ProblemServerRoom";
+                  
+                    return _responseDTO;
+                }
                 var checkExsit= await _userManager.Users.Where(x => x.IdentityNumber == request.IdentityNumber).FirstOrDefaultAsync();
+               
                 if (checkExsit != null)
                 {
                     _responseDTO.Result = null;
@@ -46,6 +66,7 @@ namespace Maintenance.Application.Auth.Client.Command
                     return _responseDTO;
                 }
                 var phoneExsit = await _userManager.Users.Where(x => x.PhoneNumber == request.PhoneNumber).FirstOrDefaultAsync();
+               
                 if (phoneExsit != null)
                 {
                     _responseDTO.Result = null;

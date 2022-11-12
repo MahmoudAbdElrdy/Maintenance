@@ -29,6 +29,8 @@ using Maintenance.Application.Helper;
 using Maintenance.Helpers;
 using Maintenance.API.Helpers;
 using Maintenance.API.Middleware;
+using Refit;
+using Maintenance.Domain.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,9 +87,16 @@ builder.Services
 .ConfigureAndValidateSingleton<JwtOption>(builder.Configuration.GetSection(nameof(Sections.JwtOption)))
 .ConfigureAndValidateSingleton<AppInfoOption>(builder.Configuration.GetSection(nameof(Sections.AppInfoOption)))
 .ConfigureAndValidateSingleton<ImageOption>(builder.Configuration.GetSection(nameof(Sections.ImageOption)))
-.ConfigureAndValidateSingleton<AppSettings>(builder.Configuration.GetSection(nameof(Sections.AppSettings)))
-;
+.ConfigureAndValidateSingleton<AppSettings>(builder.Configuration.GetSection(nameof(Sections.AppSettings)));
 
+builder.Services.AddRefitClient<IRoom>()
+   .ConfigureHttpClient(c =>
+   {
+
+   c.BaseAddress = new Uri(builder.Configuration.GetValue<string>("ExternalServices:RoomApi"));
+   c.Timeout = TimeSpan.FromMinutes(3);
+  
+  });
 ApplicationServiceRegistration.AddApplicationServices(builder.Services);
 builder.Services
  .AddAutoMapper(new Assembly[] {
