@@ -48,9 +48,11 @@ namespace Maintenance.Application.Auth.Client.Command
                 try
                 {
                    room = await _room.GetRoomId(request.RoomNumber);
-                    if (room == 0)
+                  
+                 if (room == 0)
+                
                     {
-                        _responseDTO.Result = null;
+                        _responseDTO.Result = request.RoomNumber;
 
                         _responseDTO.StatusEnum = StatusEnum.Failed;
 
