@@ -31,6 +31,7 @@ using Maintenance.API.Helpers;
 using Maintenance.API.Middleware;
 using Refit;
 using Maintenance.Domain.Interfaces;
+using Maintenance.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

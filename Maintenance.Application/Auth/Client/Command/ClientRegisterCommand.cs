@@ -3,11 +3,14 @@ using AutoMapper;
 using Maintenance.Application.Auth.Login;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.SendSms;
+using Maintenance.Application.Interfaces;
 using Maintenance.Domain.Enums;
 using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Refit;
 
 namespace Maintenance.Application.Auth.Client.Command
@@ -41,12 +44,23 @@ namespace Maintenance.Application.Auth.Client.Command
             var user = new User();
             try
             {
-                var room = 0;
+                long room =0;
                 try
                 {
                    room = await _room.GetRoomId(request.RoomNumber);
+                    if (room == 0)
+                    {
+                        _responseDTO.Result = null;
+
+                        _responseDTO.StatusEnum = StatusEnum.Failed;
+
+                        _responseDTO.Message = "RoomNotFound";
+
+                        return _responseDTO;
+                    }
+                   
                 }
-                catch (ApiException)
+                catch (ApiException ex)
                 {
                     _responseDTO.Result = null;
                    
@@ -95,7 +109,7 @@ namespace Maintenance.Application.Auth.Client.Command
 
                     IdentityNumber = request.IdentityNumber,
 
-                    RoomId = request.RoomNumber,
+                    RoomId = room,
 
                     UserType = request.UserType,
                     
