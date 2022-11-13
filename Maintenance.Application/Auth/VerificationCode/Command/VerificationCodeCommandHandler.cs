@@ -91,10 +91,10 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
         }
         private string GenerateJSONWebToken(User user)
         {
-            var signingKey = Convert.FromBase64String(_configuration["Jwt:Key"]);
-            var audience = _configuration["Jwt:Audience"];
-            var expiryDuration = int.Parse(_configuration["Jwt:ExpiryDuration"]);
-            var issuer = _configuration["Jwt:Issuer"];
+            var signingKey = Convert.FromBase64String(_configuration["JwtOption:Key"]);
+            var audience = _configuration["JwtOption:Audience"];
+            var expiryDuration = int.Parse(_configuration["JwtOption:ExpiryDuration"]);
+            var issuer = _configuration["JwtOption:Issuer"];
 
             var claims = new ClaimsIdentity(new List<Claim>() {
                     new Claim("userLoginId", user.Id.ToString()),
