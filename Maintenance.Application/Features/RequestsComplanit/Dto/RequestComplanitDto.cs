@@ -19,6 +19,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Dto
         public string? Description { get; set; }
         public long []? CheckListsRequest { get; set; }
         public string []? AttachmentsComplanit { get; set; } 
+      
        
     }
 }

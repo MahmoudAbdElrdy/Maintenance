@@ -8,6 +8,6 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
     {
         public long? UserId { get; set; }
         public string? Code { get; set; }
-        public string? Password { get; set; }  
+     
     }
 }

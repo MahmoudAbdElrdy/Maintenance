@@ -16,6 +16,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
         //public long[]? CheckListsRequest { get; set; }
         //public string[]? AttachmentsComplanit { get; set; }
         public List<RequestComplanitDto> requests { get; set; }
+        public long RegionId { get; set; }
         class PostRequestComplanit : IRequestHandler<PostRequestComplanitCommand, ResponseDTO>
         {
             private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;
@@ -53,6 +54,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             CreatedOn = DateTime.Now,
                             State = Domain.Enums.State.NotDeleted,
                             Description = requestObj.Description,
+                            RegionId=request.RegionId
                         };
 
                         foreach (var item in requestObj.AttachmentsComplanit)

@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Features\RequestsComplanit\**" />
-    <EmbeddedResource Remove="Features\RequestsComplanit\**" />
-    <None Remove="Features\RequestsComplanit\**" />
+    <Compile Remove="Features\RequestsReport\**" />
+    <EmbeddedResource Remove="Features\RequestsReport\**" />
+    <None Remove="Features\RequestsReport\**" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="11.0.1" />

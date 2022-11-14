@@ -1,4 +1,5 @@
 ﻿using Maintenance.Application.Features.Categories.Commands;
+using Maintenance.Application.Features.Categories.Queries;
 using Maintenance.Application.Features.RequestsComplanit;
 using Maintenance.Application.Features.RequestsComplanit.Commands;
 using Maintenance.Application.Helper;
@@ -23,18 +24,21 @@ namespace Maintenance.Controllers.V1
         }
 
 
-        //[HttpGet]
-        //public async Task<ResponseDTO> GetAll(int pageNumber, int pageSize)
-        //{
-        //    return await _mediator.Send(new GetAllRequestComplanitQuery()
-        //    {
-        //        PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
-        //        {
-        //            PageNumber = pageNumber,
-        //            PageSize = pageSize
-        //        },
-        //    });
-        //}
+        [HttpGet]
+        public async Task<ResponseDTO> GetAll(int pageNumber, int pageSize, long CategoryId, long RegionId)
+        {
+            return await _mediator.Send(new GetAllComplanitQueryByRegionId()
+            {
+                PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    
+                },
+                CategoryId= CategoryId,
+                RegionId= RegionId
+            });
+        }
 
         //[HttpGet]
         //[Route("{id}")]

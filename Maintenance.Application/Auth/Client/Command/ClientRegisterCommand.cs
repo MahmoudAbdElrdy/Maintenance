@@ -1,6 +1,7 @@
 ﻿using AuthDomain.Entities.Auth;
 using AutoMapper;
 using Maintenance.Application.Auth.Login;
+using Maintenance.Application.Features.Account.Commands.Login;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.SendSms;
 using Maintenance.Application.Interfaces;
@@ -157,7 +158,12 @@ namespace Maintenance.Application.Auth.Client.Command
                 _responseDTO.StatusEnum = StatusEnum.Exception;
                 _responseDTO.Message = "anErrorOccurredPleaseContactSystemAdministrator";
             }
-            _responseDTO.Result = _mapper.Map<UserDto>(user);
+            var authorizedUserDto = new AuthorizedUserDTO
+            {
+                User = _mapper.Map<UserDto>(user),
+                Token = null,
+            };
+            _responseDTO.Result = authorizedUserDto;
             _responseDTO.Message = "userAddedSuccessfully";
             _responseDTO.StatusEnum = StatusEnum.SavedSuccessfully;
 

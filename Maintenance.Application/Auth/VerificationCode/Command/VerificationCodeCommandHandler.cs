@@ -56,17 +56,7 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
                     _response.Message = "codeNotCorrect";
                     return _response;
                 }
-              //  var token = await _userManager.GeneratePasswordResetTokenAsync(userLogin);
-
-                var userHasValidPassword = await _userManager.CheckPasswordAsync(userLogin, request.Password);
-
-                if (!userHasValidPassword)
-                {
-                    _response.Message = "PassWordNotCorrect";
-                    _response.StatusEnum = StatusEnum.Failed;
-                    return _response;
-
-                }
+            
 
                 var authorizedUserDto = new AuthorizedUserDTO
                 {
