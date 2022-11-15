@@ -132,19 +132,19 @@ namespace Maintenance.Application.Auth.Client.Command
                 }
                
                 user.Code = SendSMS.GenerateCode();
-                user.Code = "1234";
-                var res =  SendSMS.SendMessageUnifonic("رمز التحقق من الجوال : " + user.Code, user.PhoneNumber);
-                if (res == -1)
-                {
+               user.Code = "1234";
+                //var res =  SendSMS.SendMessageUnifonic("رمز التحقق من الجوال : " + user.Code, user.PhoneNumber);
+                //if (res == -1)
+                //{
 
-                    if (await _userManager.FindByNameAsync(user.UserName) != null)
-                    {
-                        await _userManager.DeleteAsync(user);
-                    }
-                    _responseDTO.Message = "حدث خطا فى ارسال الكود";
-                    _responseDTO.StatusEnum = StatusEnum.Failed;
-                    return _responseDTO;
-                }
+                //    if (await _userManager.FindByNameAsync(user.UserName) != null)
+                //    {
+                //        await _userManager.DeleteAsync(user);
+                //    }
+                //    _responseDTO.Message = "حدث خطا فى ارسال الكود";
+                //    _responseDTO.StatusEnum = StatusEnum.Failed;
+                //    return _responseDTO;
+                //}
                 await _userManager.UpdateAsync(user);
             }
             catch (Exception ex)

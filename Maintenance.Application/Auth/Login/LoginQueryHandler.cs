@@ -82,14 +82,14 @@ namespace Maintenance.Application.Features.Account.Commands.Login
 
                 }
                  personalUser.Code = SendSMS.GenerateCode();
-               // personalUser.Code = "1234";
-                var res =  SendSMS.SendMessageUnifonic("رمز التحقق من الجوال : " + personalUser.Code, personalUser.PhoneNumber);
-                if (res == -1)
-                {
-                    _response.Message = "حدث خطا فى ارسال الكود";
-                    _response.StatusEnum = StatusEnum.Failed;
-                    return _response;
-                }
+                personalUser.Code = "1234";
+                //var res =  SendSMS.SendMessageUnifonic("رمز التحقق من الجوال : " + personalUser.Code, personalUser.PhoneNumber);
+                //if (res == -1)
+                //{
+                //    _response.Message = "حدث خطا فى ارسال الكود";
+                //    _response.StatusEnum = StatusEnum.Failed;
+                //    return _response;
+                //}
                 await _userManager.UpdateAsync(personalUser);
                 var authorizedUserDto = new AuthorizedUserDTO
                 {
