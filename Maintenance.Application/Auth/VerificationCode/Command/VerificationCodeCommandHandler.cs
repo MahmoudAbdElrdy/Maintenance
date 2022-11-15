@@ -3,6 +3,8 @@ using AutoMapper;
 using Maintenance.Application.Auth.Login;
 using Maintenance.Application.Features.Account.Commands.Login;
 using Maintenance.Application.Helper;
+using Maintenance.Application.Interfaces;
+using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -23,8 +25,13 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
         public ResponseDTO Response => _response;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
+        private readonly ILocalizationProvider _localizationProvider;
+        private readonly IAuditService _auditService;
         public VerificationCodeCommandHandler(IMapper mapper,
-            UserManager<User> userManager, IConfiguration configuration,
+            UserManager<User> userManager,
+            IConfiguration configuration,
+             IAuditService auditService,
+             ILocalizationProvider localizationProvider,
             ILogger<VerificationCodeCommand> logger)
         
         {
@@ -33,6 +40,8 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _mapper = mapper;
             _configuration = configuration;
+            _auditService = auditService;
+            _localizationProvider = localizationProvider;
         }
 
         public async Task<ResponseDTO> Handle(VerificationCodeCommand request, CancellationToken cancellationToken)
@@ -45,7 +54,9 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
                 if (userLogin == null)
                 {
                     _response.StatusEnum = StatusEnum.Failed;
-                    _response.Message = "emailNotFound";
+                   // _response.Message = "UserNotFound";
+                    _response.Message = _localizationProvider.Localize("UserNotFound", _auditService.UserLanguage);
+
                     return _response;
                 }
                 var userCode = await _userManager.Users.Where(x => x.Id == request.UserId && x.Code == request.Code).FirstOrDefaultAsync();
@@ -53,7 +64,9 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
                 if (userCode == null)
                 {
                     _response.StatusEnum = StatusEnum.Failed;
-                    _response.Message = "codeNotCorrect";
+                  
+                    _response.Message = _localizationProvider.Localize("codeNotCorrect", _auditService.UserLanguage);
+
                     return _response;
                 }
             
@@ -65,7 +78,9 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
                 };
                // await _userManager.UpdateAsync(userLogin);
                 _response.StatusEnum = StatusEnum.Success;
-                _response.Message = "mobileVerficiationSuccess";
+            
+                _response.Message = _localizationProvider.Localize("mobileVerficiationSuccess", _auditService.UserLanguage);
+
                 _response.Result = authorizedUserDto;
             }
             catch (Exception ex)

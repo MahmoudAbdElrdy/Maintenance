@@ -4,7 +4,9 @@ using Maintenance.Application.Features.Categories.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.Paginations;
+using Maintenance.Application.Interfaces;
 using Maintenance.Domain.Entities.Complanits;
+using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -27,11 +29,16 @@ namespace Maintenance.Application.Features.Categories.Queries
             private readonly ResponseDTO _response;
             public long _loggedInUserId;
             private readonly IMapper _mapper;
+            private readonly IAuditService _auditService;
+            private readonly ILocalizationProvider _localizationProvider;
             public GetAllCategoryComplanit(
                 IHttpContextAccessor _httpContextAccessor,
                 IGRepository<CategoryComplanit> CategoryComplanitRepository,
                 ILogger<GetAllCategoryComplanitQuery> logger, IMapper mapper,
-                IGRepository<User> userRepository
+                IGRepository<User> userRepository,
+                 IAuditService auditService,
+                ILocalizationProvider localizationProvider
+
             )
             {
                 _mapper = mapper;
@@ -39,27 +46,21 @@ namespace Maintenance.Application.Features.Categories.Queries
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _response = new ResponseDTO();
                 _userRepository = userRepository;
-                try
-                {
-                    _loggedInUserId = long.Parse(_httpContextAccessor.HttpContext.User.Claims.Where(c => c.Type == "userLoginId").SingleOrDefault().Value);
-                }
-                catch (Exception ex)
-                {
-                    throw new UnauthorizedAccessException();
-                }
-
+                
+                _auditService = auditService;
+                _localizationProvider = localizationProvider;
             }
             public async Task<ResponseDTO> Handle(GetAllCategoryComplanitQuery request, CancellationToken cancellationToken)
             {
                 try
                 {
-                    var user = _userRepository.GetFirst(x => x.Id == _loggedInUserId);
-                    if (user == null)
-                    {
+                    //var user = _userRepository.GetFirst(x => x.Id == _auditService.UserId);
+                    //if (user == null)
+                    //{
 
-                        _response.StatusEnum = StatusEnum.Failed;
-                        _response.Message = "userNotFound";
-                    }
+                    //    _response.StatusEnum = StatusEnum.Failed;
+                    //    _response.Message = "userNotFound";
+                    //}
 
                     var entityJobs = _CategoryComplanitRepository.GetAll(x => x.State != Domain.Enums.State.Deleted).ToList();
 
@@ -68,7 +69,8 @@ namespace Maintenance.Application.Features.Categories.Queries
                     _response.setPaginationData(paginatedObjs);
                     _response.Result = paginatedObjs;
                     _response.StatusEnum = StatusEnum.Success;
-                    _response.Message = "CategoryComplanitRetrievedSuccessfully";
+                  
+                    _response.Message = _localizationProvider.Localize("AddedSuccessfully", _auditService.UserLanguage);
 
                     return _response;
                 }

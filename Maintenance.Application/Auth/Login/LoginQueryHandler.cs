@@ -5,6 +5,7 @@ using Maintenance.Application.Auth.Login;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.SendSms;
+using Maintenance.Application.Interfaces;
 using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -29,14 +30,17 @@ namespace Maintenance.Application.Features.Account.Commands.Login
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IConfiguration _configuration;
         private readonly JwtOption _jwtOption;
-
+        private readonly IAuditService _auditService;
+        private readonly ILocalizationProvider _localizationProvider;
         public LoginQueryHandler(
             IMapper mapper, ILogger<LoginQueryHandler> logger,
          
             UserManager<User> userManager,
             IPasswordHasher<User> passwordHasher,
             IConfiguration configuration,
-            JwtOption jwtOption
+            JwtOption jwtOption,
+             IAuditService auditService,
+             ILocalizationProvider localizationProvider
 
         )
         {
@@ -48,8 +52,9 @@ namespace Maintenance.Application.Features.Account.Commands.Login
             _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _jwtOption = jwtOption;
-          
-            
+            _auditService = auditService;
+            _localizationProvider = localizationProvider;
+
         }
         public async Task<ResponseDTO> Handle(LoginQuery request, CancellationToken cancellationToken)
         {
@@ -60,7 +65,9 @@ namespace Maintenance.Application.Features.Account.Commands.Login
                 if (personalUser == null)
                 {
 
-                    _response.Message = "nationalIdNotFound";
+                  
+                    _response.Message = _localizationProvider.Localize("NationalNumberFoundBefore", _auditService.UserLanguage);
+
                     _response.StatusEnum = StatusEnum.Failed;
                     return _response;
                 }
@@ -68,7 +75,9 @@ namespace Maintenance.Application.Features.Account.Commands.Login
              
                 else if (personalUser.State == Domain.Enums.State.Deleted)
                 {
-                    _response.Message = "userAreDeleted";
+                   
+                    _response.Message = _localizationProvider.Localize("userAreDeleted", _auditService.UserLanguage);
+
                     _response.StatusEnum = StatusEnum.Failed;
                     return _response;
                 }
@@ -76,20 +85,22 @@ namespace Maintenance.Application.Features.Account.Commands.Login
 
                 if (!userHasValidPassword)
                 {
-                    _response.Message = "PassWordNotCorrect";
+                   
+                    _response.Message = _localizationProvider.Localize("PassWordNotCorrect", _auditService.UserLanguage);
+
                     _response.StatusEnum = StatusEnum.Failed;
                     return _response;
 
                 }
                  personalUser.Code = SendSMS.GenerateCode();
-                personalUser.Code = "1234";
-                //var res =  SendSMS.SendMessageUnifonic("رمز التحقق من الجوال : " + personalUser.Code, personalUser.PhoneNumber);
-                //if (res == -1)
-                //{
-                //    _response.Message = "حدث خطا فى ارسال الكود";
-                //    _response.StatusEnum = StatusEnum.Failed;
-                //    return _response;
-                //}
+                //  personalUser.Code = "1234";
+                var res = SendSMS.SendMessageUnifonic("رمز التحقق من الجوال : " + personalUser.Code, personalUser.PhoneNumber);
+                if (res == -1)
+                {
+                    _response.Message = "حدث خطا فى ارسال الكود";
+                    _response.StatusEnum = StatusEnum.Failed;
+                    return _response;
+                }
                 await _userManager.UpdateAsync(personalUser);
                 var authorizedUserDto = new AuthorizedUserDTO
                 {
@@ -98,7 +109,9 @@ namespace Maintenance.Application.Features.Account.Commands.Login
                 };
 
                 _response.StatusEnum = StatusEnum.Success;
-                _response.Message = "userLoggedInSuccessfully";
+               
+                _response.Message = _localizationProvider.Localize("userLoggedInSuccessfully", _auditService.UserLanguage);
+
                 _response.Result = authorizedUserDto;
 
                 return _response;
@@ -107,7 +120,9 @@ namespace Maintenance.Application.Features.Account.Commands.Login
             {
                 _response.StatusEnum = StatusEnum.Exception;
                 _response.Result = null;
-                _response.Message = (ex != null && ex.InnerException != null ? ex.InnerException.Message : ex.Message);
+                _response.Message = _localizationProvider.Localize("anErrorOccurredPleaseContactSystemAdministrator", _auditService.UserLanguage);
+
+            //    _response.Message = (ex != null && ex.InnerException != null ? ex.InnerException.Message : ex.Message);
                 _logger.LogError(ex, ex.Message, (ex != null && ex.InnerException != null ? ex.InnerException.Message : ""));
 
                 return _response;

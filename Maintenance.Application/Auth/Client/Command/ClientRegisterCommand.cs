@@ -33,12 +33,16 @@ namespace Maintenance.Application.Auth.Client.Command
         private readonly UserManager<User> _userManager;
         private readonly ResponseDTO _responseDTO;
         private readonly IRoom _room;
-        public Handler(UserManager<User> userManager, IMapper mapper, IRoom room)
+        private readonly ILocalizationProvider _localizationProvider;
+        private readonly IAuditService _auditService;
+        public Handler(UserManager<User> userManager, IMapper mapper, IRoom room, IAuditService auditService, ILocalizationProvider localizationProvider)
         {
             _userManager = userManager;
             _mapper = mapper;
             _responseDTO = new ResponseDTO();
             _room = room;
+            _localizationProvider = localizationProvider;
+            _auditService = auditService;
         }
         public async Task<ResponseDTO> Handle(ClientRegisterCommand request, CancellationToken cancellationToken)
         {
@@ -57,7 +61,7 @@ namespace Maintenance.Application.Auth.Client.Command
 
                         _responseDTO.StatusEnum = StatusEnum.Failed;
 
-                        _responseDTO.Message = "RoomNotFound";
+                        _responseDTO.Message =_localizationProvider.Localize("RoomNotFound",_auditService.UserLanguage) ;
 
                         return _responseDTO;
                     }
@@ -68,9 +72,8 @@ namespace Maintenance.Application.Auth.Client.Command
                     _responseDTO.Result = null;
                    
                     _responseDTO.StatusEnum = StatusEnum.Failed;
-                   
-                    _responseDTO.Message = "ProblemServerRoom";
                   
+                    _responseDTO.Message = _localizationProvider.Localize("anErrorOccurredPleaseContactSystemAdministrator", _auditService.UserLanguage);
                     return _responseDTO;
                 }
                 var checkExsit= await _userManager.Users.Where(x => x.IdentityNumber == request.IdentityNumber).FirstOrDefaultAsync();
@@ -79,7 +82,9 @@ namespace Maintenance.Application.Auth.Client.Command
                 {
                     _responseDTO.Result = null;
                     _responseDTO.StatusEnum = StatusEnum.Failed;
-                    _responseDTO.Message = "National Number Found Before";
+                  
+                    _responseDTO.Message = _localizationProvider.Localize("NationalNumberFoundBefore", _auditService.UserLanguage);
+
                     return _responseDTO;
                 }
                 var phoneExsit = await _userManager.Users.Where(x => x.PhoneNumber == request.PhoneNumber).FirstOrDefaultAsync();
@@ -88,7 +93,9 @@ namespace Maintenance.Application.Auth.Client.Command
                 {
                     _responseDTO.Result = null;
                     _responseDTO.StatusEnum = StatusEnum.Failed;
-                    _responseDTO.Message = "Phone Number Found Before";
+                 
+                    _responseDTO.Message = _localizationProvider.Localize("PhoneNumberFoundBefore", _auditService.UserLanguage);
+
                     return _responseDTO;
                 }
 
@@ -122,7 +129,8 @@ namespace Maintenance.Application.Auth.Client.Command
                 {
                     _responseDTO.Result = null;
                     _responseDTO.StatusEnum = StatusEnum.Exception;
-                    _responseDTO.Message = "anErrorOccurredPleaseContactSystemAdministrator";
+                    _responseDTO.Message = _localizationProvider.Localize("anErrorOccurredPleaseContactSystemAdministrator", _auditService.UserLanguage);
+
                     return _responseDTO;
                 }
                  if (request.Roles.Count() > 0)
@@ -132,19 +140,22 @@ namespace Maintenance.Application.Auth.Client.Command
                 }
                
                 user.Code = SendSMS.GenerateCode();
-               user.Code = "1234";
-                //var res =  SendSMS.SendMessageUnifonic("رمز التحقق من الجوال : " + user.Code, user.PhoneNumber);
-                //if (res == -1)
-                //{
+               var meass= _localizationProvider.Localize("Mobileverificationcode", _auditService.UserLanguage);
+      
+                var res = SendSMS.SendMessageUnifonic(meass +" : " + user.Code, user.PhoneNumber);
+                if (res == -1)
+                {
 
-                //    if (await _userManager.FindByNameAsync(user.UserName) != null)
-                //    {
-                //        await _userManager.DeleteAsync(user);
-                //    }
-                //    _responseDTO.Message = "حدث خطا فى ارسال الكود";
-                //    _responseDTO.StatusEnum = StatusEnum.Failed;
-                //    return _responseDTO;
-                //}
+                    if (await _userManager.FindByNameAsync(user.UserName) != null)
+                    {
+                        await _userManager.DeleteAsync(user);
+                    }
+                   
+                    _responseDTO.Message = _localizationProvider.Localize("ProplemSendCode", _auditService.UserLanguage);
+
+                    _responseDTO.StatusEnum = StatusEnum.Failed;
+                    return _responseDTO;
+                }
                 await _userManager.UpdateAsync(user);
             }
             catch (Exception ex)
@@ -156,7 +167,8 @@ namespace Maintenance.Application.Auth.Client.Command
               
                 _responseDTO.Result = null;
                 _responseDTO.StatusEnum = StatusEnum.Exception;
-                _responseDTO.Message = "anErrorOccurredPleaseContactSystemAdministrator";
+                _responseDTO.Message = _localizationProvider.Localize("anErrorOccurredPleaseContactSystemAdministrator", _auditService.UserLanguage);
+
             }
             var authorizedUserDto = new AuthorizedUserDTO
             {
@@ -164,7 +176,9 @@ namespace Maintenance.Application.Auth.Client.Command
                 Token = null,
             };
             _responseDTO.Result = authorizedUserDto;
-            _responseDTO.Message = "userAddedSuccessfully";
+         
+            _responseDTO.Message = _localizationProvider.Localize("AddedSuccessfully", _auditService.UserLanguage);
+
             _responseDTO.StatusEnum = StatusEnum.SavedSuccessfully;
 
             return _responseDTO;

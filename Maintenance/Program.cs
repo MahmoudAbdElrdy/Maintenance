@@ -98,6 +98,7 @@ builder.Services.AddRefitClient<IRoom>()
    c.Timeout = TimeSpan.FromMinutes(3);
   
   });
+
 ApplicationServiceRegistration.AddApplicationServices(builder.Services);
 builder.Services
  .AddAutoMapper(new Assembly[] {
