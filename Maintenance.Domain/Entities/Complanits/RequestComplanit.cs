@@ -22,7 +22,7 @@ namespace Maintenance.Domain.Entities.Complanits
         public long? CreatedBy { set; get; }
         public virtual User Creator { get; set; }
         public string? Description { get; set; }
-        public long RegionId { get; set; }
+        public long OfficeId { get; set; }
         public virtual ICollection<CheckListRequest> CheckListRequests { get; set; } = new List<CheckListRequest>();
         public virtual ICollection<AttachmentComplanit> AttachmentsComplanit { get; set; } = new List<AttachmentComplanit>();
     }

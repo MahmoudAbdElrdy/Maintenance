@@ -69,7 +69,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                      
                         Include(c=>c.RequestComplanit).ThenInclude(c=>c.CheckListRequests)
                      
-                        .WhereIf(request.RegionId != null && request.RegionId>0, x => x.RequestComplanit.RegionId == request.RegionId)
+                        .WhereIf(request.RegionId != null && request.RegionId>0, x => x.RequestComplanit.OfficeId == request.RegionId)
                         
                         .WhereIf(request.CategoryId !=null && request.CategoryId > 0, x=>x.CheckListComplanit.CategoryComplanitId==request.CategoryId)
                     
