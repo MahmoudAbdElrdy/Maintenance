@@ -20,7 +20,9 @@ namespace Maintenance.Domain.Persistence
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<PermissionRole> PermissionRoles { get; set; }
         public DbSet<CategoryComplanit> CategoriesComplanit { get; set; }
-        public DbSet<CheckListComplanit> CheckListsComplanit { get; set; } 
+        public DbSet<CheckListComplanit> CheckListsComplanit { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
         public AppDbContext(DbContextOptions options) : base(options)
         {
         }

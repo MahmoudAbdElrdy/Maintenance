@@ -17,10 +17,12 @@ namespace Maintenance.Application.Auth.Login
         public UserType? UserType { get; set; }
         public string? IdentityNumber { get; set; }
         public string? Code { get; set; }
-        
+        public string PhoneNumber { get; set; }
         public void CreateMappings(Profile configuration)
         {
-            configuration.CreateMap<User, UserDto>().ForMember(c=>c.UserId,opt=>opt.MapFrom(x=>x.Id))
+            configuration.CreateMap<User, UserDto>()
+                .ForMember(c=>c.UserId,opt=>opt.MapFrom(x=>x.Id))
+               
                 .ReverseMap();
           
         }

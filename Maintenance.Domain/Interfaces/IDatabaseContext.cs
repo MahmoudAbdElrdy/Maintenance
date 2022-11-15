@@ -19,6 +19,8 @@ namespace Maintenance.Domain.Interfaces
         public DbSet<PermissionRole> PermissionRoles { get; set; }
         public DbSet<CategoryComplanit> CategoriesComplanit { get; set; }
         public DbSet<CheckListComplanit> CheckListsComplanit { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
         public ChangeTracker ChangeTracker { get; }
 
         public int SaveChanges();

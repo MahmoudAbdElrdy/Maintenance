@@ -211,4 +211,15 @@
         All
 
     }
+    public enum NotificationType
+    {
+        Message,
+        Request,
+    }
+    public enum NotificationState
+    {
+        New,
+        Approved,
+        Rejected
+    }
 }

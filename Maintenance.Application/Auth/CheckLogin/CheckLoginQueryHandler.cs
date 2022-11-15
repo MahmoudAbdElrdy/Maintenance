@@ -63,7 +63,7 @@ namespace Maintenance.Application.Features.Account.Queries.CheckLogin
                 userLogin.Code = GenerateCode();
 
                 var result = SendSMS.SendMessageUnifonic("رمز الدخول الخاص للنظام : " + userLogin.Code, userLogin.PhoneNumber);
-                if (result.Result == -1)
+                if (result == -1)
                 {
                     _response.Message = "حدث خطا فى ارسال الكود";
                     _response.StatusEnum = StatusEnum.Failed;
