@@ -1,0 +1,16 @@
+{
+  "AddedSuccessfully": "Added Successfully",
+  "anErrorOccurredPleaseContactSystemAdministrator": "an Error Occurred Please Contact System Administrator",
+  "codeNotCorrect": "code Not Correct",
+  "mobileVerficiationSuccess": "mobile Verficiation Success",
+  "Mobileverificationcode": "Mobile verification code",
+  "NationalNumberFoundBefore": "National Number Found Before",
+  "NationalNumberNotFound": "National Number Not Found",
+  "PassWordNotCorrect": "PassWord Not Correct",
+  "PhoneNumberFoundBefore": "Phone Number Found Before",
+  "ProplemSendCode": "Proplem Send Code",
+  "RoomNotFound": "Room Not Found",
+  "userAreDeleted": "user Are Deleted",
+  "userLoggedInSuccessfully": "user Logged In Successfully",
+  "UserNotFound": "User Not Found"
+}

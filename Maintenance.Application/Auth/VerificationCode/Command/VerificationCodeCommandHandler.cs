@@ -10,6 +10,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,14 +28,14 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
         public ResponseDTO Response => _response;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
-        private readonly ILocalizationProvider _localizationProvider;
+        private readonly IStringLocalizer<VerificationCodeCommandHandler> _localizationProvider;
         private readonly IAuditService _auditService;
         private readonly JwtOption _jwtOption;
         public VerificationCodeCommandHandler(IMapper mapper,
             UserManager<User> userManager,
             IConfiguration configuration,
              IAuditService auditService,
-             ILocalizationProvider localizationProvider,
+              IStringLocalizer<VerificationCodeCommandHandler> localizationProvider,
              JwtOption jwtOption,
             ILogger<VerificationCodeCommand> logger)
         
@@ -60,7 +61,7 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
                 {
                     _response.StatusEnum = StatusEnum.Failed;
                    // _response.Message = "UserNotFound";
-                    _response.Message = _localizationProvider.Localize("UserNotFound", _auditService.UserLanguage);
+                    _response.Message = _localizationProvider["UserNotFound"];
 
                     return _response;
                 }
@@ -70,7 +71,7 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
                 {
                     _response.StatusEnum = StatusEnum.Failed;
                   
-                    _response.Message = _localizationProvider.Localize("codeNotCorrect", _auditService.UserLanguage);
+                    _response.Message = _localizationProvider["codeNotCorrect"];
 
                     return _response;
                 }
@@ -84,7 +85,7 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
                // await _userManager.UpdateAsync(userLogin);
                 _response.StatusEnum = StatusEnum.Success;
             
-                _response.Message = _localizationProvider.Localize("mobileVerficiationSuccess", _auditService.UserLanguage);
+                _response.Message = _localizationProvider["mobileVerficiationSuccess"];
 
                 _response.Result = authorizedUserDto;
             }

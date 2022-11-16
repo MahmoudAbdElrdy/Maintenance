@@ -32,6 +32,10 @@ using Maintenance.API.Middleware;
 using Refit;
 using Maintenance.Domain.Interfaces;
 using Maintenance.Application.Interfaces;
+using dotnet_6_json_localization;
+using Microsoft.Extensions.Localization;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -193,6 +197,13 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuthorizationHandler, CustomRequireUserClaim>();
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
+
+builder.Services.AddLocalization();
+builder.Services.AddSingleton<LocalizationMiddleware>();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
+
+
 var app = builder.Build();
 
 using (var serviceScope = app.Services.CreateScope())
@@ -232,7 +243,12 @@ app.UseStaticFiles(new StaticFileOptions
 
 
 app.UseCors("AllowCors");
-
+var options = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(new CultureInfo("ar"))
+};
+app.UseRequestLocalization(options);
+app.UseMiddleware<LocalizationMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseRouting();

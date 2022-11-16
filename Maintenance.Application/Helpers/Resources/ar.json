@@ -1,0 +1,18 @@
+{
+  "AddedSuccessfully": "تم الاضافة بنجاح",
+  "anErrorOccurredPleaseContactSystemAdministrator": "يوجد مشكلة من فضلك تواصل مع الادمن",
+  "codeNotCorrect": "الكود غير صحيح",
+  "mobileVerficiationSuccess": "تم التحقق بنجاح",
+  "Mobileverificationcode": "رمز التحقق من الجوال",
+  "NationalNumberFoundBefore": "الرقم القومي موجود من قبل",
+  "NationalNumberNotFound": "الرقم القومي غير موجود",
+  "PassWordNotCorrect": "الرقم السري غير صحيح",
+  "PhoneNumberFoundBefore": "رقم الجوال تم التسجيل به من فبل",
+  "ProplemSendCode": "مشكلة في ارسال الكود",
+  "RoomNotFound": "الغرفة غير موجودة",
+  "userAreDeleted": "هذا المستخدم عير موجودد",
+  "userLoggedInSuccessfully": "تم الدخول بنجاح",
+  "UserNotFound": "المستخدم غير موجود"
+
+
+}

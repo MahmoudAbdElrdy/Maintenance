@@ -5,7 +5,6 @@ using Infrastructure;
 using Maintenance.Application.Behaviours;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers;
-using Maintenance.Application.Helpers.Resources;
 using Maintenance.Application.Interfaces;
 using Maintenance.Domain.Interfaces;
 using MediatR;
@@ -19,10 +18,7 @@ namespace Maintenance.Application
   {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-            services.AddScoped<ILocalizationManager, LocalizationManager>();
-            services.AddScoped<ILocalizationProvider, LocalizationProvider>();
-            services.AddScoped<IResourceSourceManager, ResourceSourceManager>()
-             .AddTransient(typeof(LocalizationMappingAction<,>));
+           
 
             // services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

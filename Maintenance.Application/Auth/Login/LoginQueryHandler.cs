@@ -1,6 +1,7 @@
 ﻿using AuthDomain.Entities.Auth;
 using AutoMapper;
 using Common.Options;
+using Maintenance.Application.Auth.Client.Command;
 using Maintenance.Application.Auth.Login;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
@@ -11,6 +12,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.DirectoryServices;
@@ -31,7 +33,7 @@ namespace Maintenance.Application.Features.Account.Commands.Login
         private readonly IConfiguration _configuration;
         private readonly JwtOption _jwtOption;
         private readonly IAuditService _auditService;
-        private readonly ILocalizationProvider _localizationProvider;
+        private readonly IStringLocalizer<LoginQueryHandler> _localizationProvider;
         public LoginQueryHandler(
             IMapper mapper, ILogger<LoginQueryHandler> logger,
          
@@ -40,7 +42,7 @@ namespace Maintenance.Application.Features.Account.Commands.Login
             IConfiguration configuration,
             JwtOption jwtOption,
              IAuditService auditService,
-             ILocalizationProvider localizationProvider
+              IStringLocalizer<LoginQueryHandler> localizationProvider
 
         )
         {
@@ -66,7 +68,7 @@ namespace Maintenance.Application.Features.Account.Commands.Login
                 {
 
                   
-                    _response.Message = _localizationProvider.Localize("NationalNumberNotFound", _auditService.UserLanguage);
+                    _response.Message = _localizationProvider["NationalNumberNotFound"];
 
                     _response.StatusEnum = StatusEnum.Failed;
                     return _response;
@@ -76,7 +78,7 @@ namespace Maintenance.Application.Features.Account.Commands.Login
                 else if (personalUser.State == Domain.Enums.State.Deleted)
                 {
                    
-                    _response.Message = _localizationProvider.Localize("userAreDeleted", _auditService.UserLanguage);
+                    _response.Message = _localizationProvider["userAreDeleted"];
 
                     _response.StatusEnum = StatusEnum.Failed;
                     return _response;
@@ -86,7 +88,7 @@ namespace Maintenance.Application.Features.Account.Commands.Login
                 if (!userHasValidPassword)
                 {
                    
-                    _response.Message = _localizationProvider.Localize("PassWordNotCorrect", _auditService.UserLanguage);
+                    _response.Message = _localizationProvider["PassWordNotCorrect"];
 
                     _response.StatusEnum = StatusEnum.Failed;
                     return _response;
@@ -118,7 +120,7 @@ namespace Maintenance.Application.Features.Account.Commands.Login
 
                 _response.StatusEnum = StatusEnum.Success;
                
-                _response.Message = _localizationProvider.Localize("userLoggedInSuccessfully", _auditService.UserLanguage);
+                _response.Message = _localizationProvider["userLoggedInSuccessfully"];
 
                 _response.Result = authorizedUserDto;
 
@@ -128,7 +130,7 @@ namespace Maintenance.Application.Features.Account.Commands.Login
             {
                 _response.StatusEnum = StatusEnum.Exception;
                 _response.Result = null;
-                _response.Message = _localizationProvider.Localize("anErrorOccurredPleaseContactSystemAdministrator", _auditService.UserLanguage);
+                _response.Message = _localizationProvider["anErrorOccurredPleaseContactSystemAdministrator"];
 
             //    _response.Message = (ex != null && ex.InnerException != null ? ex.InnerException.Message : ex.Message);
                 _logger.LogError(ex, ex.Message, (ex != null && ex.InnerException != null ? ex.InnerException.Message : ""));

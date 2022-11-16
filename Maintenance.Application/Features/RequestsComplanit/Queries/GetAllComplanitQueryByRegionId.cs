@@ -23,6 +23,8 @@ namespace Maintenance.Application.Features.Categories.Queries
         }
         public long? CategoryId { get; set; } 
         public long? RegionId { get; set; }  
+        public long? OfficeId { get; set; }  
+
         public PaginatedInputModel PaginatedInputModel { get; set; }
         class GetAllCategoryComplanit : IRequestHandler<GetAllComplanitQueryByRegionId, ResponseDTO>
         {
@@ -70,6 +72,8 @@ namespace Maintenance.Application.Features.Categories.Queries
                         Include(c=>c.RequestComplanit).ThenInclude(c=>c.CheckListRequests)
                      
                         .WhereIf(request.RegionId != null && request.RegionId>0, x => x.RequestComplanit.OfficeId == request.RegionId)
+                       
+                        .WhereIf(request.OfficeId != null && request.OfficeId > 0, x => x.RequestComplanit.OfficeId == request.OfficeId)
                         
                         .WhereIf(request.CategoryId !=null && request.CategoryId > 0, x=>x.CheckListComplanit.CategoryComplanitId==request.CategoryId)
                     

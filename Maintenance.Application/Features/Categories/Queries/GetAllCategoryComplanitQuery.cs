@@ -1,5 +1,6 @@
 ﻿using AuthDomain.Entities.Auth;
 using AutoMapper;
+using Maintenance.Application.Auth.VerificationCode.Command;
 using Maintenance.Application.Features.Categories.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
@@ -10,6 +11,7 @@ using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace Maintenance.Application.Features.Categories.Queries
@@ -30,14 +32,14 @@ namespace Maintenance.Application.Features.Categories.Queries
             public long _loggedInUserId;
             private readonly IMapper _mapper;
             private readonly IAuditService _auditService;
-            private readonly ILocalizationProvider _localizationProvider;
+            private readonly IStringLocalizer<GetAllCategoryComplanit> _localizationProvider;
             public GetAllCategoryComplanit(
                 IHttpContextAccessor _httpContextAccessor,
                 IGRepository<CategoryComplanit> CategoryComplanitRepository,
                 ILogger<GetAllCategoryComplanitQuery> logger, IMapper mapper,
                 IGRepository<User> userRepository,
                  IAuditService auditService,
-                ILocalizationProvider localizationProvider
+                IStringLocalizer<GetAllCategoryComplanit> localizationProvider
 
             )
             {
@@ -70,7 +72,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                     _response.Result = paginatedObjs;
                     _response.StatusEnum = StatusEnum.Success;
                   
-                    _response.Message = _localizationProvider.Localize("AddedSuccessfully", _auditService.UserLanguage);
+                    _response.Message = _localizationProvider["AddedSuccessfully"];
 
                     return _response;
                 }

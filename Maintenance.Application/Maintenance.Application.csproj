@@ -11,6 +11,16 @@
     <EmbeddedResource Remove="Features\RequestsReport\**" />
     <None Remove="Features\RequestsReport\**" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Helpers\Resources\ar.json" />
+    <None Remove="Helpers\Resources\en.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Helpers\Resources\ar.json" />
+    <EmbeddedResource Include="Helpers\Resources\en.json" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="AutoMapper" Version="11.0.1" />
@@ -68,7 +78,8 @@
     <PackageReference Include="Refit" Version="6.3.2" />
     <PackageReference Include="Refit.HttpClientFactory" Version="6.3.2" />
     <PackageReference Include="FCM.Net.Core" Version="1.0.1" />
-
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  
   </ItemGroup>
 
   <ItemGroup>
@@ -78,21 +89,6 @@
   <ItemGroup>
     <Folder Include="Auth\Client\Queries\" />
     <Folder Include="Helpers\Permission\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Helpers\Resources\SharedResource.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>SharedResource.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Helpers\Resources\SharedResource.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>SharedResource.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
