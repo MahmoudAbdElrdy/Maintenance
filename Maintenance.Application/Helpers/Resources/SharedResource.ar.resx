@@ -135,6 +135,9 @@
   <data name="NationalNumberFoundBefore" xml:space="preserve">
     <value>الرقم القومي موجود من قبل</value>
   </data>
+  <data name="NationalNumberNotFound" xml:space="preserve">
+    <value>الرقم القومي غير موجود</value>
+  </data>
   <data name="PassWordNotCorrect" xml:space="preserve">
     <value>الرقم السري غير صحيح</value>
   </data>

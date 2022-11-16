@@ -1,5 +1,6 @@
 ﻿using AuthDomain.Entities.Auth;
 using AutoMapper;
+using Common.Options;
 using Maintenance.Application.Auth.Login;
 using Maintenance.Application.Features.Account.Commands.Login;
 using Maintenance.Application.Helper;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace Maintenance.Application.Auth.VerificationCode.Command
 {
@@ -27,11 +29,13 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
         private readonly IConfiguration _configuration;
         private readonly ILocalizationProvider _localizationProvider;
         private readonly IAuditService _auditService;
+        private readonly JwtOption _jwtOption;
         public VerificationCodeCommandHandler(IMapper mapper,
             UserManager<User> userManager,
             IConfiguration configuration,
              IAuditService auditService,
              ILocalizationProvider localizationProvider,
+             JwtOption jwtOption,
             ILogger<VerificationCodeCommand> logger)
         
         {
@@ -42,6 +46,7 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
             _configuration = configuration;
             _auditService = auditService;
             _localizationProvider = localizationProvider;
+            _jwtOption = jwtOption;
         }
 
         public async Task<ResponseDTO> Handle(VerificationCodeCommand request, CancellationToken cancellationToken)
@@ -101,26 +106,26 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
             var expiryDuration = int.Parse(_configuration["JwtOption:ExpiryDuration"]);
             var issuer = _configuration["JwtOption:Issuer"];
 
-            var claims = new ClaimsIdentity(new List<Claim>() {
+            var claims = (new List<Claim>() {
                     new Claim("userLoginId", user.Id.ToString()),
                     new Claim("identityNumber", user.IdentityNumber),
                     new Claim("FullName", user.FullName),
+                    new Claim("UserType", user.UserType.ToString())
                      });
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOption.Key));
+            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.Now.AddDays(Convert.ToDouble(_jwtOption.ExpireDays));
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Issuer = issuer,              // Not required as no third-party is involved
-                Audience = audience,            // Not required as no third-party is involved
-                IssuedAt = DateTime.UtcNow,
-                NotBefore = DateTime.UtcNow,
-                Expires = DateTime.UtcNow.AddDays(expiryDuration),
-                Subject = claims,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(signingKey), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var jwtTokenHandler = new JwtSecurityTokenHandler();
-            var jwtToken = jwtTokenHandler.CreateJwtSecurityToken(tokenDescriptor);
-            var token = jwtTokenHandler.WriteToken(jwtToken);
-            return token;
+            var tokenDescriptor = new JwtSecurityToken(
+            _jwtOption.Issuer,
+              _jwtOption.Issuer,
+              claims,
+              expires: expires,
+              signingCredentials: cred
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
+     
     }
 }

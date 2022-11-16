@@ -115,6 +115,15 @@ namespace Maintenance.Application.Helpers.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to National Number Not Found.
+        /// </summary>
+        internal static string NationalNumberNotFound {
+            get {
+                return ResourceManager.GetString("NationalNumberNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to PassWord Not Correct.
         /// </summary>
         internal static string PassWordNotCorrect {

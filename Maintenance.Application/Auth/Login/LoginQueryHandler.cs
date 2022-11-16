@@ -66,7 +66,7 @@ namespace Maintenance.Application.Features.Account.Commands.Login
                 {
 
                   
-                    _response.Message = _localizationProvider.Localize("NationalNumberFoundBefore", _auditService.UserLanguage);
+                    _response.Message = _localizationProvider.Localize("NationalNumberNotFound", _auditService.UserLanguage);
 
                     _response.StatusEnum = StatusEnum.Failed;
                     return _response;
@@ -92,12 +92,20 @@ namespace Maintenance.Application.Features.Account.Commands.Login
                     return _response;
 
                 }
-                 personalUser.Code = SendSMS.GenerateCode();
-                //  personalUser.Code = "1234";
-                var res = SendSMS.SendMessageUnifonic("رمز التحقق من الجوال : " + personalUser.Code, personalUser.PhoneNumber);
+                personalUser.Code = SendSMS.GenerateCode();
+                var meass = _localizationProvider.Localize("Mobileverificationcode", _auditService.UserLanguage);
+
+                var res = SendSMS.SendMessageUnifonic(meass + " : " + personalUser.Code, personalUser.PhoneNumber);
                 if (res == -1)
                 {
-                    _response.Message = "حدث خطا فى ارسال الكود";
+
+                    if (await _userManager.FindByNameAsync(personalUser.UserName) != null)
+                    {
+                        await _userManager.DeleteAsync(personalUser);
+                    }
+
+                    _response.Message = _localizationProvider.Localize("ProplemSendCode", _auditService.UserLanguage);
+
                     _response.StatusEnum = StatusEnum.Failed;
                     return _response;
                 }

@@ -135,6 +135,9 @@
   <data name="NationalNumberFoundBefore" xml:space="preserve">
     <value>NationalNumberFoundBefore</value>
   </data>
+  <data name="NationalNumberNotFound" xml:space="preserve">
+    <value>National Number Not Found</value>
+  </data>
   <data name="PassWordNotCorrect" xml:space="preserve">
     <value>PassWord Not Correct</value>
   </data>
