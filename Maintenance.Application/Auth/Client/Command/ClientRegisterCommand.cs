@@ -140,22 +140,22 @@ namespace Maintenance.Application.Auth.Client.Command
                 }
                
                 user.Code = SendSMS.GenerateCode();
-               var meass= _localizationProvider.Localize("Mobileverificationcode", _auditService.UserLanguage);
+                var meass= _localizationProvider.Localize("Mobileverificationcode", _auditService.UserLanguage);
       
-                var res = SendSMS.SendMessageUnifonic(meass +" : " + user.Code, user.PhoneNumber);
-                if (res == -1)
-                {
+                //var res = SendSMS.SendMessageUnifonic(meass +" : " + user.Code, user.PhoneNumber);
+                //if (res == -1)
+                //{
 
-                    if (await _userManager.FindByNameAsync(user.UserName) != null)
-                    {
-                        await _userManager.DeleteAsync(user);
-                    }
+                //    if (await _userManager.FindByNameAsync(user.UserName) != null)
+                //    {
+                //        await _userManager.DeleteAsync(user);
+                //    }
                    
-                    _responseDTO.Message = _localizationProvider.Localize("ProplemSendCode", _auditService.UserLanguage);
+                //    _responseDTO.Message = _localizationProvider.Localize("ProplemSendCode", _auditService.UserLanguage);
 
-                    _responseDTO.StatusEnum = StatusEnum.Failed;
-                    return _responseDTO;
-                }
+                //    _responseDTO.StatusEnum = StatusEnum.Failed;
+                //    return _responseDTO;
+                //}
                 await _userManager.UpdateAsync(user);
             }
             catch (Exception ex)
