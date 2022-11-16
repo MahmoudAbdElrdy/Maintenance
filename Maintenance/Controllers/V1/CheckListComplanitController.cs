@@ -35,6 +35,20 @@ namespace Maintenance.Controllers.V1
                 },
             });
         }
+        
+        [HttpGet("GetAllByCategory")]
+        public async Task<ResponseDTO> GetAllByCategory(int pageNumber, int pageSize,long categoryComplanitId)
+        {
+            return await _mediator.Send(new GetAllCheckListComplanitByCategoryQuery()
+            {
+                PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                },
+                CategoryComplanitId = categoryComplanitId
+            });
+        }
 
         [HttpGet]
         [Route("{id}")]
