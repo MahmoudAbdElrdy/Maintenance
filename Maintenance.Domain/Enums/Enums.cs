@@ -31,11 +31,7 @@
         Owner ,
         Consultant
     }
-    public enum RequestStatus
-    {
-        Approved = 1,
-        Cancelled
-    }
+   
     public enum ContractCategory
     {
         FestivalManagement,
@@ -221,5 +217,29 @@
         New,
         Approved,
         Rejected
+    }
+    
+    public enum ComplanitStatus 
+    {
+        Submitted = 1,
+
+        TechnicianAssigned = 2,
+
+        ConsultantApprovalAfterAssigned= 3,
+
+        TechnicianSuspended=4,
+
+        ConsultantApprovalAfterSuspended = 5,
+
+        TechnicianCanceled = 6,
+
+        ConsultantApprovalAfterCanceled = 7,
+
+        TechnicianDone = 8,
+
+        ConsultantApprovalAfterDone = 9,
+    
+        TechnicianClosed = 10,
+
     }
 }

@@ -21,6 +21,7 @@ namespace AuthDomain.Entities.Auth
         public string? Code { get; set; }
         public string? DeletedBy { get; set; }
         public DateTime? DeletedDate { get; set; }
+        public string? Token { get; set; }
     }
 
 }

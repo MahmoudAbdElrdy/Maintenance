@@ -3,6 +3,7 @@ using Maintenance.Application.Features.RequestsComplanit.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Domain.Entities.Complanits;
+using Maintenance.Domain.Enums;
 using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -21,6 +22,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
         class PostRequestComplanit : IRequestHandler<PostRequestComplanitCommand, ResponseDTO>
         {
             private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;
+
+            private readonly IGRepository<ComplanitHistory> _ComplanitHistoryRepository;
+
             private readonly ILogger<PostRequestComplanitCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
@@ -31,7 +35,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 IGRepository<RequestComplanit> RequestComplanitRepository,
                 ILogger<PostRequestComplanitCommand> logger,
                 IAuditService auditService,
-                IMapper mapper
+                IMapper mapper,
+                IGRepository<ComplanitHistory> ComplanitHistoryRepository
             )
             {
                 _RequestComplanitRepository = RequestComplanitRepository;
@@ -39,7 +44,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 _auditService = auditService;
                 _response = new ResponseDTO();
                 _mapper = mapper;
-              
+                _ComplanitHistoryRepository = ComplanitHistoryRepository;
+
+
             }
             public async Task<ResponseDTO> Handle(PostRequestComplanitCommand request, CancellationToken cancellationToken)
             {
@@ -77,10 +84,19 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                                 CreatedOn = DateTime.Now,
                             });
                         }
+
+                        RequestComplanit.ComplanitHistory.Add(new ComplanitHistory()
+                        {
+                        CreatedBy = _auditService.UserId,
+                        CreatedOn = DateTime.Now,
+                        State = Domain.Enums.State.NotDeleted,
+                        ComplanitStatus = Domain.Enums.ComplanitStatus.Submitted,
+                      
+                        });
                         RequestComplanitList.Add(RequestComplanit);
 
                     }
-
+                   
 
                     await _RequestComplanitRepository.AddRangeAsync(RequestComplanitList);
                     _RequestComplanitRepository.Save();

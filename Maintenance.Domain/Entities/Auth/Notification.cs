@@ -13,8 +13,8 @@ namespace Maintenance.Domain.Entities.Auth
         public DateTime CreatedOn { get ; set ; }
         public long? UpdatedBy { get ; set ; }
         public DateTime? UpdatedOn { get ; set ; }
-        public string From { get; set; }
-        public string To { get; set; }
+        public long? From { get; set; }
+        public long? To { get; set; }
         public bool Read { get; set; }
         public string SubjectAr { get; set; }
         public string SubjectEn { get; set; }

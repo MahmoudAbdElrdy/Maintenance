@@ -3,7 +3,6 @@ using Maintenance.Domain.Enums;
 using Maintenance.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -11,21 +10,29 @@ using System.Threading.Tasks;
 
 namespace Maintenance.Domain.Entities.Complanits
 {
-    public class RequestComplanit : IBaseEntity, IAuditable, ISoftDelete
+    public class ComplanitHistory : IBaseEntity, IAuditable, ISoftDelete
     {
         public long Id { get; set; }
         public DateTime CreatedOn { get; set; }
         public long? UpdatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
+        public string? Description { get; set; }
+
         public State State { get; set; }
+        public ComplanitStatus? ComplanitStatus { get; set; }
+
         [ForeignKey("Creator")]
         public long? CreatedBy { set; get; }
         public virtual User Creator { get; set; }
-        public string? Description { get; set; }
-        public long? OfficeId { get; set; }
-        public long? RegionId { get; set; } 
-        public virtual ICollection<CheckListRequest> CheckListRequests { get; set; } = new List<CheckListRequest>();
-        public virtual ICollection<AttachmentComplanit> AttachmentsComplanit { get; set; } = new List<AttachmentComplanit>();
-        public virtual ICollection<ComplanitHistory> ComplanitHistory { get; set; } = new List<ComplanitHistory>();
+       
+        public long? RequestComplanitId { set; get; }
+       
+        [ForeignKey("RequestComplanitId")]
+      
+        public virtual RequestComplanit RequestComplanit { get; set; }
+
+        public virtual ICollection<AttachmentComplanitHistory> AttachmentComplanitHistory { get; set; } = new List<AttachmentComplanitHistory>();
+
     }
+
 }

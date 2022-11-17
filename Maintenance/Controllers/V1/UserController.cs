@@ -1,4 +1,5 @@
 ﻿using Maintenance.Application.Auth.Client.Command;
+using Maintenance.Application.Auth.UpdateToken.Command;
 using Maintenance.Application.Helper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -21,6 +22,13 @@ namespace Maintenance.Controllers.V1
         [AllowAnonymous]
         [Route("Register")]
         public async Task<ResponseDTO> Register([FromBody] ClientRegisterCommand command)
+        {
+            return await _mediator.Send(command);
+        }
+        [HttpPost]
+       // [AllowAnonymous]
+        [Route("UpdateToken")]
+        public async Task<ResponseDTO> UpdateToken([FromBody] UpdateTokenCommand command) 
         {
             return await _mediator.Send(command);
         }
