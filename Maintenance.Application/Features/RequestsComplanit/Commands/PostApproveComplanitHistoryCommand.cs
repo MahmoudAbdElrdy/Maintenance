@@ -17,18 +17,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Maintenance.Application.Features.RequestsComplanit.Commands
 {
-    public class PostRequestComplanitHistoryCommand : IRequest<ResponseDTO>
+    public class PostApproveComplanitHistoryCommand : IRequest<ResponseDTO>
     {
 
 
         public string? Description { get; set; }
         public string[]? AttachmentsComplanitHistory { get; set; }
         public ComplanitStatus? ComplanitStatus { get; set; }
-        class PostRequestComplanit : IRequestHandler<PostRequestComplanitHistoryCommand, ResponseDTO>
+        class PostRequestComplanit : IRequestHandler<PostApproveComplanitHistoryCommand, ResponseDTO>
         {
             private readonly IGRepository<ComplanitHistory> _RequestComplanitRepository;
             private readonly IGRepository<Notification> _NotificationRepository;
-            private readonly ILogger<PostRequestComplanitHistoryCommand> _logger;
+            private readonly ILogger<PostApproveComplanitHistoryCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
             private readonly IMapper _mapper;
@@ -37,7 +37,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
             public PostRequestComplanit(
 
                 IGRepository<ComplanitHistory> RequestComplanitRepository,
-                ILogger<PostRequestComplanitHistoryCommand> logger,
+                ILogger<PostApproveComplanitHistoryCommand> logger,
                 IAuditService auditService,
                 IMapper mapper,
                 IGRepository<Notification> NotificationRepository,
@@ -54,7 +54,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 _userManager = userManager;
                 _localizationProvider = localizationProvider;
             }
-            public async Task<ResponseDTO> Handle(PostRequestComplanitHistoryCommand request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(PostApproveComplanitHistoryCommand request, CancellationToken cancellationToken)
             {
                 try
                 {

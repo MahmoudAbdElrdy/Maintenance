@@ -225,21 +225,19 @@
 
         TechnicianAssigned = 2,
 
-        ConsultantApprovalAfterAssigned= 3,
+        TechnicianSuspended=3,
 
-        TechnicianSuspended=4,
+        ConsultantApprovalAfterSuspended = 4,
 
-        ConsultantApprovalAfterSuspended = 5,
+        TechnicianCanceled = 5,
 
-        TechnicianCanceled = 6,
+        ConsultantApprovalAfterCanceled =6,
 
-        ConsultantApprovalAfterCanceled = 7,
+        TechnicianDone = 7,
 
-        TechnicianDone = 8,
-
-        ConsultantApprovalAfterDone = 9,
+        ConsultantApprovalAfterDone = 8,
     
-        TechnicianClosed = 10,
+        TechnicianClosed = 9,
 
     }
 }

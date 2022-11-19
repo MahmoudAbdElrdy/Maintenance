@@ -25,7 +25,14 @@ namespace dotnet_6_json_localization
                 return new LocalizedString(name, value ?? name, value == null);
             }
         }
-
+        public LocalizedString this[string name,string lang]
+        {
+            get
+            {
+                var value = GetStringLang(name,lang);
+                return new LocalizedString(name, value ?? name, value == null);
+            }
+        }
         public LocalizedString this[string name, params object[] arguments]
         {
             get
@@ -109,6 +116,41 @@ namespace dotnet_6_json_localization
                     reader.Read();
                     return _serializer.Deserialize<string>(reader);
                 }
+            }
+            return default;
+        }
+        private string? GetStringLang(string key,string lang)
+        {
+            string? relativeFilePath = null;
+            var fullPath1 = Path.Combine("/Resources", lang + ".json");
+            if (_env.IsDevelopment())
+            {
+                relativeFilePath = $"D:\\Ahmed_Alaa\\Maintenance\\Maintenance\\Maintenance.Application\\Helpers\\Resources\\{Thread.CurrentThread.CurrentCulture.Name}.json";
+            }
+            else
+            {
+                relativeFilePath = $"Resources/{lang}.json";
+
+            }
+
+
+            if (File.Exists(relativeFilePath))
+            {
+                var cacheKey = $"locale_{lang}_{key}";
+                var cacheValue = _cache.GetString(cacheKey);
+                if (!string.IsNullOrEmpty(cacheValue))
+                {
+                    return cacheValue;
+                }
+
+                var result = GetValueFromJSON(key, Path.GetFullPath(relativeFilePath));
+
+                if (!string.IsNullOrEmpty(result))
+                {
+                    _cache.SetString(cacheKey, result);
+
+                }
+                return result;
             }
             return default;
         }

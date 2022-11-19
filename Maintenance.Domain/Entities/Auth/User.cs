@@ -1,4 +1,5 @@
 ﻿
+using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Enums;
 using Maintenance.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -22,6 +23,9 @@ namespace AuthDomain.Entities.Auth
         public string? DeletedBy { get; set; }
         public DateTime? DeletedDate { get; set; }
         public string? Token { get; set; }
+        public string? WebToken { get; set; }
+        public virtual ICollection<RequestComplanit> RequestComplanits { get; set; } = new List<RequestComplanit>();
+
     }
 
 }

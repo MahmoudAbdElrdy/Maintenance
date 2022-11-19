@@ -3,6 +3,7 @@ using Maintenance.Application.Features.Categories.Queries;
 using Maintenance.Application.Features.RequestsComplanit;
 using Maintenance.Application.Features.RequestsComplanit.Commands;
 using Maintenance.Application.Helper;
+using Maintenance.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,7 @@ namespace Maintenance.Controllers.V1
 
 
         [HttpGet]
-        public async Task<ResponseDTO> GetAll(int pageNumber, int pageSize, long CategoryId, long RegionId)
+        public async Task<ResponseDTO> GetAll(int pageNumber, int pageSize, long CategoryId, long RegionId, long OfficeId)
         {
             return await _mediator.Send(new GetAllComplanitQueryByRegionId()
             {
@@ -36,7 +37,26 @@ namespace Maintenance.Controllers.V1
                     
                 },
                 CategoryId= CategoryId,
-                RegionId= RegionId
+                RegionId= RegionId,
+                OfficeId=OfficeId
+            });
+        }
+
+        [HttpGet("GetComplanitsByStatus")]
+        public async Task<ResponseDTO> GetComplanitsByStatus(int pageNumber, int pageSize, long CategoryId, long RegionId,long OfficeId, ComplanitStatus Status)
+        {
+            return await _mediator.Send(new GetComplanitHistoryQueryByStatus()
+            {
+                PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    
+                },
+                CategoryId= CategoryId,
+                RegionId= RegionId,
+                ComplanitStatus= Status,
+                OfficeId= OfficeId
             });
         }
 

@@ -82,11 +82,11 @@ namespace Maintenance.Controllers.V1
         //    // Don't rely on or trust the FileName property without validation.
         //    return Ok(new { count = files.Count, size, filePaths });
         //}
-        [HttpGet("Base")]
-        public string ServerRootPath()
+        [HttpGet("PathComplanits")]
+        public string PathComplanits() 
         {
 
-            return $"{Request.Scheme}://{Request.Host}{Request.PathBase}" + "/wwwroot/UploadFiles/";
+            return $"{Request.Scheme}://{Request.Host}{Request.PathBase}" + "/wwwroot/Uploads/Complanits";
         }
     }
 }
