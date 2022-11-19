@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Maintenance.Domain.Enums;
+using Maintenance.Domain.Interfaces;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -81,5 +83,60 @@ namespace Maintenance.Application.Helpers.QueryableExtensions
                     (current, transform) => transform.Invoke(current))
                 : query;
         }
+        public static IQueryable<TSource> Protected<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, int, bool>> predicate)
+        {
+            var resulte = typeof(ISoftDelete).IsAssignableFrom(typeof(TSource));
+            if (resulte)
+            {
+                source = source.Where(s => ((ISoftDelete)s).State==State.NotDeleted);
+            }
+            source = source.Where(predicate);
+            return source;
+        }
+
+        public static IQueryable<TSource> Protected<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate)
+        {
+            var resulte = typeof(ISoftDelete).IsAssignableFrom(typeof(TSource));
+            if (resulte)
+            {
+                source = source.Where(s => ((ISoftDelete)s).State == State.NotDeleted);
+            }
+            source = source.Where(predicate);
+            return source;
+        }
+        public static IQueryable<TSource> Protected<TSource>(this IQueryable<TSource> source)
+        {
+            var resulte = typeof(ISoftDelete).IsAssignableFrom(typeof(TSource));
+            if (resulte)
+            {
+                source = source.Where(s =>  ((ISoftDelete)s).State==State.NotDeleted);
+            }
+
+            return source;
+        }
+
+
+        public static IEnumerable<TSource> WhereProtected<TSource>(this IEnumerable<TSource> source, Func<TSource, int, bool> predicate)
+        {
+            var resulte = typeof(ISoftDelete).IsAssignableFrom(typeof(TSource));
+            if (resulte)
+            {
+                source = source.Where(s =>  ((ISoftDelete)s).State==State.NotDeleted);
+            }
+            source = source.Where(predicate);
+            return source;
+        }
+
+        public static IEnumerable<TSource> WhereProtected<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate)
+        {
+            var resulte = typeof(ISoftDelete).IsAssignableFrom(typeof(TSource));
+            if (resulte)
+            {
+                source = source.Where(s =>  ((ISoftDelete)s).State==State.NotDeleted);
+            }
+            source = source.Where(predicate);
+            return source;
+        }
+
     }
 }

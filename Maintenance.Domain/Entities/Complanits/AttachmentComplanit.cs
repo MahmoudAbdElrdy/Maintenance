@@ -13,7 +13,7 @@ namespace Maintenance.Domain.Entities.Complanits
 {
     public class AttachmentComplanit : IBaseEntity, IAuditable, ISoftDelete
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity), Key]
+       // [DatabaseGenerated(DatabaseGeneratedOption.Identity), Key]
         public long Id { set; get; }
         public DateTime CreatedOn { set; get; }
         public long? UpdatedBy { set; get; }
@@ -27,9 +27,11 @@ namespace Maintenance.Domain.Entities.Complanits
         public long? CreatedBy { set; get; }
         public virtual User Creator { get; set; }
 
-        [ForeignKey("RequestComplanit")]
-        public long RequestComplanitId { set; get; }
-        public virtual RequestComplanit RequestComplanit { set; get; }
+        public long? RequestComplanitId { set; get; }
+
+        [ForeignKey("RequestComplanitId")]
+
+        public virtual RequestComplanit RequestComplanit { get; set; }
 
 
     }

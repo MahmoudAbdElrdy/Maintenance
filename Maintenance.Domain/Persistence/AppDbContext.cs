@@ -23,6 +23,11 @@ namespace Maintenance.Domain.Persistence
         public DbSet<CheckListComplanit> CheckListsComplanit { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<UserNotification> UserNotifications { get; set; }
+        public DbSet<RequestComplanit> RequestComplanit { get; set; }
+        public DbSet<AttachmentComplanit> AttachmentComplanit { get; set; }
+        public DbSet<AttachmentComplanitHistory> AttachmentComplanitHistory { get; set; }
+        public DbSet<ComplanitHistory> ComplanitHistory { get; set; }
+        public DbSet<CheckListRequest> CheckListRequest { get; set; }
         public AppDbContext(DbContextOptions options) : base(options)
         {
         }

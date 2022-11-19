@@ -34,6 +34,7 @@ namespace Maintenance.Application.Features.Categories.Queries
             private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;
             private readonly IGRepository<CheckListRequest> _CheckListRequestRepository;
             private readonly IGRepository<CheckListComplanit> _CheckListComplanitRepository;
+            private readonly IGRepository<AttachmentComplanit> _AttachmentComplanitRepository;
             private readonly IGRepository<User> _userRepository;
             private readonly ILogger<GetAllCategoryComplanitQuery> _logger;
             private readonly ResponseDTO _response;
@@ -48,7 +49,8 @@ namespace Maintenance.Application.Features.Categories.Queries
                 IGRepository<ComplanitHistory> ComplanitHistoryRepository,
                 IGRepository<CheckListRequest> CheckListRequestRepository,
                 IGRepository<RequestComplanit> RequestComplanitRepository,
-                IGRepository<CheckListComplanit> CheckListComplanitRepository
+                IGRepository<CheckListComplanit> CheckListComplanitRepository,
+                IGRepository<AttachmentComplanit> AttachmentComplanitRepository
             )
             {
                 _mapper = mapper;
@@ -61,6 +63,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                 _CheckListRequestRepository = CheckListRequestRepository;
                 _RequestComplanitRepository = RequestComplanitRepository;
                 _CheckListComplanitRepository = CheckListComplanitRepository;
+                _AttachmentComplanitRepository = AttachmentComplanitRepository;
 
             }
             public async Task<ResponseDTO> Handle(GetAllComplanitQueryByRegionId request, CancellationToken cancellationToken)
@@ -74,11 +77,13 @@ namespace Maintenance.Application.Features.Categories.Queries
                         _response.StatusEnum = StatusEnum.Failed;
                         _response.Message = "userNotFound";
                     }
-                    var _RequestComplanit = await (
+                    var res = await (
                              from req in _RequestComplanitRepository.GetAll(x => x.State == State.NotDeleted)
-                           .WhereIf(request.RegionId != null && request.RegionId > 0, x => x.RegionId == request.RegionId)
+
+                             .WhereIf(request.RegionId != null && request.RegionId > 0, x => x.RegionId == request.RegionId)
 
                              .WhereIf(request.OfficeId != null && request.OfficeId > 0, x => x.OfficeId == request.OfficeId)
+
 
                              join check in _CheckListRequestRepository.GetAll(x => x.State == State.NotDeleted)
 
@@ -93,20 +98,27 @@ namespace Maintenance.Application.Features.Categories.Queries
 
                              on CheckListComp.CategoryComplanitId equals cat.Id
 
+                            
+
+                             join attachment in _AttachmentComplanitRepository.GetAll()
+
+                              on req.Id equals attachment.RequestComplanitId
 
                              select (new
                              {
                                  CategoryComplanitName = _auditService.UserLanguage == "ar" ? cat.NameAr : cat.NameEn,
                                  Description = req.Description,
                                  CheckListsRequest = _auditService.UserLanguage == "ar" ?
-                                 req.CheckListRequests.Select(x => x.CheckListComplanit.NameAr).ToArray() :
-                                 req.CheckListRequests.Select(x => x.CheckListComplanit.NameEn).ToArray(),
+                                 CheckListComp.CheckListRequests.Select(x => x.CheckListComplanit.NameAr).ToArray() :
+                                 CheckListComp.CheckListRequests.Select(x => x.CheckListComplanit.NameEn).ToArray(),
                                  ComplanitId = req.Id,
-                                 CheckListsRequestIds = req.CheckListRequests.Select(x => x.Id).ToArray(),
-                                 CategoryComplanitId = CheckListComp.CategoryComplanitId
+                                 CheckListsRequestIds = CheckListComp.CheckListRequests.Select(x => x.Id).ToArray(),
+                                 CategoryComplanitId = CheckListComp.CategoryComplanitId,
+                                 AttachmentsComplanit = req.AttachmentsComplanit.Select(x => x.Path).ToArray()
                              })).ToListAsync();
 
-                    var paginatedObjs = await PaginationUtility.Paging(request.PaginatedInputModel, _RequestComplanit);
+
+                    var paginatedObjs = await PaginationUtility.Paging(request.PaginatedInputModel, res);
 
                     _response.setPaginationData(paginatedObjs);
                     _response.Result = paginatedObjs;
