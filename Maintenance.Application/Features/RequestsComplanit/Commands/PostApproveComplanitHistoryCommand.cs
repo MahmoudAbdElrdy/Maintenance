@@ -1,7 +1,6 @@
 ﻿using AuthDomain.Entities.Auth;
 using AutoMapper;
 using Maintenance.Application.Features.Account.Commands.Login;
-using Maintenance.Application.Features.RequestsComplanit.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.Notifications;
@@ -19,11 +18,10 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 {
     public class PostApproveComplanitHistoryCommand : IRequest<ResponseDTO>
     {
-
-
         public string? Description { get; set; }
         public string[]? AttachmentsComplanitHistory { get; set; }
         public ComplanitStatus? ComplanitStatus { get; set; }
+        public long? RequestComplanitId { get; set; }
         class PostRequestComplanit : IRequestHandler<PostApproveComplanitHistoryCommand, ResponseDTO>
         {
             private readonly IGRepository<ComplanitHistory> _RequestComplanitRepository;
@@ -66,8 +64,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             CreatedOn = DateTime.Now,
                             State = Domain.Enums.State.NotDeleted,
                             Description = request.Description,
-                            ComplanitStatus = request.ComplanitStatus,
-                           
+                            ComplanitStatus = request.ComplanitStatus,//TechnicianClosed no message
+                            RequestComplanitId = request.RequestComplanitId
                         };
 
                         foreach (var item in request.AttachmentsComplanitHistory)
@@ -94,8 +92,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     }
                     //Domain.Enums.ComplanitStatus.TechnicianAssigned
                     //The owner and the consultant will recieve a notification contains
-                    var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner 
-                    || x.UserType == UserType.Consultant &&x.State == State.NotDeleted).ToListAsync();
+                  
 
                     if (  request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianAssigned 
                         ||request.ComplanitStatus== Domain.Enums.ComplanitStatus.TechnicianSuspended 
@@ -103,6 +100,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianDone
                         )
                     {
+                        var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner
+                  || x.UserType == UserType.Consultant && x.State == State.NotDeleted).ToListAsync();
                         foreach (var item in users)
                       
                        {
@@ -134,11 +133,62 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                          await  _NotificationRepository.AddAsync(notfication);
                         }
                     }
-                 
+                    if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterSuspended
+                        || request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterCanceled
+                        || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled
+                        )
+                    {
+                        var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner && x.State == State.NotDeleted).ToListAsync();
+                       
+                        foreach (var item in users)
+                        {
+                            var notfication = new Notification()
+                            {
+                                CreatedBy = _auditService.UserId,
+
+                                CreatedOn = DateTime.Now,
+
+                                State = Domain.Enums.State.NotDeleted,
+
+                                From = _auditService.UserId,
+
+                                NotificationState = NotificationState.New,
+
+                                SubjectAr = _localizationProvider[Enum.GetName(typeof(Domain.Enums.ComplanitStatus), request.ComplanitStatus), "ar"],
+
+                                SubjectEn = _localizationProvider[Enum.GetName(typeof(Domain.Enums.ComplanitStatus), request.ComplanitStatus), "en"],
+
+                                BodyAr = request.Description,
+
+                                BodyEn = request.Description,
+
+                                To = item.Id
+                            };
+
+                            await NotificationHelper.FCMNotify(notfication, "");
+
+                            await _NotificationRepository.AddAsync(notfication);
+                        }
+                    }
+                    if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterDone)
+                    {
+                        var RequestComplanit = await _RequestComplanitRepository.FindAsync(request.RequestComplanitId);
+                        var clientUser = await _userManager.Users.Where(x => x.Id == RequestComplanit.CreatedBy).FirstOrDefaultAsync();
+                        //var res = SendSMS.SendMessageUnifonic(meass + " : " + clientUser.Code, clientUser.PhoneNumber);
+                        //if (res == -1)
+                        //{
+                         //    _response.Message = _localizationProvider["ProplemSendCode"];
+
+                        //    _response.StatusEnum = StatusEnum.Failed;
+                        //    return _response;
+                        //}
+                    }
+
+
                     _RequestComplanitRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = "RequestComplanitSavedSuccessfully";
+                    _response.Message = _localizationProvider["AddedSuccessfully"];
                     _response.Result = null;
                     return _response;
                 }
