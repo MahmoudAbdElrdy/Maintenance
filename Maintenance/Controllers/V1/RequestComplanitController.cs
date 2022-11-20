@@ -45,7 +45,7 @@ namespace Maintenance.Controllers.V1
         [HttpGet("GetComplanitsByStatus")]
         public async Task<ResponseDTO> GetComplanitsByStatus(int pageNumber, int pageSize, long CategoryId, long RegionId,long OfficeId, ComplanitStatus Status)
         {
-            return await _mediator.Send(new GetComplanitHistoryQueryByStatus()
+            return await _mediator.Send(new GetComplanitQueryByStatus()
             {
                 PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
                 {
@@ -57,6 +57,20 @@ namespace Maintenance.Controllers.V1
                 RegionId= RegionId,
                 ComplanitStatus= Status,
                 OfficeId= OfficeId
+            });
+        }
+        [HttpGet("GetComplanitDetailsQuery")]
+        public async Task<ResponseDTO> GetComplanitDetailsQuery(int pageNumber, int pageSize,long requestComplanitId)
+        {
+            return await _mediator.Send(new GetComplanitDetailsQuery()
+            {
+                PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+
+                },
+                RequestComplanitId = requestComplanitId
             });
         }
 

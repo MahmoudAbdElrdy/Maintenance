@@ -1,8 +1,5 @@
 ﻿using AuthDomain.Entities.Auth;
 using AutoMapper;
-using MailKit.Search;
-using Maintenance.Application.Features.Categories.Dto;
-using Maintenance.Application.Features.RequestsComplanit.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.Paginations;
@@ -10,22 +7,16 @@ using Maintenance.Application.Helpers.QueryableExtensions;
 using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Enums;
 using Maintenance.Domain.Interfaces;
-using Maintenance.Infrastructure.Migrations;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Org.BouncyCastle.Ocsp;
-using System.Linq;
 using System.Linq.Dynamic.Core;
-using AttachmentComplanit = Maintenance.Domain.Entities.Complanits.AttachmentComplanit;
-using ComplanitHistory = Maintenance.Domain.Entities.Complanits.ComplanitHistory;
 
 namespace Maintenance.Application.Features.Categories.Queries
 {
-    public class GetComplanitHistoryQueryByStatus : IRequest<ResponseDTO>
+    public class GetComplanitQueryByStatus : IRequest<ResponseDTO>
     {
-        public GetComplanitHistoryQueryByStatus() 
+        public GetComplanitQueryByStatus() 
         {
             PaginatedInputModel = new PaginatedInputModel();
         }
@@ -34,46 +25,37 @@ namespace Maintenance.Application.Features.Categories.Queries
         public long? OfficeId { get; set; }  
         public ComplanitStatus? ComplanitStatus { get; set; }
         public PaginatedInputModel PaginatedInputModel { get; set; }
-        class GetAllCategoryComplanit : IRequestHandler<GetComplanitHistoryQueryByStatus, ResponseDTO>
+        class GetAllCategoryComplanit : IRequestHandler<GetComplanitQueryByStatus, ResponseDTO>
         {
-            private readonly IGRepository<CategoryComplanit> _CategoryComplanitRepository;
-            private readonly IGRepository<ComplanitHistory> _ComplanitHistoryRepository;  
-            private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;  
+          
             private readonly IGRepository<CheckListRequest> _CheckListRequestRepository; 
-            private readonly IGRepository<CheckListComplanit> _CheckListComplanitRepository; 
-            private readonly IGRepository<AttachmentComplanit> _AttachmentComplanitRepository; 
+           
             private readonly IGRepository<User> _userRepository;
             private readonly ILogger<GetAllCategoryComplanitQuery> _logger;
             private readonly ResponseDTO _response;
             private readonly IAuditService _auditService;
             private readonly IMapper _mapper;
             public GetAllCategoryComplanit(
-                IHttpContextAccessor _httpContextAccessor,
-                IGRepository<CategoryComplanit> CategoryComplanitRepository,
+            
                 ILogger<GetAllCategoryComplanitQuery> logger, IMapper mapper,
                 IGRepository<User> userRepository,
                 IAuditService auditService,
-                IGRepository<ComplanitHistory> ComplanitHistoryRepository,
-                IGRepository<CheckListRequest> CheckListRequestRepository,
-                IGRepository<RequestComplanit> RequestComplanitRepository,
-                IGRepository<CheckListComplanit> CheckListComplanitRepository,
-                IGRepository<AttachmentComplanit> AttachmentComplanitRepository
+              
+                IGRepository<CheckListRequest> CheckListRequestRepository
+               
             )
             {
                 _mapper = mapper;
-                _CategoryComplanitRepository = CategoryComplanitRepository;
+               
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _response = new ResponseDTO();
                 _userRepository = userRepository;
                 _auditService = auditService;
-                _ComplanitHistoryRepository = ComplanitHistoryRepository;
+              
                 _CheckListRequestRepository = CheckListRequestRepository;
-                _RequestComplanitRepository = RequestComplanitRepository;
-                _CheckListComplanitRepository = CheckListComplanitRepository;
-                _AttachmentComplanitRepository = AttachmentComplanitRepository;
-
+              
             }
-            public async Task<ResponseDTO> Handle(GetComplanitHistoryQueryByStatus request, CancellationToken cancellationToken)
+            public async Task<ResponseDTO> Handle(GetComplanitQueryByStatus request, CancellationToken cancellationToken)
             {
                 try
                 {
