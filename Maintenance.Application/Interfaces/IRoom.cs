@@ -11,6 +11,13 @@ namespace Maintenance.Application.Interfaces
     public interface IRoom
     {
         [Get("/api/v1/Room/GetRoomIdByRoomNumber/{roomNumber}")]
-        Task<long> GetRoomId(long roomNumber);   
+        Task<long> GetRoomId(long roomNumber);
+        [Get("/api/v1/Office/GetOffices")]
+        Task<List<OfficeDto>> GetOffices();   
+    }
+    public class OfficeDto
+    {
+        public string Name { get; set; }
+        public string Code { get; set; } 
     }
 }

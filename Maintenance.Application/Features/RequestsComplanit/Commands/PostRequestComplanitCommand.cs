@@ -19,6 +19,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
         public List<RequestComplanitDto> requests { get; set; }
         public long? OfficeId { get; set; }
         public long? RegionId { get; set; }
+        public string SerialNumber { get; set; }
         class PostRequestComplanit : IRequestHandler<PostRequestComplanitCommand, ResponseDTO>
         {
             private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;
@@ -62,8 +63,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             CreatedOn = DateTime.Now,
                             State = Domain.Enums.State.NotDeleted,
                             Description = requestObj.Description,
-                            OfficeId=request.OfficeId,
-                            RegionId = request.RegionId
+                            SerialNumber = requestObj.SerialNumber,
+                          //  OfficeId=request.OfficeId,
+                           // RegionId = request.RegionId
                         };
 
                         foreach (var item in requestObj.AttachmentsComplanit)
