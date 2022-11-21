@@ -68,7 +68,7 @@ namespace Maintenance.Application.Features.Categories.Queries
             {
                 try
                 {
-                    //var offices =await _room.GetOffices();
+                    var offices =await _room.GetOffices();
 
                     var res2 = await _RequestComplanitRepository.GetAll()
 
@@ -87,7 +87,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                          .Select(x => new ComplanitDto
                          {
                              SerialNumber=x.SerialNumber,
-                             location =x.SerialNumber.Length>0? "مركز : "  //offices.Where(y=>y.Code==x.SerialNumber.Substring(0,3)).FirstOrDefault().Name
+                             location =x.SerialNumber.Length>0? "مركز : " + offices.Where(y=>y.Code==x.SerialNumber.Substring(0,3)).FirstOrDefault().Name
                              + " منطقة : "+ x.SerialNumber.Substring(3,2)
                              + " بركس : " + x.SerialNumber.Substring(5, 2)
                              + " غرفة : " + x.SerialNumber.Substring(7, 0):"",
