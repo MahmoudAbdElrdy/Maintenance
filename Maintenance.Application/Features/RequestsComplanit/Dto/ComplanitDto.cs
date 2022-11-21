@@ -21,6 +21,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Dto
         public string[] AttachmentsComplanit { get; set; }
         public ComplanitStatus? ComplanitStatus { get; set; }
         public string location { get; set; } 
+        public string SerialNumber { get; set; } 
 
     }
     public class CheckListComplanitDto:IHaveCustomMapping
