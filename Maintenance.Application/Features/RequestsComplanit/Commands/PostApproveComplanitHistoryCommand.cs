@@ -4,6 +4,7 @@ using Maintenance.Application.Features.Account.Commands.Login;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.Notifications;
+using Maintenance.Application.Helpers.SendSms;
 using Maintenance.Domain.Entities.Auth;
 using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Enums;
@@ -24,7 +25,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
         public long? RequestComplanitId { get; set; }
         class PostRequestComplanit : IRequestHandler<PostApproveComplanitHistoryCommand, ResponseDTO>
         {
-            private readonly IGRepository<ComplanitHistory> _RequestComplanitRepository;
+            private readonly IGRepository<ComplanitHistory> _ComplanitHistoryRepository;
+            private readonly IGRepository<RequestComplanit> _RequestComplanitRepository; 
             private readonly IGRepository<Notification> _NotificationRepository;
             private readonly ILogger<PostApproveComplanitHistoryCommand> _logger;
             private readonly ResponseDTO _response;
@@ -34,16 +36,17 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
             private readonly IStringLocalizer<LoginQueryHandler> _localizationProvider;
             public PostRequestComplanit(
 
-                IGRepository<ComplanitHistory> RequestComplanitRepository,
+                IGRepository<ComplanitHistory> ComplanitHistoryRepository,
                 ILogger<PostApproveComplanitHistoryCommand> logger,
                 IAuditService auditService,
                 IMapper mapper,
                 IGRepository<Notification> NotificationRepository,
                 UserManager<User> userManager,
-                IStringLocalizer<LoginQueryHandler> localizationProvider
+                IStringLocalizer<LoginQueryHandler> localizationProvider,
+                IGRepository<RequestComplanit> RequestComplanitRepository
             )
             {
-                _RequestComplanitRepository = RequestComplanitRepository;
+                _ComplanitHistoryRepository = ComplanitHistoryRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _auditService = auditService;
                 _response = new ResponseDTO();
@@ -51,6 +54,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 _NotificationRepository = NotificationRepository;
                 _userManager = userManager;
                 _localizationProvider = localizationProvider;
+                _RequestComplanitRepository = RequestComplanitRepository;
             }
             public async Task<ResponseDTO> Handle(PostApproveComplanitHistoryCommand request, CancellationToken cancellationToken)
             {
@@ -78,7 +82,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             });
                         }
 
-                    await _RequestComplanitRepository.AddAsync(complanitHistory);
+                    await _ComplanitHistoryRepository.AddAsync(complanitHistory);
                    
                     var personalUser = await _userManager.Users.Where(x => x.Id == _auditService.UserId).FirstOrDefaultAsync();
                    
@@ -129,8 +133,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             };
                             var tokken = "f9t8Lh05QROd4qe6F9ALKu:APA91bHmzqSLyWSq5wg-itJTT5XEq6GhpWshKfl0TwGVsQ8xzXBYGfConk_pcXI-T5dqF90PUEP3o7vXVKvAhxxS7mG51YJXm0HKDtb1p2vUKHL8QCT06lTFtFn8-u_E5M0cxWT6TsAD\r\neyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJ1c2VyTG9naW5JZCI6IjMiLCJpZGVudGl0eU51bWJlciI6IjEyMzQ1Njc4OSIsIkZ1bGxOYW1lIjoiQWhtZWQgTWFucyIsIlVzZXJUeXBlIjoiQ2xpZW50IiwiZXhwIjoxNjcxMzcwOTg0LCJpc3MiOiJNYWludGVuYW5jZUFQSSIsImF1ZCI6Ik1haW50ZW5hbmNlQVBJIn0.k8Cs4LTsrdxwI2LWDY5Vn1X5-YBOfBQB-Yc-6-lrcls"
                           ;
-                          //  await NotificationHelper.FCMNotify(notfication, tokken);
-                       NotificationHelper.PushNotificationByFirebase(notfication.BodyAr,notfication.SubjectAr,0,item.Token,null);
+                        //  await NotificationHelper.FCMNotify(notfication,item. Token);
+                       NotificationHelper.PushNotificationByFirebase(notfication.BodyAr,notfication.SubjectAr,0, item.Token, null);
                         
                          await  _NotificationRepository.AddAsync(notfication);
                         }
@@ -167,21 +171,23 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                                 To = item.Id
                             };
 
-                            var tokken = "f9t8Lh05QROd4qe6F9ALKu:APA91bHmzqSLyWSq5wg-itJTT5XEq6GhpWshKfl0TwGVsQ8xzXBYGfConk_pcXI-T5dqF90PUEP3o7vXVKvAhxxS7mG51YJXm0HKDtb1p2vUKHL8QCT06lTFtFn8-u_E5M0cxWT6TsAD\r\neyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJ1c2VyTG9naW5JZCI6IjMiLCJpZGVudGl0eU51bWJlciI6IjEyMzQ1Njc4OSIsIkZ1bGxOYW1lIjoiQWhtZWQgTWFucyIsIlVzZXJUeXBlIjoiQ2xpZW50IiwiZXhwIjoxNjcxMzcwOTg0LCJpc3MiOiJNYWludGVuYW5jZUFQSSIsImF1ZCI6Ik1haW50ZW5hbmNlQVBJIn0.k8Cs4LTsrdxwI2LWDY5Vn1X5-YBOfBQB-Yc-6-lrcls"
-                       ;
-                            await NotificationHelper.FCMNotify(notfication, tokken);
-
-                            await _NotificationRepository.AddAsync(notfication);
+                         //   var tokken = "f9t8Lh05QROd4qe6F9ALKu:APA91bHmzqSLyWSq5wg-itJTT5XEq6GhpWshKfl0TwGVsQ8xzXBYGfConk_pcXI-T5dqF90PUEP3o7vXVKvAhxxS7mG51YJXm0HKDtb1p2vUKHL8QCT06lTFtFn8-u_E5M0cxWT6TsAD\r\neyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJ1c2VyTG9naW5JZCI6IjMiLCJpZGVudGl0eU51bWJlciI6IjEyMzQ1Njc4OSIsIkZ1bGxOYW1lIjoiQWhtZWQgTWFucyIsIlVzZXJUeXBlIjoiQ2xpZW50IiwiZXhwIjoxNjcxMzcwOTg0LCJpc3MiOiJNYWludGVuYW5jZUFQSSIsImF1ZCI6Ik1haW50ZW5hbmNlQVBJIn0.k8Cs4LTsrdxwI2LWDY5Vn1X5-YBOfBQB-Yc-6-lrcls"
+                      NotificationHelper.PushNotificationByFirebase(notfication.BodyAr, notfication.SubjectAr, 0, item.Token, null);
                         }
                     }
                     if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterDone)
                     {
+                        var RequestComplanitHistory = await _ComplanitHistoryRepository.FindAsync(request.RequestComplanitId);
+                        
                         var RequestComplanit = await _RequestComplanitRepository.FindAsync(request.RequestComplanitId);
-                        var clientUser = await _userManager.Users.Where(x => x.Id == RequestComplanit.CreatedBy).FirstOrDefaultAsync();
+
+                        var clientUser = await _userManager.Users.Where(x => x.Id == RequestComplanitHistory.CreatedBy).FirstOrDefaultAsync();
+                        RequestComplanit.CodeSms= SendSMS.GenerateCode();
+                       _RequestComplanitRepository.Update(RequestComplanit);
                         //var res = SendSMS.SendMessageUnifonic(meass + " : " + clientUser.Code, clientUser.PhoneNumber);
                         //if (res == -1)
                         //{
-                         //    _response.Message = _localizationProvider["ProplemSendCode"];
+                        //    _response.Message = _localizationProvider["ProplemSendCode"];
 
                         //    _response.StatusEnum = StatusEnum.Failed;
                         //    return _response;
@@ -189,7 +195,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     }
 
 
-                    _RequestComplanitRepository.Save();
+                    _ComplanitHistoryRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
                     _response.Message = _localizationProvider["AddedSuccessfully"];
