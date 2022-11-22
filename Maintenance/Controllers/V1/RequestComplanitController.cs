@@ -1,10 +1,13 @@
 ﻿using Maintenance.Application.Features.Categories.Commands;
 using Maintenance.Application.Features.Categories.Queries;
 using Maintenance.Application.Features.RequestsComplanit;
+using Maintenance.Application.Features.RequestsComplanit.Command;
 using Maintenance.Application.Features.RequestsComplanit.Commands;
+using Maintenance.Application.Features.RequestsComplanit.Dto;
 using Maintenance.Application.Helper;
 using Maintenance.Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,20 +46,20 @@ namespace Maintenance.Controllers.V1
         }
 
         [HttpGet("GetComplanitsByStatus")]
-        public async Task<ResponseDTO> GetComplanitsByStatus(int pageNumber, int pageSize, long CategoryId, long RegionId,long OfficeId, ComplanitStatus Status)
+        public async Task<ResponseDTO> GetComplanitsByStatus([FromQuery] FilterComplanitDto filterComplanit)
         {
             return await _mediator.Send(new GetComplanitQueryByStatus()
             {
                 PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
                 {
-                    PageNumber = pageNumber,
-                    PageSize = pageSize,
+                    PageNumber = filterComplanit.PaginatedInputModel.PageNumber,
+                    PageSize = filterComplanit.PaginatedInputModel.PageSize,
                     
                 },
-                CategoryId= CategoryId,
-                RegionId= RegionId,
-                ComplanitStatus= Status,
-                OfficeId= OfficeId
+                CategoryId= filterComplanit.CategoryId,
+                RegionId= filterComplanit.RegionId,
+                ComplanitStatus= filterComplanit.ComplanitStatus,
+                OfficeId= filterComplanit.OfficeId
             });
         }
         [HttpGet("GetComplanitDetailsQuery")]
@@ -93,6 +96,27 @@ namespace Maintenance.Controllers.V1
                     Message = "error"
                 };
             }
+            return await _mediator.Send(command);
+        } 
+        [HttpPost("PostComplanitHistory")]
+
+        public async Task<ResponseDTO> PostApproveComplanitHistoryCommand([FromBody] PostApproveComplanitHistoryCommand command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return new ResponseDTO()
+                {
+                    StatusEnum = StatusEnum.FailedToSave,
+                    Message = "error"
+                };
+            }
+            return await _mediator.Send(command);
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("VerificationCodeComplanit")]
+        public async Task<ResponseDTO> VerificationCode([FromBody] VerificationCodeComplanit command)
+        {
             return await _mediator.Send(command);
         }
 

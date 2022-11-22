@@ -13,6 +13,7 @@ namespace Maintenance.Application.Interfaces
         [Get("/api/v1/Room/GetRoomIdByRoomNumber/{roomNumber}")]
         Task<long> GetRoomId(long roomNumber);
         [Get("/api/v1/Office/GetOffices")]
+       // Task<List<OfficeDto>> GetOffices();   
         Task<List<OfficeDto>> GetOffices();   
     }
     public class OfficeDto

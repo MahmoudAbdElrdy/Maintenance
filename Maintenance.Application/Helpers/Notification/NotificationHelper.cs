@@ -79,26 +79,34 @@ namespace Maintenance.Application.Helpers.Notifications
         }
         public static async Task FCMNotify(Notification notification, string userFcmToken)
         {
-            var serverKey = "AAAAAzeHsvc:APA91bGzQXZ2pWbom40rIb0CLcWI4CPmduQAz0GA3q1-LzQiuzQqnLi0VaUYHBPuKCrYxBupkIixhrxDGgqGCJhOsG7N4v2TLqtmQa0v-mpKDdf1_gTXYFjZPmFjzVtz7cF-IDpTQOEp";
-            
-            using (var sender = new FCMNet.Sender(serverKey))
+            try
             {
-                FCMNet.Message msg;
-                msg = new FCMNet.Message
+                var serverKey = "AAAAdqL_0Ts:ccccGiuA1khLTEUcl83pPNLtSJ8acgNNQO1eRC_bMA6199ENJItryAV3G5GPYL5-TQqKvj0MbwpYH49GfUyX15Lj4KVPk-KeQ7wu07qbU01S1I18PkEATFFEofJQmr4sRd3QmZblmH";
+
+                using (var sender = new FCMNet.Sender(serverKey))
                 {
-                    RegistrationIds = new List<string> { userFcmToken },
-
-                    Notification = new FCMNet.Notification
+                    FCMNet.Message msg;
+                    msg = new FCMNet.Message
                     {
-                        Title = notification.SubjectAr,
-                        Body = notification.BodyAr,
-                        Sound = "sound.caf"
-                    },
-                    Priority = FCMNet.Priority.High,
-                };
+                        RegistrationIds = new List<string> { userFcmToken },
 
-                var data = await sender.SendAsync(msg);
+                        Notification = new FCMNet.Notification
+                        {
+                            Title = notification.SubjectAr,
+                            Body = notification.BodyAr,
+                            Sound = "sound.caf"
+                        },
+                        Priority = FCMNet.Priority.High,
+                    };
+
+                    var data = await sender.SendAsync(msg);
+                }
             }
+            catch (Exception e)
+            {
+                ;
+            }
+         
         }
         //public static void PushNotificationByFirebase(string englishMessage, string title, List<string> player_Id, Dictionary<string, object> AdditionalData, int second = 0)
         //{

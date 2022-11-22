@@ -2,6 +2,7 @@
 using Maintenance.Application.Features.RequestsComplanit.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
+using Maintenance.Application.Helpers.SendSms;
 using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Enums;
 using Maintenance.Domain.Interfaces;
@@ -17,9 +18,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
         //public long[]? CheckListsRequest { get; set; }
         //public string[]? AttachmentsComplanit { get; set; }
         public List<RequestComplanitDto> requests { get; set; }
-        public long? OfficeId { get; set; }
-        public long? RegionId { get; set; }
-        public string SerialNumber { get; set; }
+      //  public long? OfficeId { get; set; }
+      //  public long? RegionId { get; set; }
+       
         class PostRequestComplanit : IRequestHandler<PostRequestComplanitCommand, ResponseDTO>
         {
             private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;
@@ -64,8 +65,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             State = Domain.Enums.State.NotDeleted,
                             Description = requestObj.Description,
                             SerialNumber = requestObj.SerialNumber,
-                          //  OfficeId=request.OfficeId,
-                           // RegionId = request.RegionId
+                            Code= GenerateCodeComplaint()
+                            //  OfficeId=request.OfficeId,
+                            // RegionId = request.RegionId
                         };
 
                         foreach (var item in requestObj.AttachmentsComplanit)
@@ -139,7 +141,18 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     return _response;
                 }
             }
-
+            public  string GenerateCodeComplaint()
+            {
+                var characters = "0123456789";
+                var charsArr = new char[10];
+                var random = new Random();
+                for (int i = 0; i < charsArr.Length; i++)
+                {
+                    charsArr[i] = characters[random.Next(characters.Length)];
+                }
+                var segmentString = new String(charsArr);
+                return segmentString;
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ using Maintenance.Infrastructure.Migrations;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 using System.Linq.Dynamic.Core;
 
 namespace Maintenance.Application.Features.Categories.Queries
@@ -23,9 +24,9 @@ namespace Maintenance.Application.Features.Categories.Queries
         {
             PaginatedInputModel = new PaginatedInputModel();
         }
-        public long? CategoryId { get; set; } 
-        public long? RegionId { get; set; }  
-        public long? OfficeId { get; set; }  
+        public List<long>? CategoryId { get; set; } 
+        public List<string>? RegionId { get; set; }
+        public List<string>? OfficeId { get; set; }  
         public ComplanitStatus? ComplanitStatus { get; set; }
         public PaginatedInputModel PaginatedInputModel { get; set; }
         class GetAllCategoryComplanit : IRequestHandler<GetComplanitQueryByStatus, ResponseDTO>
@@ -33,6 +34,7 @@ namespace Maintenance.Application.Features.Categories.Queries
           
             private readonly IGRepository<CheckListRequest> _CheckListRequestRepository; 
             private readonly IGRepository<RequestComplanit> _RequestComplanitRepository; 
+            private readonly IGRepository<CheckListComplanit> _CheckListComplanitRepository; 
            
             private readonly IGRepository<User> _userRepository;
             private readonly ILogger<GetAllCategoryComplanitQuery> _logger;
@@ -48,6 +50,7 @@ namespace Maintenance.Application.Features.Categories.Queries
               
                 IGRepository<CheckListRequest> CheckListRequestRepository,
                 IGRepository<RequestComplanit> RequestComplanitRepository,
+                IGRepository<CheckListComplanit> CheckListComplanitRepository,
                 IRoom room
 
             )
@@ -62,13 +65,21 @@ namespace Maintenance.Application.Features.Categories.Queries
                 _CheckListRequestRepository = CheckListRequestRepository;
                 _RequestComplanitRepository = RequestComplanitRepository;
                 _room = room;
-              
+                _CheckListComplanitRepository = CheckListComplanitRepository;
+
+
             }
             public async Task<ResponseDTO> Handle(GetComplanitQueryByStatus request, CancellationToken cancellationToken)
             {
                 try
                 {
                     var offices =await _room.GetOffices();
+                    List<long> CheckListComplanitIds = new List<long>();
+                    if (request.CategoryId.Count > 0)
+                    {
+                        CheckListComplanitIds = _CheckListComplanitRepository.GetAll(x => request.CategoryId.Contains((long)x.CategoryComplanitId)).Select(s => s.Id).ToList();
+
+                    }
 
                     var res2 = await _RequestComplanitRepository.GetAll()
 
@@ -77,9 +88,9 @@ namespace Maintenance.Application.Features.Categories.Queries
                      .Include(x => x.CheckListRequests).
                      ThenInclude(x => x.CheckListComplanit.CategoryComplanit)
                      .Protected(x => x.State == State.NotDeleted)
-                     .WhereIf(request.RegionId != null && request.RegionId > 0, x => x.SerialNumber.Substring(3,2).Contains(request.RegionId.ToString()))
-                     .WhereIf(request.OfficeId != null && request.OfficeId > 0, x => x.SerialNumber.Substring(0,3).Contains(request.OfficeId.ToString()))
-                     .WhereIf(request.CategoryId != null && request.CategoryId > 0, x => x.CheckListRequests.Select(x => x.CheckListComplanit.CategoryComplanitId).Contains(request.CategoryId))
+                     .WhereIf(request.RegionId != null && request.RegionId.Count>0, x => request.RegionId.Contains(x.SerialNumber.Substring(3,2)))
+                     .WhereIf(request.OfficeId != null && request.OfficeId.Count > 0, x => request.OfficeId.Contains(x.SerialNumber.Substring(0, 3)))
+                     .WhereIf(request.CategoryId != null && request.CategoryId.Count > 0, x => x.CheckListRequests.Any(c=> CheckListComplanitIds.Contains((long)c.CheckListComplanitId)))
                      .WhereIf(request.ComplanitStatus != null && request.ComplanitStatus > 0, x => x.ComplanitHistory.Select(x => x.ComplanitStatus)
                      .Contains(request.ComplanitStatus))
 
@@ -87,10 +98,13 @@ namespace Maintenance.Application.Features.Categories.Queries
                          .Select(x => new ComplanitDto
                          {
                              SerialNumber=x.SerialNumber,
-                             location =x.SerialNumber.Length>0? "مركز : " + offices.Where(y=>y.Code==x.SerialNumber.Substring(0,3)).FirstOrDefault().Name
-                             + " منطقة : "+ x.SerialNumber.Substring(3,2)
+                             location = x.SerialNumber.Length > 0 ? "مركز : " //+ offices.Where(y => y.Code== x.SerialNumber.Substring(0, 3)).FirstOrDefault().Name
+                             + " منطقة : " + x.SerialNumber.Substring(3, 2)
                              + " بركس : " + x.SerialNumber.Substring(5, 2)
-                             + " غرفة : " + x.SerialNumber.Substring(7, 0):"",
+                             + " غرفة : " + x.SerialNumber.Substring(7, 0) : "",
+                             CategoryComplanitLogo = x.CheckListRequests.FirstOrDefault(x => x.State == State.NotDeleted).CheckListComplanit.CategoryComplanit.Logo,
+
+
                              CategoryComplanitName = _auditService.UserLanguage == "ar" ?
                               x.CheckListRequests.FirstOrDefault(x => x.State == State.NotDeleted).CheckListComplanit.CategoryComplanit.NameAr
                              : x.CheckListRequests.FirstOrDefault(x => x.State == State.NotDeleted).CheckListComplanit.CategoryComplanit.NameEn,
@@ -100,7 +114,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                              //CheckListsRequestIds = x.CheckListRequests.Select(x => x.CheckListComplanit.Id),
                              CategoryComplanitId = x.CheckListRequests.FirstOrDefault(x=>x.State==State.NotDeleted).CheckListComplanit.Id,
                              AttachmentsComplanit = x.AttachmentsComplanit.Where(s => s.State == State.NotDeleted).Select(x => x.Path).ToArray(),
-                             ComplanitStatus= x.ComplanitHistory.OrderByDescending(x=>x.CreatedOn).Select(x => x.ComplanitStatus).FirstOrDefault().Value,
+                             ComplanitStatus=(int) x.ComplanitHistory.OrderByDescending(x=>x.CreatedOn).Select(x => x.ComplanitStatus).FirstOrDefault(),
                              CheckListComplanit = (List<CheckListComplanitDto>)x.CheckListRequests.
                              Where(x => x.State == State.NotDeleted).
                              Select(s => new CheckListComplanitDto
@@ -115,28 +129,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                          }).ToListAsync()
                      ;
 
-                    //var res = await _CheckListRequestRepository.GetAll()
 
-                    // .Include(x => x.RequestComplanit.AttachmentsComplanit)
-                    // .Include(x => x.RequestComplanit.ComplanitHistory)
-                    // .Include(x => x.CheckListComplanit.CategoryComplanit)
-                    // .WhereIf(request.RegionId != null && request.RegionId > 0, x => x.RequestComplanit.RegionId == request.RegionId)
-                    // .WhereIf(request.OfficeId != null && request.OfficeId > 0, x => x.RequestComplanit.OfficeId == request.OfficeId)
-                    // .WhereIf(request.CategoryId != null && request.CategoryId > 0, x => x.CheckListComplanit.CategoryComplanitId == request.CategoryId)
-                    // .WhereIf(request.ComplanitStatus != null && request.ComplanitStatus > 0, x => x.RequestComplanit.ComplanitHistory.Select(x => x.ComplanitStatus)
-                    // .Contains(request.ComplanitStatus))
-                    //  .Select(x => new
-                    //     {
-                    //         CategoryComplanitName = _auditService.UserLanguage == "ar" ? x.CheckListComplanit.CategoryComplanit.NameAr : x.CheckListComplanit.CategoryComplanit.NameEn,
-                    //         Description = x.RequestComplanit.Description,
-                    //         CheckComplanitName = _auditService.UserLanguage == "ar" ? x.CheckListComplanit.NameAr : x.CheckListComplanit.NameEn,
-                    //         RequestComplanitId = x.RequestComplanitId,
-                    //         CheckComplanitId = x.CheckListComplanit.Id, 
-                    //         CategoryComplanitId = x.CheckListComplanit.CategoryComplanitId,
-                    //         AttachmentsComplanit = x.RequestComplanit.AttachmentsComplanit.Select(x => x.Path).ToArray()
-                    //     }).ToListAsync();
-                     
-                    //var res1 = res.DistinctBy(x => x.RequestComplanitId).ToList();
 
                     var paginatedObjs = await PaginationUtility.Paging(request.PaginatedInputModel, res2);
 

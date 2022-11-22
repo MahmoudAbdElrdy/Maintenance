@@ -19,6 +19,7 @@ namespace Maintenance.Domain.Entities.Complanits
         public string? NameEn { get; set; }
         public string? DescriptionAr { get; set; }
         public string? DescriptionEn { get; set; }
+        public string? Logo { get; set; }
         public virtual ICollection<CheckListComplanit> CheckListsComplanit { get; set; } = new List<CheckListComplanit>();
     }
 }

@@ -221,7 +221,7 @@
     
     public enum ComplanitStatus 
     {
-        Submitted = 1,
+        Submitted = 1,//create
 
         TechnicianAssigned = 2,
 

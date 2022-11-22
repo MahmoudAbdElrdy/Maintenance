@@ -127,8 +127,10 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                                
                                 To=item.Id
                             };
-                          
-                         await NotificationHelper.FCMNotify(notfication, "");
+                            var tokken = "f9t8Lh05QROd4qe6F9ALKu:APA91bHmzqSLyWSq5wg-itJTT5XEq6GhpWshKfl0TwGVsQ8xzXBYGfConk_pcXI-T5dqF90PUEP3o7vXVKvAhxxS7mG51YJXm0HKDtb1p2vUKHL8QCT06lTFtFn8-u_E5M0cxWT6TsAD\r\neyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJ1c2VyTG9naW5JZCI6IjMiLCJpZGVudGl0eU51bWJlciI6IjEyMzQ1Njc4OSIsIkZ1bGxOYW1lIjoiQWhtZWQgTWFucyIsIlVzZXJUeXBlIjoiQ2xpZW50IiwiZXhwIjoxNjcxMzcwOTg0LCJpc3MiOiJNYWludGVuYW5jZUFQSSIsImF1ZCI6Ik1haW50ZW5hbmNlQVBJIn0.k8Cs4LTsrdxwI2LWDY5Vn1X5-YBOfBQB-Yc-6-lrcls"
+                          ;
+                          //  await NotificationHelper.FCMNotify(notfication, tokken);
+                       NotificationHelper.PushNotificationByFirebase(notfication.BodyAr,notfication.SubjectAr,0,item.Token,null);
                         
                          await  _NotificationRepository.AddAsync(notfication);
                         }
@@ -165,7 +167,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                                 To = item.Id
                             };
 
-                            await NotificationHelper.FCMNotify(notfication, "");
+                            var tokken = "f9t8Lh05QROd4qe6F9ALKu:APA91bHmzqSLyWSq5wg-itJTT5XEq6GhpWshKfl0TwGVsQ8xzXBYGfConk_pcXI-T5dqF90PUEP3o7vXVKvAhxxS7mG51YJXm0HKDtb1p2vUKHL8QCT06lTFtFn8-u_E5M0cxWT6TsAD\r\neyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJ1c2VyTG9naW5JZCI6IjMiLCJpZGVudGl0eU51bWJlciI6IjEyMzQ1Njc4OSIsIkZ1bGxOYW1lIjoiQWhtZWQgTWFucyIsIlVzZXJUeXBlIjoiQ2xpZW50IiwiZXhwIjoxNjcxMzcwOTg0LCJpc3MiOiJNYWludGVuYW5jZUFQSSIsImF1ZCI6Ik1haW50ZW5hbmNlQVBJIn0.k8Cs4LTsrdxwI2LWDY5Vn1X5-YBOfBQB-Yc-6-lrcls"
+                       ;
+                            await NotificationHelper.FCMNotify(notfication, tokken);
 
                             await _NotificationRepository.AddAsync(notfication);
                         }
