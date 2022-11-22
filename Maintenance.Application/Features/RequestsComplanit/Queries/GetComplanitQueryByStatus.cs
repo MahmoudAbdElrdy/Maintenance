@@ -75,7 +75,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                 {
                     var offices =await _room.GetOffices();
                     List<long> CheckListComplanitIds = new List<long>();
-                    if (request.CategoryId.Count > 0)
+                    if (request.CategoryId != null && request.CategoryId.Count > 0)
                     {
                         CheckListComplanitIds = _CheckListComplanitRepository.GetAll(x => request.CategoryId.Contains((long)x.CategoryComplanitId)).Select(s => s.Id).ToList();
 

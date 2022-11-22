@@ -45,8 +45,8 @@ namespace Maintenance.Controllers.V1
             });
         }
 
-        [HttpGet("GetComplanitsByStatus")]
-        public async Task<ResponseDTO> GetComplanitsByStatus([FromQuery] FilterComplanitDto filterComplanit)
+        [HttpPost("GetComplanitsByStatus")]
+        public async Task<ResponseDTO> GetComplanitsByStatus([FromBody] FilterComplanitDto filterComplanit)
         {
             return await _mediator.Send(new GetComplanitQueryByStatus()
             {
@@ -60,6 +60,20 @@ namespace Maintenance.Controllers.V1
                 RegionId= filterComplanit.RegionId,
                 ComplanitStatus= filterComplanit.ComplanitStatus,
                 OfficeId= filterComplanit.OfficeId
+            });
+        }    
+        [HttpGet("GetComplanitQueryByCode")]
+        public async Task<ResponseDTO> GetComplanitQueryByCode(int pageNumber, int pageSize, string code)
+        {
+            return await _mediator.Send(new GetComplanitQueryByCode()
+            {
+                PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
+                {
+                    PageNumber =pageNumber,
+                    PageSize = pageSize,
+                    
+                },
+              Code= code
             });
         }
         [HttpGet("GetComplanitDetailsQuery")]
