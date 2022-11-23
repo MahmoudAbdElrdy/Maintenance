@@ -1,0 +1,99 @@
+﻿using AuthDomain.Entities.Auth;
+using AutoMapper;
+using Infrastructure;
+using IronBarCode.Logging;
+using Maintenance.Application.Features.Account.Commands.Login;
+using Maintenance.Application.Features.Categories.Commands;
+using Maintenance.Application.Features.Categories.Dto;
+using Maintenance.Application.Features.RequestsComplanit.Dto;
+using Maintenance.Application.GenericRepo;
+using Maintenance.Application.Helper;
+using Maintenance.Application.Helpers.Notifications;
+using Maintenance.Domain.Entities.Auth;
+using Maintenance.Domain.Entities.Complanits;
+using Maintenance.Domain.Enums;
+using Maintenance.Domain.Interfaces;
+using MediatR;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
+
+namespace Maintenance.Application.Features.RequestsComplanit.Commands
+{
+    public class PostReadNotificationCommand : IRequest<ResponseDTO>
+    {
+
+        public long? NotificationId { get; set; }
+       // public long? RequestComplanitId { get; set; }
+        public long? ComplanitHistoryId { get; set; } 
+        public bool? Approve { get; set; }
+      //  public NotificationState NotificationState { get; set; }
+        public ComplanitStatus? ComplanitStatus { get; set; }
+        class PostComplanitHistory : IRequestHandler<PostReadNotificationCommand, ResponseDTO>
+        {
+            private readonly IGRepository<ComplanitHistory> _ComplanitHistoryRepository;
+            private readonly IGRepository<Notification> _NotificationRepository;
+            private readonly ILogger<PostReadNotificationCommand> _logger;
+            private readonly ResponseDTO _response;
+            public readonly IAuditService _auditService;
+            private readonly IMapper _mapper;
+            public PostComplanitHistory(
+
+               IGRepository<ComplanitHistory> ComplanitHistoryRepository,
+               ILogger<PostReadNotificationCommand> logger,
+               IAuditService auditService,
+               IMapper mapper,
+               IGRepository<Notification> NotificationRepository
+           )
+            {
+                _ComplanitHistoryRepository = ComplanitHistoryRepository;
+                _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+                _auditService = auditService;
+                _response = new ResponseDTO();
+                _mapper = mapper;
+                _NotificationRepository = NotificationRepository;
+
+            }
+            public async Task<ResponseDTO> Handle(PostReadNotificationCommand request, CancellationToken cancellationToken)
+            {
+                try
+                {
+
+                    var ComplanitHistory = await _ComplanitHistoryRepository.GetFirstAsync(c => c.Id == request.ComplanitHistoryId);
+                   
+                    ComplanitHistory.ComplanitStatus = request.ComplanitStatus;
+                    ComplanitHistory.UpdatedOn = DateTime.Now;
+                    ComplanitHistory.IsApprove = request.Approve;
+                    var Notification = await _NotificationRepository.GetFirstAsync(c => c.Id == request.NotificationId);
+
+                  
+
+                    Notification.UpdatedOn = DateTime.Now;
+                    Notification.ReadDate = DateTime.Now;
+                    Notification.NotificationState = NotificationState.Read;
+                    Notification.Read = true;
+                    _ComplanitHistoryRepository.Update(ComplanitHistory);
+                    _NotificationRepository.Update(Notification);
+
+                    _ComplanitHistoryRepository.Save();
+
+                    _response.StatusEnum = StatusEnum.SavedSuccessfully;
+                    _response.Message = "Successfully";
+                    _response.Result = null;
+                    return _response;
+                }
+                catch (Exception ex)
+                {
+                    _response.StatusEnum = StatusEnum.Exception;
+                    _response.Result = null;
+                    _response.Message = ex != null && ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                    _logger.LogError(ex, ex.Message, ex != null && ex.InnerException != null ? ex.InnerException.Message : "");
+
+                    return _response;
+                }
+            }
+
+        }
+    }
+}

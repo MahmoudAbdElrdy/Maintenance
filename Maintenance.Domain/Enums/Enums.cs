@@ -210,13 +210,13 @@
     public enum NotificationType
     {
         Message,
-        Request,
+        RequestComplanit, 
     }
     public enum NotificationState
     {
-        New,
-        Approved,
-        Rejected
+        New,Read
+      //  Approved,
+       // Rejected
     }
     
     public enum ComplanitStatus 

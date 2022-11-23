@@ -11,7 +11,7 @@ namespace Maintenance.Application.Helpers.Notifications
         //BAjcGgKwhivRrPBavpgF7xeDGCcmYRJ_UnWGVGsWFwaCB18rBHgTDVL_NBx1ZLJJHniJA1O8H3tRvNcdfboCNWM
         //private static string FirebaseApplicationID = "AAAALeyliNM:APA91bH0CTQajX1fVlbSd0HN-4Hf4VyiQEzwgj3C8Tzk1Gc0FAfxmi3AE-uFgDmg8u_53kaRenxWhCeE4okyjzsRLkmxexhcanxmbgz81s1sDDSUL_z7_1r3IRDCNiyVAh27nGPeZfwK";
         //private static string FirebaseSenderId = "197243799763";
-        private static string FirebaseApplicationID = "AAAAdqL_0Ts:APA91bGiuA1khLTEUcl83pPNLtSJ8acgNNQO1eRC_bMA6199ENJItryAV3G5GPYL5-TQqKvj0MbwpYH49GfUyX15Lj4KVPk-KeQ7wu07qbU01S1I18PkEATFFEofJQmr4sRd3QmZblmH";
+        private static string FirebaseApplicationID = "AAAAdqL_0Ts:APA91bFuHEWOT3lzKiSdYVZSyLeQOZgqWf__mGKjubOnFw0Z-c2pUbt2q2lkjtYUQbPfIBkWOzDNJVKoDQSsPmtHvgIjXCjFYALEMSH4pEGwTtmptcwrvN581Wcly5lQwGACVraE1SQq";
         private static string FirebaseSenderId = "509540815163";
         public static string PushNotificationByFirebase(string txtmsg, string txttitle, int badgeCounter, string deviceId, string iamgeURL = null)
         {
@@ -81,7 +81,7 @@ namespace Maintenance.Application.Helpers.Notifications
         {
             try
             {
-                var serverKey = "AAAAdqL_0Ts:ccccGiuA1khLTEUcl83pPNLtSJ8acgNNQO1eRC_bMA6199ENJItryAV3G5GPYL5-TQqKvj0MbwpYH49GfUyX15Lj4KVPk-KeQ7wu07qbU01S1I18PkEATFFEofJQmr4sRd3QmZblmH";
+                var serverKey = "AAAAdqL_0Ts:APA91bFuHEWOT3lzKiSdYVZSyLeQOZgqWf__mGKjubOnFw0Z-c2pUbt2q2lkjtYUQbPfIBkWOzDNJVKoDQSsPmtHvgIjXCjFYALEMSH4pEGwTtmptcwrvN581Wcly5lQwGACVraE1SQq";
 
                 using (var sender = new FCMNet.Sender(serverKey))
                 {
@@ -94,7 +94,8 @@ namespace Maintenance.Application.Helpers.Notifications
                         {
                             Title = notification.SubjectAr,
                             Body = notification.BodyAr,
-                            Sound = "sound.caf"
+                            Sound = "sound.caf",
+
                         },
                         Priority = FCMNet.Priority.High,
                     };

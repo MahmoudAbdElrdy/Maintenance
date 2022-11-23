@@ -28,6 +28,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
             private readonly IGRepository<ComplanitHistory> _ComplanitHistoryRepository;
             private readonly IGRepository<RequestComplanit> _RequestComplanitRepository; 
             private readonly IGRepository<Notification> _NotificationRepository;
+            private readonly IGRepository<RequestComplanitNotification> _RequestComplanitNotificationRepository;
             private readonly ILogger<PostApproveComplanitHistoryCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
@@ -43,7 +44,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 IGRepository<Notification> NotificationRepository,
                 UserManager<User> userManager,
                 IStringLocalizer<LoginQueryHandler> localizationProvider,
-                IGRepository<RequestComplanit> RequestComplanitRepository
+                IGRepository<RequestComplanit> RequestComplanitRepository,
+                IGRepository<RequestComplanitNotification> RequestComplanitNotificationRepository
             )
             {
                 _ComplanitHistoryRepository = ComplanitHistoryRepository;
@@ -55,13 +57,28 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 _userManager = userManager;
                 _localizationProvider = localizationProvider;
                 _RequestComplanitRepository = RequestComplanitRepository;
+                _RequestComplanitNotificationRepository = RequestComplanitNotificationRepository;
             }
             public async Task<ResponseDTO> Handle(PostApproveComplanitHistoryCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
-                  
-                  
+                   
+                     var complaintSataus =await _ComplanitHistoryRepository.GetAll(c => c.RequestComplanitId == request.RequestComplanitId).ToListAsync();
+                    if (
+                        complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled && x.IsApprove==null)
+                        ||
+                        complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended && x.IsApprove == null) ||
+                        complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed && x.IsApprove == null)
+                        
+
+                        )
+                    {
+                        _response.StatusEnum = StatusEnum.Failed;
+                        _response.Message = _localizationProvider["ApproveOrRejectedStatus"];
+                        _response.Result = null;
+                        return _response;
+                    }
                         var complanitHistory = new ComplanitHistory()
                         {
                             CreatedBy = _auditService.UserId,
@@ -82,18 +99,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             });
                         }
 
-                    await _ComplanitHistoryRepository.AddAsync(complanitHistory);
+                 
                    
-                    var personalUser = await _userManager.Users.Where(x => x.Id == _auditService.UserId).FirstOrDefaultAsync();
-                   
-                    if (personalUser == null)
-                    {
-                      _response.Message = _localizationProvider["UserNotFound"];
-
-                      _response.StatusEnum = StatusEnum.Failed;
-                      
-                        return _response;
-                    }
                     //Domain.Enums.ComplanitStatus.TechnicianAssigned
                     //The owner and the consultant will recieve a notification contains
                   
@@ -129,14 +136,18 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                               
                                 BodyEn = request.Description,
                                
-                                To=item.Id
-                            };
-                            var tokken = "f9t8Lh05QROd4qe6F9ALKu:APA91bHmzqSLyWSq5wg-itJTT5XEq6GhpWshKfl0TwGVsQ8xzXBYGfConk_pcXI-T5dqF90PUEP3o7vXVKvAhxxS7mG51YJXm0HKDtb1p2vUKHL8QCT06lTFtFn8-u_E5M0cxWT6TsAD\r\neyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJ1c2VyTG9naW5JZCI6IjMiLCJpZGVudGl0eU51bWJlciI6IjEyMzQ1Njc4OSIsIkZ1bGxOYW1lIjoiQWhtZWQgTWFucyIsIlVzZXJUeXBlIjoiQ2xpZW50IiwiZXhwIjoxNjcxMzcwOTg0LCJpc3MiOiJNYWludGVuYW5jZUFQSSIsImF1ZCI6Ik1haW50ZW5hbmNlQVBJIn0.k8Cs4LTsrdxwI2LWDY5Vn1X5-YBOfBQB-Yc-6-lrcls"
-                          ;
-                        //  await NotificationHelper.FCMNotify(notfication,item. Token);
-                       NotificationHelper.PushNotificationByFirebase(notfication.BodyAr,notfication.SubjectAr,0, item.Token, null);
-                        
-                         await  _NotificationRepository.AddAsync(notfication);
+                                To=item.Id,
+                                Read=false,
+                               Type=NotificationType.RequestComplanit,
+                               ComplanitHistoryId= complanitHistory.Id
+                          };
+
+                            var tokken = "fwAE0Y95QLOkhl2Gw0Hf9s:APA91bFKjvu9X-dlIETVAdW90MvXMiX9SHFV3Wzso1CG7IaRpJ8OZlei-ksx6hQ2yOvqJJfpeVUm5IXz-uABbrmYbkRZtjYs8fposHVkv4vyZoMYoM6F2XS3b76kDrypTmT5Gak2R7syeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9eyJ1c2VyTG9naW5JZCI6IjMyIiwiaWRlbnRpdHlOdW1iZXIiOiIxMjM0NTYxMjM0NTYiLCJGdWxsTmFtZSI6IkFobWVkIiwiVXNlclR5cGUiOiJUZWNobmljaWFuIiwiZXhwIjoxNjcxNzY3MzE1LCJpc3MiOiJNYWludGVuYW5jZUFQSSIsImF1ZCI6Ik1haW50ZW5hbmNlQVBJIn0.LgDJUD0a43HRSmoxCweTPkIEMFuCoXslU6vQXyrpcKY";
+                             await NotificationHelper.FCMNotify(notfication,item. Token);
+                            NotificationHelper.PushNotificationByFirebase(notfication.BodyAr,notfication.SubjectAr,0, item.Token, null);
+                            notfication.ComplanitHistory = complanitHistory;
+                            await _NotificationRepository.AddAsync(notfication);
+                           await  _NotificationRepository.AddAsync(notfication);
                         }
                     }
                     if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterSuspended
@@ -167,12 +178,18 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                                 BodyAr = request.Description,
 
                                 BodyEn = request.Description,
-
-                                To = item.Id
+                                Read = false,
+                                To = item.Id,
+                                Type = NotificationType.RequestComplanit,
+                                ComplanitHistoryId = complanitHistory.Id
                             };
 
-                         //   var tokken = "f9t8Lh05QROd4qe6F9ALKu:APA91bHmzqSLyWSq5wg-itJTT5XEq6GhpWshKfl0TwGVsQ8xzXBYGfConk_pcXI-T5dqF90PUEP3o7vXVKvAhxxS7mG51YJXm0HKDtb1p2vUKHL8QCT06lTFtFn8-u_E5M0cxWT6TsAD\r\neyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJ1c2VyTG9naW5JZCI6IjMiLCJpZGVudGl0eU51bWJlciI6IjEyMzQ1Njc4OSIsIkZ1bGxOYW1lIjoiQWhtZWQgTWFucyIsIlVzZXJUeXBlIjoiQ2xpZW50IiwiZXhwIjoxNjcxMzcwOTg0LCJpc3MiOiJNYWludGVuYW5jZUFQSSIsImF1ZCI6Ik1haW50ZW5hbmNlQVBJIn0.k8Cs4LTsrdxwI2LWDY5Vn1X5-YBOfBQB-Yc-6-lrcls"
-                      NotificationHelper.PushNotificationByFirebase(notfication.BodyAr, notfication.SubjectAr, 0, item.Token, null);
+                            var tokken = "fwAE0Y95QLOkhl2Gw0Hf9s:APA91bFKjvu9X-dlIETVAdW90MvXMiX9SHFV3Wzso1CG7IaRpJ8OZlei-ksx6hQ2yOvqJJfpeVUm5IXz-uABbrmYbkRZtjYs8fposHVkv4vyZoMYoM6F2XS3b76kDrypTmT5Gak2R7syeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9eyJ1c2VyTG9naW5JZCI6IjMyIiwiaWRlbnRpdHlOdW1iZXIiOiIxMjM0NTYxMjM0NTYiLCJGdWxsTmFtZSI6IkFobWVkIiwiVXNlclR5cGUiOiJUZWNobmljaWFuIiwiZXhwIjoxNjcxNzY3MzE1LCJpc3MiOiJNYWludGVuYW5jZUFQSSIsImF1ZCI6Ik1haW50ZW5hbmNlQVBJIn0.LgDJUD0a43HRSmoxCweTPkIEMFuCoXslU6vQXyrpcKY";
+                            await NotificationHelper.FCMNotify(notfication,item. Token);
+                            NotificationHelper.PushNotificationByFirebase(notfication.BodyAr, notfication.SubjectAr, 0, item.Token, null);
+
+                            notfication.ComplanitHistory = complanitHistory;
+                            await _NotificationRepository.AddAsync(notfication);
                         }
                     }
                     if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterDone)
@@ -182,8 +199,11 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         var RequestComplanit = await _RequestComplanitRepository.FindAsync(request.RequestComplanitId);
 
                         var clientUser = await _userManager.Users.Where(x => x.Id == RequestComplanitHistory.CreatedBy).FirstOrDefaultAsync();
+                       
                         RequestComplanit.CodeSms= SendSMS.GenerateCode();
-                       _RequestComplanitRepository.Update(RequestComplanit);
+                       
+                        await _ComplanitHistoryRepository.AddAsync(complanitHistory);
+                        _RequestComplanitRepository.Update(RequestComplanit);
                         //var res = SendSMS.SendMessageUnifonic(meass + " : " + clientUser.Code, clientUser.PhoneNumber);
                         //if (res == -1)
                         //{

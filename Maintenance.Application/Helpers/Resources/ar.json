@@ -12,5 +12,6 @@
   "RoomNotFound": "الغرفة غير موجودة",
   "userAreDeleted": "هذا المستخدم عير موجودد",
   "userLoggedInSuccessfully": "تم الدخول بنجاح",
-  "UserNotFound": "المستخدم غير موجود"
+  "UserNotFound": "المستخدم غير موجود",
+  "ApproveOrRejectedStatus": "يجب موافقة او رفض الاستشاري"
 }

@@ -1,6 +1,8 @@
-﻿using Maintenance.Domain.Enums;
+﻿using Maintenance.Domain.Entities.Complanits;
+using Maintenance.Domain.Enums;
 using Maintenance.Domain.Interfaces;
 using Newtonsoft.Json.Converters;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Maintenance.Domain.Entities.Auth
@@ -15,7 +17,7 @@ namespace Maintenance.Domain.Entities.Auth
         public DateTime? UpdatedOn { get ; set ; }
         public long? From { get; set; }
         public long? To { get; set; }
-        public bool Read { get; set; }
+        public bool? Read { get; set; }
         public string SubjectAr { get; set; }
         public string SubjectEn { get; set; }
         public string BodyAr { get; set; }
@@ -25,5 +27,9 @@ namespace Maintenance.Domain.Entities.Auth
         [JsonConverter(typeof(StringEnumConverter))]
         public NotificationState NotificationState { get; set; }
         public ICollection<UserNotification> Users { get; set; }  = new HashSet<UserNotification>();
+        [ForeignKey("ComplanitHistoryId")]
+        public long? ComplanitHistoryId { get; set; }
+        public ComplanitHistory ComplanitHistory { get; set; }
+        public DateTime? ReadDate { get; set; }
     }
 }
