@@ -144,7 +144,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                             var tokken = "fwAE0Y95QLOkhl2Gw0Hf9s:APA91bFKjvu9X-dlIETVAdW90MvXMiX9SHFV3Wzso1CG7IaRpJ8OZlei-ksx6hQ2yOvqJJfpeVUm5IXz-uABbrmYbkRZtjYs8fposHVkv4vyZoMYoM6F2XS3b76kDrypTmT5Gak2R7syeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9eyJ1c2VyTG9naW5JZCI6IjMyIiwiaWRlbnRpdHlOdW1iZXIiOiIxMjM0NTYxMjM0NTYiLCJGdWxsTmFtZSI6IkFobWVkIiwiVXNlclR5cGUiOiJUZWNobmljaWFuIiwiZXhwIjoxNjcxNzY3MzE1LCJpc3MiOiJNYWludGVuYW5jZUFQSSIsImF1ZCI6Ik1haW50ZW5hbmNlQVBJIn0.LgDJUD0a43HRSmoxCweTPkIEMFuCoXslU6vQXyrpcKY";
                              await NotificationHelper.FCMNotify(notfication,item. Token);
-                            NotificationHelper.PushNotificationByFirebase(notfication.BodyAr,notfication.SubjectAr,0, item.Token, null);
+                            //NotificationHelper.PushNotificationByFirebase(notfication.BodyAr,notfication.SubjectAr,0, item.Token, null);
                             notfication.ComplanitHistory = complanitHistory;
                             await _NotificationRepository.AddAsync(notfication);
                            await  _NotificationRepository.AddAsync(notfication);
@@ -186,7 +186,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                             var tokken = "fwAE0Y95QLOkhl2Gw0Hf9s:APA91bFKjvu9X-dlIETVAdW90MvXMiX9SHFV3Wzso1CG7IaRpJ8OZlei-ksx6hQ2yOvqJJfpeVUm5IXz-uABbrmYbkRZtjYs8fposHVkv4vyZoMYoM6F2XS3b76kDrypTmT5Gak2R7syeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9eyJ1c2VyTG9naW5JZCI6IjMyIiwiaWRlbnRpdHlOdW1iZXIiOiIxMjM0NTYxMjM0NTYiLCJGdWxsTmFtZSI6IkFobWVkIiwiVXNlclR5cGUiOiJUZWNobmljaWFuIiwiZXhwIjoxNjcxNzY3MzE1LCJpc3MiOiJNYWludGVuYW5jZUFQSSIsImF1ZCI6Ik1haW50ZW5hbmNlQVBJIn0.LgDJUD0a43HRSmoxCweTPkIEMFuCoXslU6vQXyrpcKY";
                             await NotificationHelper.FCMNotify(notfication,item. Token);
-                            NotificationHelper.PushNotificationByFirebase(notfication.BodyAr, notfication.SubjectAr, 0, item.Token, null);
+                           // NotificationHelper.PushNotificationByFirebase(notfication.BodyAr, notfication.SubjectAr, 0, item.Token, null);
 
                             notfication.ComplanitHistory = complanitHistory;
                             await _NotificationRepository.AddAsync(notfication);
