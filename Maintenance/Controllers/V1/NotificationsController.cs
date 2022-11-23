@@ -1,10 +1,9 @@
-﻿using Maintenance.Application.Features.Categories.Commands;
-using Maintenance.Application.Features.Categories.Queries;
-using Maintenance.Application.Features.RequestsComplanit.Commands;
+﻿using Maintenance.Application.Features.RequestsComplanit.Commands;
 using Maintenance.Application.Features.RequestsComplanit.Queries;
 using Maintenance.Application.Helper;
+using Maintenance.Application.Helpers.Notifications;
+using Maintenance.Domain.Entities.Auth;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Maintenance.Controllers.V1
@@ -54,6 +53,19 @@ namespace Maintenance.Controllers.V1
                 };
             }
             return await _mediator.Send(command);
+        }
+        [HttpPost("PostNotification")]
+
+        public async Task PostNotificationAsync([FromBody] string Token)
+        {
+            var tokken = "fwAE0Y95QLOkhl2Gw0Hf9s:APA91bFKjvu9X-dlIETVAdW90MvXMiX9SHFV3Wzso1CG7IaRpJ8OZlei-ksx6hQ2yOvqJJfpeVUm5IXz-uABbrmYbkRZtjYs8fposHVkv4vyZoMYoM6F2XS3b76kDrypTmT5Gak2R7sy";
+            var notfication = new Notification()
+            {
+                BodyAr = "AAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHMMMMMMMMMMMMMMMMMMMMMMMMEEEEEEEEEEEEEEDDDDDDd",
+                SubjectAr="SSSSSSSSSSHHHHHHHHHHHHHRRRRRRRRRR",
+                
+            };
+            await NotificationHelper.FCMNotify(notfication, Token);
         }
     }
 }

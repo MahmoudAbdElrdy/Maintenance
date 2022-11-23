@@ -121,7 +121,7 @@ namespace Maintenance.Application.Auth.Client.Command
 
                     IdentityNumber = request.IdentityNumber,
 
-                    RoomId = room,
+                    RoomId = request.RoomNumber,
 
                     UserType = request.UserType,
                     

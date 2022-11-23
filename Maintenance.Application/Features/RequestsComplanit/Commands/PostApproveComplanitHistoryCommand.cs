@@ -65,6 +65,17 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 {
                    
                      var complaintSataus =await _ComplanitHistoryRepository.GetAll(c => c.RequestComplanitId == request.RequestComplanitId).ToListAsync();
+                   
+                    
+                    if (complaintSataus.Any(c => c.ComplanitStatus == request.ComplanitStatus))
+                    {
+                        _response.StatusEnum = StatusEnum.Failed;
+                        _response.Message = _localizationProvider["This Status Send Befor"];
+                        _response.Result = null;
+                        return _response;
+
+                    }
+
                     if (
                         complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled && x.IsApprove==null)
                         ||
@@ -79,6 +90,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         _response.Result = null;
                         return _response;
                     }
+                   
                         var complanitHistory = new ComplanitHistory()
                         {
                             CreatedBy = _auditService.UserId,
@@ -141,13 +153,12 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                                Type=NotificationType.RequestComplanit,
                                ComplanitHistoryId= complanitHistory.Id
                           };
-
-                            var tokken = "fwAE0Y95QLOkhl2Gw0Hf9s:APA91bFKjvu9X-dlIETVAdW90MvXMiX9SHFV3Wzso1CG7IaRpJ8OZlei-ksx6hQ2yOvqJJfpeVUm5IXz-uABbrmYbkRZtjYs8fposHVkv4vyZoMYoM6F2XS3b76kDrypTmT5Gak2R7syeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9eyJ1c2VyTG9naW5JZCI6IjMyIiwiaWRlbnRpdHlOdW1iZXIiOiIxMjM0NTYxMjM0NTYiLCJGdWxsTmFtZSI6IkFobWVkIiwiVXNlclR5cGUiOiJUZWNobmljaWFuIiwiZXhwIjoxNjcxNzY3MzE1LCJpc3MiOiJNYWludGVuYW5jZUFQSSIsImF1ZCI6Ik1haW50ZW5hbmNlQVBJIn0.LgDJUD0a43HRSmoxCweTPkIEMFuCoXslU6vQXyrpcKY";
-                             await NotificationHelper.FCMNotify(notfication,item. Token);
-                            //NotificationHelper.PushNotificationByFirebase(notfication.BodyAr,notfication.SubjectAr,0, item.Token, null);
                             notfication.ComplanitHistory = complanitHistory;
                             await _NotificationRepository.AddAsync(notfication);
-                           await  _NotificationRepository.AddAsync(notfication);
+                             await NotificationHelper.FCMNotify(notfication, item.Token);
+                           //NotificationHelper.PushNotificationByFirebase(notfication.BodyAr,notfication.SubjectAr,0, tokken, null);
+                          
+                           //await  _NotificationRepository.AddAsync(notfication);
                         }
                     }
                     if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterSuspended
@@ -184,12 +195,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                                 ComplanitHistoryId = complanitHistory.Id
                             };
 
-                            var tokken = "fwAE0Y95QLOkhl2Gw0Hf9s:APA91bFKjvu9X-dlIETVAdW90MvXMiX9SHFV3Wzso1CG7IaRpJ8OZlei-ksx6hQ2yOvqJJfpeVUm5IXz-uABbrmYbkRZtjYs8fposHVkv4vyZoMYoM6F2XS3b76kDrypTmT5Gak2R7syeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9eyJ1c2VyTG9naW5JZCI6IjMyIiwiaWRlbnRpdHlOdW1iZXIiOiIxMjM0NTYxMjM0NTYiLCJGdWxsTmFtZSI6IkFobWVkIiwiVXNlclR5cGUiOiJUZWNobmljaWFuIiwiZXhwIjoxNjcxNzY3MzE1LCJpc3MiOiJNYWludGVuYW5jZUFQSSIsImF1ZCI6Ik1haW50ZW5hbmNlQVBJIn0.LgDJUD0a43HRSmoxCweTPkIEMFuCoXslU6vQXyrpcKY";
-                            await NotificationHelper.FCMNotify(notfication,item. Token);
-                           // NotificationHelper.PushNotificationByFirebase(notfication.BodyAr, notfication.SubjectAr, 0, item.Token, null);
-
                             notfication.ComplanitHistory = complanitHistory;
                             await _NotificationRepository.AddAsync(notfication);
+                            await NotificationHelper.FCMNotify(notfication, item.Token);
                         }
                     }
                     if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterDone)

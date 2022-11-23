@@ -7,6 +7,7 @@ using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Enums;
 using Maintenance.Domain.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace Maintenance.Application.Features.RequestsComplanit.Commands
@@ -28,6 +29,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
             private readonly IGRepository<ComplanitHistory> _ComplanitHistoryRepository;
 
             private readonly ILogger<PostRequestComplanitCommand> _logger;
+            private readonly IStringLocalizer<string> _Localizer; 
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
             private readonly IMapper _mapper;
@@ -38,7 +40,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 ILogger<PostRequestComplanitCommand> logger,
                 IAuditService auditService,
                 IMapper mapper,
-                IGRepository<ComplanitHistory> ComplanitHistoryRepository
+                IGRepository<ComplanitHistory> ComplanitHistoryRepository,
+                IStringLocalizer<string> Localizer
             )
             {
                 _RequestComplanitRepository = RequestComplanitRepository;
@@ -47,6 +50,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 _response = new ResponseDTO();
                 _mapper = mapper;
                 _ComplanitHistoryRepository = ComplanitHistoryRepository;
+                _Localizer = Localizer;
 
 
             }
@@ -106,7 +110,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     _RequestComplanitRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = "RequestComplanitSavedSuccessfully";
+                    _response.Message = _Localizer["AddedSuccessfully"] ;
                     _response.Result = null;
                     return _response;
                 }

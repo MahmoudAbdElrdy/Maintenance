@@ -13,6 +13,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Dto
 {
     public class ComplanitDto 
     {
+        public string Code { get; set; }
         public string CategoryComplanitName { set; get; }
         public string? CategoryComplanitLogo { get; set; }
         public long? CategoryComplanitId { get; set; }

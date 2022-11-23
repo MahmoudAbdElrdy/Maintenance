@@ -72,6 +72,21 @@ namespace Maintenance.Application.Helpers.Notifications
                     }
                 }
             }
+            catch (WebException e)
+            {
+                using (WebResponse response = e.Response)
+                {
+                    HttpWebResponse httpResponse = (HttpWebResponse)response;
+                    Console.WriteLine("Error code: {0}", httpResponse.StatusCode);
+                    using (Stream data = response.GetResponseStream())
+                    using (var reader = new StreamReader(data))
+                    {
+                        string text = reader.ReadToEnd();
+                        Console.WriteLine(text);
+                    }
+                }
+                return "Error";
+            }
             catch (Exception e)
             {
                 return "Error";
@@ -90,7 +105,7 @@ namespace Maintenance.Application.Helpers.Notifications
                     {
                         RegistrationIds = new List<string> { userFcmToken },
 
-                        Notification = new FCMNet.Notification
+                        Data = new FCMNet.Notification
                         {
                             Title = notification.SubjectAr,
                             Body = notification.BodyAr,
@@ -98,6 +113,8 @@ namespace Maintenance.Application.Helpers.Notifications
 
                         },
                         Priority = FCMNet.Priority.High,
+                        TimeToLive = 180,
+                        ContentAvailable = true
                     };
 
                     var data = await sender.SendAsync(msg);

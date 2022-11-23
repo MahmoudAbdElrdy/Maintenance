@@ -79,30 +79,32 @@ namespace Maintenance.Application.Features.Categories.Queries
                      .Include(x => x.CheckListRequests).
                      ThenInclude(x => x.CheckListComplanit.CategoryComplanit)
                      .Protected(x => x.State == State.NotDeleted)
-                    
 
-                         .Select(x => new ComplanitDto
-                         {
-                             SerialNumber=x.SerialNumber,
-                             location = x.SerialNumber.Length > 0 ? "مركز : " //+ offices.Where(y => y.Code== x.SerialNumber.Substring(0, 3)).FirstOrDefault().Name
+
+                        .Select(x => new ComplanitDto
+                        {
+                            Code=x.Code,
+                            SerialNumber = x.SerialNumber,
+                            location = x.SerialNumber.Length > 0 ? "مركز : " //+ offices.Where(y => y.Code== x.SerialNumber.Substring(0, 3)).FirstOrDefault().Name
                              + " منطقة : " + x.SerialNumber.Substring(3, 2)
                              + " بركس : " + x.SerialNumber.Substring(5, 2)
                              + " غرفة : " + x.SerialNumber.Substring(7, 0) : "",
-                             CategoryComplanitLogo = x.CheckListRequests.FirstOrDefault(x => x.State == State.NotDeleted).CheckListComplanit.CategoryComplanit.Logo,
+                            CategoryComplanitLogo = x.CheckListRequests.FirstOrDefault(x => x.State == State.NotDeleted).CheckListComplanit.CategoryComplanit.Logo,
 
 
-                             CategoryComplanitName = _auditService.UserLanguage == "ar" ?
-                              x.CheckListRequests.FirstOrDefault(x => x.State == State.NotDeleted).CheckListComplanit.CategoryComplanit.NameAr
-                             : x.CheckListRequests.FirstOrDefault(x => x.State == State.NotDeleted).CheckListComplanit.CategoryComplanit.NameEn,
-                             Description = x.Description,
-                             //CheckListComplanit =_mapper.Map<List<CheckListComplanitDto>>(x.CheckListRequests.Select(x=>x.CheckListComplanit).Where(x=>x.State==State.NotDeleted)),
-                             RequestComplanitId = x.Id,
-                             //CheckListsRequestIds = x.CheckListRequests.Select(x => x.CheckListComplanit.Id),
-                             CategoryComplanitId = x.CheckListRequests.FirstOrDefault(x=>x.State==State.NotDeleted).CheckListComplanit.Id,
-                             AttachmentsComplanit = x.AttachmentsComplanit.Where(s => s.State == State.NotDeleted).Select(x => x.Path).ToArray(),
-                             ComplanitStatus=(int) x.ComplanitHistory.OrderByDescending(x=>x.CreatedOn).Select(x => x.ComplanitStatus).FirstOrDefault(),
-                             CheckListComplanit = (List<CheckListComplanitDto>)x.CheckListRequests.
-                             Where(x => x.State == State.NotDeleted).
+                            CategoryComplanitName = _auditService.UserLanguage == "ar" ?
+                              x.CheckListRequests.Where(s => s.RequestComplanit.State == State.NotDeleted && s.RequestComplanitId == x.Id).FirstOrDefault(x => x.State == State.NotDeleted).CheckListComplanit.CategoryComplanit.NameAr
+                             : x.CheckListRequests.Where(s => s.RequestComplanit.State == State.NotDeleted && s.RequestComplanitId == x.Id).FirstOrDefault(x => x.State == State.NotDeleted).CheckListComplanit.CategoryComplanit.NameEn,
+                            Description = x.Description,
+                            //CheckListComplanit =_mapper.Map<List<CheckListComplanitDto>>(x.CheckListRequests.Select(x=>x.CheckListComplanit).Where(x=>x.State==State.NotDeleted)),
+                            RequestComplanitId = x.Id,
+                            //CheckListsRequestIds = x.CheckListRequests.Select(x => x.CheckListComplanit.Id),
+                            CategoryComplanitId = x.CheckListRequests.Where(s => s.RequestComplanit.State == State.NotDeleted && s.RequestComplanitId == x.Id).FirstOrDefault(y => y.State == State.NotDeleted && y.RequestComplanitId == x.Id).CheckListComplanit.CategoryComplanitId,
+                            AttachmentsComplanit = x.AttachmentsComplanit.Where(s => s.State == State.NotDeleted).Select(x => x.Path).ToArray(),
+                            // ComplanitStatus=(int) x.ComplanitHistory.OrderByDescending(x=>x.CreatedOn).Select(x => x.ComplanitStatus).FirstOrDefault(),
+                            ComplanitStatus = (int)x.ComplanitHistory.OrderByDescending(x => x.CreatedOn).Select(x => x.ComplanitStatus).FirstOrDefault(),
+                            CheckListComplanit = (List<CheckListComplanitDto>)x.CheckListRequests.
+                             Where(s => s.State == State.NotDeleted & s.RequestComplanitId == x.Id).
                              Select(s => new CheckListComplanitDto
                              {
                                  CheckListComplanitId = s.CheckListComplanitId,
@@ -112,8 +114,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                              }
                                  )
 
-                         }).ToListAsync()
-                     ;
+                        }).ToListAsync();
 
 
 
