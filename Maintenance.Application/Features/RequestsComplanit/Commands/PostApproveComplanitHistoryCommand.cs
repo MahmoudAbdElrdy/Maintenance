@@ -163,8 +163,10 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                                 BodyEn = request.Description,
                                
                                 To=item.Id,
+                             
                                 Read=false,
-                               Type=NotificationType.RequestComplanit
+                              
+                               Type = NotificationType.Message
                           };
                           
 

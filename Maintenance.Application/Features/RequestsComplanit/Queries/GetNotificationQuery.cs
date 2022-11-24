@@ -6,6 +6,7 @@ using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.Paginations;
 using Maintenance.Domain.Entities.Auth;
 using Maintenance.Domain.Entities.Complanits;
+using Maintenance.Domain.Enums;
 using Maintenance.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -73,7 +74,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
                         .GetAllIncluding(c=>c.ComplanitHistory.AttachmentComplanitHistory).
                         Include(c=>c.ComplanitHistory.RequestComplanit)
            
-                        .Where(x=>x.To==request.UserId&&x.Read == false)
+                        .Where(x=>x.To==request.UserId && x.Read == false && x.Type== NotificationType.RequestComplanit)
                         .Select(c=>new
                         {
                             Title = c.ComplanitHistory.RequestComplanit.Code,

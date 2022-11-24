@@ -73,10 +73,9 @@ namespace Maintenance.Application.Features.Categories.Queries
                         ThenInclude(c=>c.CheckListComplanit.CategoryComplanit)
                        .ToListAsync();
                     var checklist = res2.SelectMany(c => c.CheckListRequests).ToList();
-                    var checklist2 = await _CheckListRequestRepository.GetAll(x => x.State == State.NotDeleted).ToListAsync();
-
-                    var itemCategories2 = await _CategoryComplanitRepository.GetAll(c => c.State == State.NotDeleted).ToListAsync();
-                    var itemCategories = res2.SelectMany(c => c.CheckListRequests).Select(c=>c.CheckListComplanit.CategoryComplanit).DistinctBy(c=>c.Id).ToList();
+                    
+                   var itemCategories = res2.SelectMany(c => c.CheckListRequests).Select(c=>c.CheckListComplanit).DistinctBy(c=>c.Id).ToList();
+                  
                     var item = new
                     {
                         AllComplanit=res2.Count(),
@@ -84,10 +83,14 @@ namespace Maintenance.Application.Features.Categories.Queries
                         SuspendedComplanit = res2.Count(x=>x.ComplanitStatus==ComplanitStatus.TechnicianSuspended),
                         ClosedComplanit = res2.Count(x=>x.ComplanitStatus==ComplanitStatus.TechnicianClosed),
                         DoneComplanit = res2.Count(x=>x.ComplanitStatus==ComplanitStatus.TechnicianDone),
-                        Electricity = checklist.Where(c=>c.CheckListComplanit.CategoryComplanit!=null).Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c=>c.NameEn== "Electricity").FirstOrDefault().Id),
-                        Cleanliness = checklist.Where(c => c.CheckListComplanit.CategoryComplanit != null).Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c => c.NameEn == "cleanliness").FirstOrDefault().Id),
-                        Plumbing = checklist.Where(c => c.CheckListComplanit.CategoryComplanit != null).Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c => c.NameEn == "Plumbing").FirstOrDefault().Id),
-                        AirConditioner = checklist.Where(c => c.CheckListComplanit.CategoryComplanit != null).Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c => c.NameEn == "Air conditioner").FirstOrDefault().Id)
+                        Electricity = itemCategories.Count(c => c.CategoryComplanit.NameEn == "Electricity"),
+                        Cleanliness = itemCategories.Count(c => c.CategoryComplanit.NameEn == ("cleanliness")),
+                        Plumbing = itemCategories.Count(c => c.CategoryComplanit.NameEn == ("Plumbing")),
+                        AirConditioner = itemCategories.Count(c => c.CategoryComplanit.NameEn == ("Air conditioner")),
+                        //Electricity = checklist.Where(c => itemCategories.Where(c => c.NameEn == "Electricity").FirstOrDefault() != null).Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c=>c.NameEn== "Electricity").FirstOrDefault().Id),
+                        //Cleanliness = checklist.Where(c => itemCategories.Where(c => c.NameEn == "cleanliness").FirstOrDefault() != null).Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c => c.NameEn == "cleanliness").FirstOrDefault().Id),
+                        //Plumbing = checklist.Where(c=>itemCategories.Where(c => c.NameEn == "Plumbing").FirstOrDefault() != null).Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c => c.NameEn == "Plumbing").FirstOrDefault().Id),
+                        //AirConditioner = checklist.Where(c => itemCategories.Where(c => c.NameEn == "Air conditioner").FirstOrDefault() != null).Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c => c.NameEn == "Air conditioner").FirstOrDefault().Id)
                     };
 
                   
