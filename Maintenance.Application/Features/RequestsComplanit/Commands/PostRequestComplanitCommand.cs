@@ -69,7 +69,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             State = Domain.Enums.State.NotDeleted,
                             Description = requestObj.Description,
                             SerialNumber = requestObj.SerialNumber,
-                            Code= GenerateCodeComplaint()
+                            Code= GenerateCodeComplaint(),
+                            ComplanitStatus=ComplanitStatus.Submitted
                             //  OfficeId=request.OfficeId,
                             // RegionId = request.RegionId
                         };

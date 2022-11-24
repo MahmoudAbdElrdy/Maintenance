@@ -68,14 +68,11 @@ namespace Maintenance.Application.Features.RequestsComplanit.Command
 
                     return _response;
                 }
-            
-
-                //var authorizedUserDto = new AuthorizedUserDTO
-                //{
-                //    User = _mapper.Map<UserDto>(userLogin),
-                //    Token = GenerateJSONWebToken(userLogin),
-                //};
-               // await _userManager.UpdateAsync(userLogin);
+                userCode.UpdatedOn = DateTime.Now;
+                userCode.ComplanitStatus = Domain.Enums.ComplanitStatus.TechnicianDone;
+                _RequestComplanitRepository.Update(userCode);
+                _RequestComplanitRepository.Save();
+               
                 _response.StatusEnum = StatusEnum.Success;
             
                 _response.Message = _localizationProvider["mobileVerficiationSuccess"];

@@ -70,20 +70,28 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
 
                  
                     var resx = await _NotficationRepository
-                        .GetAllIncluding(c=>c.ComplanitHistory.AttachmentComplanitHistory)
+                        .GetAllIncluding(c=>c.ComplanitHistory.AttachmentComplanitHistory).
+                        Include(c=>c.ComplanitHistory.RequestComplanit)
            
                         .Where(x=>x.To==request.UserId&&x.Read == false)
                         .Select(c=>new
                         {
-                            NotificationId=c.Id,
-                            NotificationState =  c.NotificationState,
+                            Title = c.ComplanitHistory.RequestComplanit.Code,
+                            Description = c.ComplanitHistory.Description,
+                            AttachmentComplanitHistory = c.ComplanitHistory.AttachmentComplanitHistory.Select(m => m.Path),
+                            NotificationType = c.Type,
+                            NotificationId =c.Id,
+                            NotificationState = (int) c.NotificationState,
                             Body=_auditService.UserLanguage=="ar"? c.BodyEn:c.BodyEn,
                             Subject = _auditService.UserLanguage=="ar"? c.SubjectAr:c.SubjectEn,
-                            Type = c.Type,
-                            AttachmentComplanitHistory = c.ComplanitHistory.AttachmentComplanitHistory.Select(m=>m.Path),
-                            Description = c.ComplanitHistory.Description ,
-                            ComplanitHistoryId= c.ComplanitHistoryId,
-                            ComplanitStatus=c.ComplanitHistory.ComplanitStatus
+                            ComplanitStatus =(int) c.ComplanitHistory.ComplanitStatus,
+
+
+                            ComplanitHistoryId = c.ComplanitHistoryId,
+                         
+                            RequestComplanitId = c.ComplanitHistory.RequestComplanitId,
+                             
+
                         })
                         .ToListAsync();
 

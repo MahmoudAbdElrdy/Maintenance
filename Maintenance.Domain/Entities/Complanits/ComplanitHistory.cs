@@ -33,7 +33,7 @@ namespace Maintenance.Domain.Entities.Complanits
         public virtual RequestComplanit RequestComplanit { get; set; }
 
         public virtual ICollection<AttachmentComplanitHistory> AttachmentComplanitHistory { get; set; } = new List<AttachmentComplanitHistory>();
-        public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+       public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
 
     }

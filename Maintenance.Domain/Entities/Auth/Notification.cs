@@ -30,6 +30,10 @@ namespace Maintenance.Domain.Entities.Auth
         [ForeignKey("ComplanitHistoryId")]
         public long? ComplanitHistoryId { get; set; }
         public ComplanitHistory ComplanitHistory { get; set; }
+
+        //[ForeignKey("RequestComplanitId")]
+        //public long? RequestComplanitId { get; set; }
+        //public RequestComplanit RequestComplanit { get; set; }
         public DateTime? ReadDate { get; set; }
     }
 }

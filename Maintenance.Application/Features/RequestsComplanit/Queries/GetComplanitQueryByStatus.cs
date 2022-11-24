@@ -93,9 +93,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                      .WhereIf(request.RegionId != null && request.RegionId.Count > 0, x => request.RegionId.Contains(x.SerialNumber.Substring(3, 2)))
                      .WhereIf(request.OfficeId != null && request.OfficeId.Count > 0, x => request.OfficeId.Contains(x.SerialNumber.Substring(0, 3)))
                      .WhereIf(request.CategoryId != null && request.CategoryId.Count > 0, x => x.CheckListRequests.Select(c => c.CheckListComplanit).Any(c => CheckListComplanitIds.Contains((long)c.CategoryComplanitId)))
-                     .WhereIf(request.ComplanitStatus != null && request.ComplanitStatus > 0, x => x.ComplanitHistory.Select(x => x.ComplanitStatus)
-                     .Contains(request.ComplanitStatus))
-
+                     .WhereIf(request.ComplanitStatus != null && request.ComplanitStatus > 0,c=>c.ComplanitStatus==request.ComplanitStatus)
 
                          .Select(x => new ComplanitDto
                          {
@@ -118,9 +116,9 @@ namespace Maintenance.Application.Features.Categories.Queries
                              CategoryComplanitId = x.CheckListRequests.Where(s => s.RequestComplanit.State == State.NotDeleted && s.RequestComplanitId == x.Id).FirstOrDefault(y => y.State == State.NotDeleted && y.RequestComplanitId == x.Id).CheckListComplanit.CategoryComplanitId,
                              AttachmentsComplanit = x.AttachmentsComplanit.Where(s => s.State == State.NotDeleted).Select(x => x.Path).ToArray(),
                              // ComplanitStatus=(int) x.ComplanitHistory.OrderByDescending(x=>x.CreatedOn).Select(x => x.ComplanitStatus).FirstOrDefault(),
-                             ComplanitStatus = (int)x.ComplanitHistory.OrderByDescending(x => x.CreatedOn).Select(x => x.ComplanitStatus).FirstOrDefault(),
+                             ComplanitStatus = (int)x.ComplanitStatus,
                              CheckListComplanit = (List<CheckListComplanitDto>)x.CheckListRequests.
-                             Where(s => s.State == State.NotDeleted & s.RequestComplanitId == x.Id).
+                             Where(s => s.State == State.NotDeleted).
                              Select(s => new CheckListComplanitDto
                              {
                                  CheckListComplanitId = s.CheckListComplanitId,

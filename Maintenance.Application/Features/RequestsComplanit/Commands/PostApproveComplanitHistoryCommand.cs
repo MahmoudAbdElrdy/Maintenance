@@ -77,10 +77,10 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     }
 
                     if (
-                        complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled && x.IsApprove==null)
+                        complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled)
                         ||
-                        complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended && x.IsApprove == null) ||
-                        complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed && x.IsApprove == null)
+                        complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended ) ||
+                        complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed)
                         
 
                         )
@@ -118,9 +118,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                   
 
                     if (  request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianAssigned 
-                        ||request.ComplanitStatus== Domain.Enums.ComplanitStatus.TechnicianSuspended 
-                        || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled
-                        || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianDone
+                      
                         )
                     {
                         var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner
@@ -150,20 +148,28 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                                
                                 To=item.Id,
                                 Read=false,
-                               Type=NotificationType.RequestComplanit,
-                               ComplanitHistoryId= complanitHistory.Id
+                               Type=NotificationType.RequestComplanit
                           };
-                            notfication.ComplanitHistory = complanitHistory;
-                            await _NotificationRepository.AddAsync(notfication);
-                             await NotificationHelper.FCMNotify(notfication, item.Token);
-                           //NotificationHelper.PushNotificationByFirebase(notfication.BodyAr,notfication.SubjectAr,0, tokken, null);
                           
-                           //await  _NotificationRepository.AddAsync(notfication);
+
+                            notfication.ComplanitHistory = complanitHistory;
+
+                            await _NotificationRepository.AddAsync(notfication);
+
+                             await NotificationHelper.FCMNotify(notfication, item.Token);
+                            
                         }
+                        var complaint = await _RequestComplanitRepository.GetFirstAsync(c => c.Id == request.RequestComplanitId);
+
+                        complaint.UpdatedOn = DateTime.Now;
+
+                        complaint.ComplanitStatus = request.ComplanitStatus;
+
+                        _RequestComplanitRepository.Update(complaint);
                     }
-                    if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterSuspended
-                        || request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterCanceled
+                    if (  request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended
                         || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled
+                        || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed
                         )
                     {
                         var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner && x.State == State.NotDeleted).ToListAsync();
@@ -189,10 +195,14 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                                 BodyAr = request.Description,
 
                                 BodyEn = request.Description,
+
                                 Read = false,
+
                                 To = item.Id,
-                                Type = NotificationType.RequestComplanit,
-                                ComplanitHistoryId = complanitHistory.Id
+
+                                Type = NotificationType.RequestComplanit
+
+                                
                             };
 
                             notfication.ComplanitHistory = complanitHistory;
@@ -200,7 +210,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             await NotificationHelper.FCMNotify(notfication, item.Token);
                         }
                     }
-                    if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterDone)
+                    if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianDone)
                     {
                         var RequestComplanitHistory = await _ComplanitHistoryRepository.FindAsync(request.RequestComplanitId);
                         
@@ -211,6 +221,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         RequestComplanit.CodeSms= SendSMS.GenerateCode();
                        
                         await _ComplanitHistoryRepository.AddAsync(complanitHistory);
+                      
                         _RequestComplanitRepository.Update(RequestComplanit);
                         //var res = SendSMS.SendMessageUnifonic(meass + " : " + clientUser.Code, clientUser.PhoneNumber);
                         //if (res == -1)

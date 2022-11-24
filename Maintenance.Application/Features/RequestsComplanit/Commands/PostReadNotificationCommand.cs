@@ -24,15 +24,15 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
     public class PostReadNotificationCommand : IRequest<ResponseDTO>
     {
 
-        public long? NotificationId { get; set; }
-       // public long? RequestComplanitId { get; set; }
+        public long? NotificationId { get; set; }      
+        public long? RequestComplanitId { get; set; }
         public long? ComplanitHistoryId { get; set; } 
-        public bool? Approve { get; set; }
-      //  public NotificationState NotificationState { get; set; }
+        public NotificationState NotificationState { get; set; }
         public ComplanitStatus? ComplanitStatus { get; set; }
         class PostComplanitHistory : IRequestHandler<PostReadNotificationCommand, ResponseDTO>
         {
             private readonly IGRepository<ComplanitHistory> _ComplanitHistoryRepository;
+            private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;
             private readonly IGRepository<Notification> _NotificationRepository;
             private readonly ILogger<PostReadNotificationCommand> _logger;
             private readonly ResponseDTO _response;
@@ -44,7 +44,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                ILogger<PostReadNotificationCommand> logger,
                IAuditService auditService,
                IMapper mapper,
-               IGRepository<Notification> NotificationRepository
+               IGRepository<Notification> NotificationRepository,
+               IGRepository<RequestComplanit> RequestComplanitRepository
            )
             {
                 _ComplanitHistoryRepository = ComplanitHistoryRepository;
@@ -53,30 +54,52 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 _response = new ResponseDTO();
                 _mapper = mapper;
                 _NotificationRepository = NotificationRepository;
-
+                _RequestComplanitRepository = RequestComplanitRepository;
             }
             public async Task<ResponseDTO> Handle(PostReadNotificationCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
+                    var complanit = await _RequestComplanitRepository.GetFirstAsync(c => c.Id == request.RequestComplanitId);
+                  
+                    if (
+                        request.ComplanitStatus==Domain.Enums.ComplanitStatus.TechnicianSuspended ||
+                        request.ComplanitStatus==Domain.Enums.ComplanitStatus.TechnicianCanceled ||
+                        request.ComplanitStatus==Domain.Enums.ComplanitStatus.TechnicianClosed 
+                        && request.NotificationState == NotificationState.Approved)
+                    {
+                        complanit.ComplanitStatus = request.ComplanitStatus;
+                       
+                        complanit.UpdatedOn = DateTime.Now;
+                       
+                        _RequestComplanitRepository.Update(complanit);
+                    }
 
-                    var ComplanitHistory = await _ComplanitHistoryRepository.GetFirstAsync(c => c.Id == request.ComplanitHistoryId);
-                   
-                    ComplanitHistory.ComplanitStatus = request.ComplanitStatus;
-                    ComplanitHistory.UpdatedOn = DateTime.Now;
-                    ComplanitHistory.IsApprove = request.Approve;
-                    var Notification = await _NotificationRepository.GetFirstAsync(c => c.Id == request.NotificationId);
+                    var NotficationList = await _NotificationRepository.GetAll(c => c.ComplanitHistoryId == request.ComplanitHistoryId).ToListAsync();
+                    foreach(var item in NotficationList)
+                    {
+                        item.UpdatedOn = DateTime.Now;
+                        item.ReadDate = DateTime.Now;
+                        item.NotificationState = request.NotificationState;
+                        item.Read = true;
+
+                        _NotificationRepository.Update(item);
+                        _NotificationRepository.Save();
+
+                    }
+
+                    //var Notification = await _NotificationRepository.GetFirstAsync(c => c.Id == request.NotificationId);
 
                   
 
-                    Notification.UpdatedOn = DateTime.Now;
-                    Notification.ReadDate = DateTime.Now;
-                    Notification.NotificationState = NotificationState.Read;
-                    Notification.Read = true;
-                    _ComplanitHistoryRepository.Update(ComplanitHistory);
-                    _NotificationRepository.Update(Notification);
+                    //Notification.UpdatedOn = DateTime.Now;
+                    //Notification.ReadDate = DateTime.Now;
+                    //Notification.NotificationState = request.NotificationState;
+                    //Notification.Read = true;
+                 
+                    //_NotificationRepository.Update(Notification);
 
-                    _ComplanitHistoryRepository.Save();
+                    _NotificationRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
                     _response.Message = "Successfully";

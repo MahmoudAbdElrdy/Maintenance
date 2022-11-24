@@ -214,9 +214,9 @@
     }
     public enum NotificationState
     {
-        New,Read
-      //  Approved,
-       // Rejected
+        New,
+        Approved,
+        Rejected
     }
     
     public enum ComplanitStatus 
