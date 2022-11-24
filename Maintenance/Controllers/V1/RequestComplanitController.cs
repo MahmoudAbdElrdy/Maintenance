@@ -155,5 +155,20 @@ namespace Maintenance.Controllers.V1
         {
             return await _mediator.Send(new DeleteRequestComplanitCommand() { Id = id });
         }
+
+        [HttpPost("ReportQueryByDate")]
+
+        public async Task<ResponseDTO> ReportQueryByDate([FromBody] ReportQueryByDate command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return new ResponseDTO()
+                {
+                    StatusEnum = StatusEnum.FailedToSave,
+                    Message = "error"
+                };
+            }
+            return await _mediator.Send(command);
+        }
     }
 }

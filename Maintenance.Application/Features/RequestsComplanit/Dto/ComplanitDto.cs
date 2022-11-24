@@ -23,8 +23,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Dto
         public string[] AttachmentsComplanit { get; set; }
         public int? ComplanitStatus { get; set; }
         public string location { get; set; } 
-        public string SerialNumber { get; set; } 
-
+        public string SerialNumber { get; set; }
+        public DateTime? CreatedOn { get; set; }
     }
     public class CheckListComplanitDto:IHaveCustomMapping
     {

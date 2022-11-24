@@ -117,6 +117,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                              AttachmentsComplanit = x.AttachmentsComplanit.Where(s => s.State == State.NotDeleted).Select(x => x.Path).ToArray(),
                              // ComplanitStatus=(int) x.ComplanitHistory.OrderByDescending(x=>x.CreatedOn).Select(x => x.ComplanitStatus).FirstOrDefault(),
                              ComplanitStatus = (int)x.ComplanitStatus,
+                             CreatedOn=x.CreatedOn,
                              CheckListComplanit = (List<CheckListComplanitDto>)x.CheckListRequests.
                              Where(s => s.State == State.NotDeleted).
                              Select(s => new CheckListComplanitDto
