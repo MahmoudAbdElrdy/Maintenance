@@ -13,5 +13,12 @@
   "userAreDeleted": "User Are Deleted",
   "userLoggedInSuccessfully": "user Logged In Successfully",
   "UserNotFound": "User Not Found",
-  "ApproveOrRejectedStatus": "The consultant must be approved or rejected"
+  "ApproveOrRejectedStatus": "The consultant must be approved or rejected",
+  "Submitted": "Submitted",
+  "TechnicianAssigned": "Processing",
+  "TechnicianSuspended": "Suspended",
+  "TechnicianCanceled": "Canceled",
+  "TechnicianDone": "Done",
+  "TechnicianClosed": "Closed",
+  "AllComplanit": "All Number Complanits"
 }
