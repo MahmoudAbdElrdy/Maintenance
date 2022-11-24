@@ -211,11 +211,11 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     }
                     if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianDone)
                     {
-                        var RequestComplanitHistory = await _ComplanitHistoryRepository.FindAsync(request.RequestComplanitId);
                         
-                        var RequestComplanit = await _RequestComplanitRepository.FindAsync(request.RequestComplanitId);
+                        
+                        var RequestComplanit = await _RequestComplanitRepository.GetFirstAsync(c => c.Id == request.RequestComplanitId);
 
-                        var clientUser = await _userManager.Users.Where(x => x.Id == RequestComplanitHistory.CreatedBy).FirstOrDefaultAsync();
+                        var clientUser = await _userManager.Users.Where(x => x.Id == RequestComplanit.CreatedBy).FirstOrDefaultAsync();
                        
                         RequestComplanit.CodeSms= SendSMS.GenerateCode();
                        
@@ -230,6 +230,16 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         //    _response.StatusEnum = StatusEnum.Failed;
                         //    return _response;
                         //}
+                        _ComplanitHistoryRepository.Save();
+
+                        _response.StatusEnum = StatusEnum.SavedSuccessfully;
+                        _response.Message = _localizationProvider["AddedSuccessfully"];
+                        _response.Result =
+                            new { 
+                            CodeSms= RequestComplanit.CodeSms ,
+                            RequestComplanitId=request.RequestComplanitId
+                            } ;
+                        return _response;
                     }
 
 

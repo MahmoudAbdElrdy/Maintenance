@@ -76,7 +76,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                     var checklist2 = await _CheckListRequestRepository.GetAll(x => x.State == State.NotDeleted).ToListAsync();
 
                     var itemCategories2 = await _CategoryComplanitRepository.GetAll(c => c.State == State.NotDeleted).ToListAsync();
-                    var itemCategories = res2.SelectMany(c => c.CheckListRequests).Select(c=>c.CheckListComplanit).ToList();
+                    var itemCategories = res2.SelectMany(c => c.CheckListRequests).Select(c=>c.CheckListComplanit.CategoryComplanit).DistinctBy(c=>c.Id).ToList();
                     var item = new
                     {
                         AllComplanit=res2.Count(),
