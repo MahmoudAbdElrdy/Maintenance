@@ -172,8 +172,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed
                         )
                     {
-                        var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner && x.State == State.NotDeleted).ToListAsync();
-                       
+                        var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner || x.UserType == UserType.Consultant && x.State == State.NotDeleted).ToListAsync();
                         foreach (var item in users)
                         {
                             var notfication = new Notification()
