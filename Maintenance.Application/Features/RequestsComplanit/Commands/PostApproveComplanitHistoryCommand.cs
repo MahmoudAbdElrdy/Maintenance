@@ -67,7 +67,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                      var complaintSataus =await _ComplanitHistoryRepository.GetAll(c => c.RequestComplanitId == request.RequestComplanitId).ToListAsync();
                    
                     
-                    if (complaintSataus.Any(c => c.ComplanitStatus == request.ComplanitStatus))
+                    if (complaintSataus.OrderBy(c=>c.CreatedBy).Any(c => c.ComplanitStatus == request.ComplanitStatus))
                     {
                         _response.StatusEnum = StatusEnum.Failed;
                         _response.Message = _localizationProvider["This Status Send Befor"];
@@ -76,20 +76,20 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                     }
 
-                    if (
-                        complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled)
-                        ||
-                        complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended ) ||
-                        complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed)
+                    //if (
+                    //    complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled)
+                    //    ||
+                    //    complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended ) ||
+                    //    complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed)
                         
 
-                        )
-                    {
-                        _response.StatusEnum = StatusEnum.Failed;
-                        _response.Message = _localizationProvider["ApproveOrRejectedStatus"];
-                        _response.Result = null;
-                        return _response;
-                    }
+                    //    )
+                    //{
+                    //    _response.StatusEnum = StatusEnum.Failed;
+                    //    _response.Message = _localizationProvider["ApproveOrRejectedStatus"];
+                    //    _response.Result = null;
+                    //    return _response;
+                    //}
                    
                         var complanitHistory = new ComplanitHistory()
                         {
@@ -233,7 +233,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         _ComplanitHistoryRepository.Save();
 
                         _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                        _response.Message = _localizationProvider["AddedSuccessfully"];
+                        _response.Message = _localizationProvider["Send Code To Technician"];
                         _response.Result =
                             new { 
                             CodeSms= RequestComplanit.CodeSms ,

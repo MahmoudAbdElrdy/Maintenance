@@ -27,6 +27,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Command
         private readonly ILogger<VerificationCodeComplanit> _logger;
         private readonly ResponseDTO _response;
         private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;
+        private readonly IGRepository<ComplanitHistory> _ComplanitHistoryRepository;
         public ResponseDTO Response => _response;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
@@ -38,6 +39,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Command
             IConfiguration configuration,
              IAuditService auditService,
               IStringLocalizer<VerificationCodeCommandHandler> localizationProvider,
+              IGRepository<ComplanitHistory> ComplanitHistoryRep,
              JwtOption jwtOption,
             ILogger<VerificationCodeComplanit> logger)
         
@@ -50,6 +52,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Command
             _auditService = auditService;
             _localizationProvider = localizationProvider;
             _jwtOption = jwtOption;
+            _ComplanitHistoryRepository = ComplanitHistoryRep;
         }
 
         public async Task<ResponseDTO> Handle(VerificationCodeComplanit request, CancellationToken cancellationToken)
@@ -58,7 +61,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Command
             try
             {
                
-                var userCode = await _RequestComplanitRepository.GetFirstAsync(x => x.Id == request.RequestComplanitId && x.Code == request.CodeSms);
+                var userCode = await _RequestComplanitRepository.GetFirstAsync(x => x.Id == request.RequestComplanitId && x.CodeSms == request.CodeSms);
 
                 if (userCode == null)
                 {
@@ -70,7 +73,23 @@ namespace Maintenance.Application.Features.RequestsComplanit.Command
                 }
                 userCode.UpdatedOn = DateTime.Now;
                 userCode.ComplanitStatus = Domain.Enums.ComplanitStatus.TechnicianDone;
+                var complanitHistory = new ComplanitHistory()
+                {
+                    CreatedBy = _auditService.UserId,
+                    CreatedOn = DateTime.Now,
+                    State = Domain.Enums.State.NotDeleted,
+                    Description = Domain.Enums.ComplanitStatus.TechnicianDone.ToString(),
+                    ComplanitStatus = Domain.Enums.ComplanitStatus.TechnicianDone,//TechnicianClosed no message
+                    RequestComplanitId = request.RequestComplanitId
+                };
+
+               
+
+
                 _RequestComplanitRepository.Update(userCode);
+          
+                await _ComplanitHistoryRepository.AddAsync(complanitHistory);
+              
                 _RequestComplanitRepository.Save();
                
                 _response.StatusEnum = StatusEnum.Success;
@@ -90,33 +109,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Command
 
             return _response;
         }
-        private string GenerateJSONWebToken(User user)
-        {
-            var signingKey = Convert.FromBase64String(_configuration["JwtOption:Key"]);
-            var audience = _configuration["JwtOption:Audience"];
-            var expiryDuration = int.Parse(_configuration["JwtOption:ExpiryDuration"]);
-            var issuer = _configuration["JwtOption:Issuer"];
-
-            var claims = (new List<Claim>() {
-                    new Claim("userLoginId", user.Id.ToString()),
-                    new Claim("identityNumber", user.IdentityNumber),
-                    new Claim("FullName", user.FullName),
-                    new Claim("UserType", user.UserType.ToString())
-                     });
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOption.Key));
-            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddDays(Convert.ToDouble(_jwtOption.ExpireDays));
-
-            var tokenDescriptor = new JwtSecurityToken(
-            _jwtOption.Issuer,
-              _jwtOption.Issuer,
-              claims,
-              expires: expires,
-              signingCredentials: cred
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
-        }
+        
      
     }
 }

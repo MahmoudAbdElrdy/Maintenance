@@ -63,18 +63,44 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     var complanit = await _RequestComplanitRepository.GetFirstAsync(c => c.Id == request.RequestComplanitId);
                   
                     if (
-                        request.ComplanitStatus==Domain.Enums.ComplanitStatus.TechnicianSuspended ||
+                       ( request.ComplanitStatus==Domain.Enums.ComplanitStatus.TechnicianSuspended ||
                         request.ComplanitStatus==Domain.Enums.ComplanitStatus.TechnicianCanceled ||
-                        request.ComplanitStatus==Domain.Enums.ComplanitStatus.TechnicianClosed 
+                        request.ComplanitStatus==Domain.Enums.ComplanitStatus.TechnicianClosed )
                         && request.NotificationState == NotificationState.Approved)
                     {
+                       
                         complanit.ComplanitStatus = request.ComplanitStatus;
                        
                         complanit.UpdatedOn = DateTime.Now;
                        
                         _RequestComplanitRepository.Update(complanit);
                     }
+                    if (
+                       (request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended ||
+                        request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled ||
+                        request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed)
+                       && request.NotificationState == NotificationState.Rejected)
+                    {
+                       // var itemHostory=await _ComplanitHistoryRepository.GetFirstAsync(c => c.Id == request.RequestComplanitId);
+                        var complanitHistory = new ComplanitHistory()
+                        {
+                            CreatedBy = _auditService.UserId,
+                            CreatedOn = DateTime.Now,
+                            State = Domain.Enums.State.NotDeleted,
+                            Description = request.ComplanitStatus.ToString(),
+                            ComplanitStatus = request.ComplanitStatus,//TechnicianClosed no message
+                            RequestComplanitId = request.RequestComplanitId
+                        };
 
+                        complanitHistory.ComplanitStatus = Domain.Enums.ComplanitStatus.Submitted;
+
+                       // complanitHistory.UpdatedOn = DateTime.Now;
+
+                        complanit.UpdatedOn = DateTime.Now;
+
+                        _RequestComplanitRepository.Update(complanit);
+                        await _ComplanitHistoryRepository.AddAsync(complanitHistory);
+                    }
                     var NotficationList = await _NotificationRepository.GetAll(c => c.ComplanitHistoryId == request.ComplanitHistoryId).ToListAsync();
                     foreach(var item in NotficationList)
                     {
