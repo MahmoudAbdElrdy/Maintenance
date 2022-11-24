@@ -52,8 +52,8 @@ namespace Maintenance.Controllers.V1
             {
                 PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
                 {
-                    PageNumber = filterComplanit.PaginatedInputModel.PageNumber,
-                    PageSize = filterComplanit.PaginatedInputModel.PageSize,
+                    PageNumber = filterComplanit.PageNumber,
+                    PageSize = filterComplanit.PageSize,
                     
                 },
                 CategoryId= filterComplanit.CategoryId,

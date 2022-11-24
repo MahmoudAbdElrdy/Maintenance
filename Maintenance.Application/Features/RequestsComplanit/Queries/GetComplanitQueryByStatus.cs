@@ -23,6 +23,7 @@ namespace Maintenance.Application.Features.Categories.Queries
         {
             PaginatedInputModel = new PaginatedInputModel();
         }
+
         public List<long>? CategoryId { get; set; } 
         public List<string>? RegionId { get; set; }
         public List<string>? OfficeId { get; set; }  
@@ -134,7 +135,7 @@ namespace Maintenance.Application.Features.Categories.Queries
 
 
 
-                    var paginatedObjs = await PaginationUtility.Paging(request.PaginatedInputModel, res2.DistinctBy(c=>c.RequestComplanitId).ToList());
+                    var paginatedObjs = await PaginationUtility.Paging(request.PaginatedInputModel, res2.ToList());
 
                     _response.setPaginationData(paginatedObjs);
                     _response.Result = paginatedObjs;

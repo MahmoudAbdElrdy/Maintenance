@@ -26,7 +26,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Dto
     }
     public class FilterComplanitDto
     {
-        public PaginatedInputModel? PaginatedInputModel = new PaginatedInputModel();
+       public int PageNumber { get; set; } 
+        public int PageSize { get; set; }
         public List<long>? CategoryId { get; set; }
         public List<string>? RegionId { get; set; }
         public List<string>? OfficeId { get; set; }

@@ -84,10 +84,10 @@ namespace Maintenance.Application.Features.Categories.Queries
                         SuspendedComplanit = res2.Count(x=>x.ComplanitStatus==ComplanitStatus.TechnicianSuspended),
                         ClosedComplanit = res2.Count(x=>x.ComplanitStatus==ComplanitStatus.TechnicianClosed),
                         DoneComplanit = res2.Count(x=>x.ComplanitStatus==ComplanitStatus.TechnicianDone),
-                        Electricity = checklist.Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c=>c.NameEn== "Electricity").FirstOrDefault().Id),
-                        Cleanliness = checklist.Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c => c.NameEn == "cleanliness").FirstOrDefault().Id),
-                        Plumbing = checklist.Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c => c.NameEn == "Plumbing").FirstOrDefault().Id),
-                        AirConditioner = checklist.Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c => c.NameEn == "Air conditioner").FirstOrDefault().Id)
+                        Electricity = checklist.Where(c=>c.CheckListComplanit.CategoryComplanit!=null).Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c=>c.NameEn== "Electricity").FirstOrDefault().Id),
+                        Cleanliness = checklist.Where(c => c.CheckListComplanit.CategoryComplanit != null).Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c => c.NameEn == "cleanliness").FirstOrDefault().Id),
+                        Plumbing = checklist.Where(c => c.CheckListComplanit.CategoryComplanit != null).Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c => c.NameEn == "Plumbing").FirstOrDefault().Id),
+                        AirConditioner = checklist.Where(c => c.CheckListComplanit.CategoryComplanit != null).Count(c=>c.CheckListComplanit.CategoryComplanitId== itemCategories.Where(c => c.NameEn == "Air conditioner").FirstOrDefault().Id)
                     };
 
                   

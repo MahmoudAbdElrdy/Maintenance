@@ -65,23 +65,39 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 {
                    
                      var complaintSataus =await _ComplanitHistoryRepository.GetAll(c => c.RequestComplanitId == request.RequestComplanitId).ToListAsync();
-                   
-                    
-                    //if (complaintSataus.OrderBy(c=>c.CreatedBy).Any(c => c.ComplanitStatus == request.ComplanitStatus))
-                    //{
-                    //    _response.StatusEnum = StatusEnum.Failed;
-                    //    _response.Message = _localizationProvider["This Status Send Befor"];
-                    //    _response.Result = null;
-                    //    return _response;
 
-                    //}
+
+                  //  if (complaintSataus.OrderBy(c => c.CreatedBy).Any(c => c.ComplanitStatus == request.ComplanitStatus))
+                    if (complaintSataus!=null && complaintSataus.Count>0)
+                    {
+                        //_response.StatusEnum = StatusEnum.Failed;
+                        //_response.Message = _localizationProvider["This Status Send Befor"];
+                        //_response.Result = null;
+                        //return _response;
+                        var idsHistory = complaintSataus.Select(c => c.Id).ToList();
+
+                        var NotficationList = await _NotificationRepository.GetAll(c => idsHistory.Contains((long)c.ComplanitHistoryId) && c.Read==false).ToListAsync();
+                      
+                        foreach (var item in NotficationList)
+                        {
+                            item.UpdatedOn = DateTime.Now;
+                            item.ReadDate = DateTime.Now;
+                            item.NotificationState = NotificationState.New;
+                            item.Read = true;
+
+                            _NotificationRepository.Update(item);
+                            _NotificationRepository.Save();
+
+                        }
+
+                    }
 
                     //if (
                     //    complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled)
                     //    ||
                     //    complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended ) ||
                     //    complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed)
-                        
+
 
                     //    )
                     //{
@@ -90,8 +106,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     //    _response.Result = null;
                     //    return _response;
                     //}
-                   
-                        var complanitHistory = new ComplanitHistory()
+
+                    var complanitHistory = new ComplanitHistory()
                         {
                             CreatedBy = _auditService.UserId,
                             CreatedOn = DateTime.Now,
