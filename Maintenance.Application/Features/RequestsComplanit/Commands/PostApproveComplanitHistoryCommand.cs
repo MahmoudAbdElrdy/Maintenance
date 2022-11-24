@@ -67,14 +67,14 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                      var complaintSataus =await _ComplanitHistoryRepository.GetAll(c => c.RequestComplanitId == request.RequestComplanitId).ToListAsync();
                    
                     
-                    if (complaintSataus.OrderBy(c=>c.CreatedBy).Any(c => c.ComplanitStatus == request.ComplanitStatus))
-                    {
-                        _response.StatusEnum = StatusEnum.Failed;
-                        _response.Message = _localizationProvider["This Status Send Befor"];
-                        _response.Result = null;
-                        return _response;
+                    //if (complaintSataus.OrderBy(c=>c.CreatedBy).Any(c => c.ComplanitStatus == request.ComplanitStatus))
+                    //{
+                    //    _response.StatusEnum = StatusEnum.Failed;
+                    //    _response.Message = _localizationProvider["This Status Send Befor"];
+                    //    _response.Result = null;
+                    //    return _response;
 
-                    }
+                    //}
 
                     //if (
                     //    complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled)
