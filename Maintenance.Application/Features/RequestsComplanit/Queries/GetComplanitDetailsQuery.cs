@@ -62,7 +62,14 @@ namespace Maintenance.Application.Features.Categories.Queries
                 try
                 {
 
-                
+                    //fileMovementRepository.GetAll()
+                    //.Where(fm => repository.GetAll().Select(f => f.Id).Contains(fm.FileId) && fm.TransferredById == userId)
+                    //.Include(f => f.User).Include(f => f.File).ThenInclude(f => f.Category)
+                    //.OrderByDescending(f => f.MovedOn)
+                    //.ToList()
+                    //.GroupBy(f => f.FileId)
+                    //.Select(f => f.First())
+                    //.ToList();
 
                     var resx = _CheckListRequestRepository.
                         GetAllIncluding(

@@ -4,6 +4,7 @@ using Maintenance.Infrastructure.Persistence.MSSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Maintenance.Infrastructure.Migrations
 {
     [DbContext(typeof(MaintenanceSqlContext))]
-    partial class MaintenanceSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20221123025408_NewReueriment")]
+    partial class NewReueriment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -643,13 +645,12 @@ namespace Maintenance.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CodeSms")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ComplanitStatus")
-                        .HasColumnType("int");
 
                     b.Property<long?>("CreatedBy")
                         .HasColumnType("bigint");

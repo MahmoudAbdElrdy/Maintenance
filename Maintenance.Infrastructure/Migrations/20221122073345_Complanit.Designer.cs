@@ -4,6 +4,7 @@ using Maintenance.Infrastructure.Persistence.MSSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Maintenance.Infrastructure.Migrations
 {
     [DbContext(typeof(MaintenanceSqlContext))]
-    partial class MaintenanceSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20221122073345_Complanit")]
+    partial class Complanit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -214,9 +216,6 @@ namespace Maintenance.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("ComplanitHistoryId")
-                        .HasColumnType("bigint");
-
                     b.Property<long?>("CreatedBy")
                         .HasColumnType("bigint");
 
@@ -229,11 +228,8 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Property<int>("NotificationState")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("Read")
+                    b.Property<bool>("Read")
                         .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ReadDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("State")
                         .HasColumnType("int");
@@ -259,8 +255,6 @@ namespace Maintenance.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ComplanitHistoryId");
 
                     b.ToTable("Notifications");
                 });
@@ -609,9 +603,6 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsApprove")
-                        .HasColumnType("bit");
-
                     b.Property<long?>("RequestComplanitId")
                         .IsRequired()
                         .HasColumnType("bigint");
@@ -643,13 +634,12 @@ namespace Maintenance.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CodeSms")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ComplanitStatus")
-                        .HasColumnType("int");
 
                     b.Property<long?>("CreatedBy")
                         .HasColumnType("bigint");
@@ -785,15 +775,6 @@ namespace Maintenance.Infrastructure.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Maintenance.Domain.Entities.Auth.Notification", b =>
-                {
-                    b.HasOne("Maintenance.Domain.Entities.Complanits.ComplanitHistory", "ComplanitHistory")
-                        .WithMany("Notifications")
-                        .HasForeignKey("ComplanitHistoryId");
-
-                    b.Navigation("ComplanitHistory");
                 });
 
             modelBuilder.Entity("Maintenance.Domain.Entities.Auth.PermissionRole", b =>
@@ -1016,8 +997,6 @@ namespace Maintenance.Infrastructure.Migrations
             modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.ComplanitHistory", b =>
                 {
                     b.Navigation("AttachmentComplanitHistory");
-
-                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("Maintenance.Domain.Entities.Complanits.RequestComplanit", b =>

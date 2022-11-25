@@ -70,6 +70,48 @@ namespace Maintenance.Application.Features.Categories.Queries
             {
                 try
                 {
+                  //  //  var res = await (
+                  //  from req in _RequestComplanitRepository.
+                  //  GetAll(x => x.State == State.NotDeleted)
+
+                  //   .WhereIf(request.RegionId != null && request.RegionId.Count > 0, x => request.RegionId.Contains(x.SerialNumber.Substring(3, 2)))
+                  //.WhereIf(request.OfficeId != null && request.OfficeId.Count > 0, x => request.OfficeId.Contains(x.SerialNumber.Substring(0, 3)))
+
+
+                  //  join check in _CheckListRequestRepository.GetAll(x => x.State == State.NotDeleted)
+
+                  //    on req.Id equals check.RequestComplanitId
+
+                  //  join CheckListComp in _CheckListComplanitRepository.GetAll(x => x.State == State.NotDeleted)
+
+                  //  on check.CheckListComplanitId equals CheckListComp.Id
+
+                  //  join cat in _CategoryComplanitRepository.GetAll(x => x.State == State.NotDeleted)
+                  //   .WhereIf(request.CategoryId != null && request.CategoryId.Count > 0, x => x.CheckListsComplanit.Any(c => CheckListComplanitIds.Contains((long)c.CategoryComplanitId)))
+
+                  //  on CheckListComp.CategoryComplanitId equals cat.Id
+
+                  //  join history in _ComplanitHistoryRepository.GetAll(x => x.State == State.NotDeleted)
+                  //   .WhereIf(request.ComplanitStatus != null && request.ComplanitStatus > 0, x => x.ComplanitStatus == request.ComplanitStatus)
+
+                  //  on req.Id equals history.RequestComplanitId
+
+                  //  select (new
+                  //  {
+                  //      CategoryComplanitName = _auditService.UserLanguage == "ar" ? cat.NameAr : cat.NameEn,
+                  //      Description = req.Description,
+                  //      CheckListsRequest = _auditService.UserLanguage == "ar" ?
+                  //                                 req.CheckListRequests.Select(x => x.CheckListComplanit.NameAr).ToArray() :
+                  //                                 req.CheckListRequests.Select(x => x.CheckListComplanit.NameEn).ToArray(),
+                  //      ComplanitId = req.Id,
+                  //      CheckListsRequestIds = req.CheckListRequests.Select(x => x.Id).ToArray(),
+                  //      CategoryComplanitId = CheckListComp.CategoryComplanitId
+                  //  })).ToListAsync();
+
+
+                    //
+                    //
+                    //
                     //var res = await _RequestComplanitRepository.GetAll() 
 
                     // .Include(x => x.AttachmentsComplanit)

@@ -210,7 +210,7 @@
     public enum NotificationType
     {
         Message,
-        Request,
+        RequestComplanit, 
     }
     public enum NotificationState
     {
@@ -221,23 +221,23 @@
     
     public enum ComplanitStatus 
     {
-        Submitted = 1,
+        Submitted = 1,//create  مفتوح
 
-        TechnicianAssigned = 2,
+        TechnicianAssigned = 2,// جاري المعالجة
 
-        TechnicianSuspended=3,
+        TechnicianSuspended=3,//معلق
 
-        ConsultantApprovalAfterSuspended = 4,
+        //ConsultantApprovalAfterSuspended = 4,
 
-        TechnicianCanceled = 5,
+        TechnicianCanceled = 5,//ملغي
 
-        ConsultantApprovalAfterCanceled =6,
+        //ConsultantApprovalAfterCanceled =6,
 
-        TechnicianDone = 7,
+        TechnicianDone = 7,//مكتمل
 
-        ConsultantApprovalAfterDone = 8,
+        //ConsultantApprovalAfterDone = 8,
     
-        TechnicianClosed = 9,
+        TechnicianClosed = 9,//مقفول
 
     }
 }

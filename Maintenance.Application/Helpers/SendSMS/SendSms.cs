@@ -107,6 +107,7 @@ namespace Maintenance.Application.Helpers.SendSms
             var segmentString = new String(charsArr);
             return segmentString;
         }
+     
     }
     public class SMSService
     {

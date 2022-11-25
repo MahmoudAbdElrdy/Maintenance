@@ -2,10 +2,12 @@
 using Maintenance.Application.Features.RequestsComplanit.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
+using Maintenance.Application.Helpers.SendSms;
 using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Enums;
 using Maintenance.Domain.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace Maintenance.Application.Features.RequestsComplanit.Commands
@@ -17,9 +19,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
         //public long[]? CheckListsRequest { get; set; }
         //public string[]? AttachmentsComplanit { get; set; }
         public List<RequestComplanitDto> requests { get; set; }
-        public long? OfficeId { get; set; }
-        public long? RegionId { get; set; }
-        public string SerialNumber { get; set; }
+      //  public long? OfficeId { get; set; }
+      //  public long? RegionId { get; set; }
+       
         class PostRequestComplanit : IRequestHandler<PostRequestComplanitCommand, ResponseDTO>
         {
             private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;
@@ -27,6 +29,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
             private readonly IGRepository<ComplanitHistory> _ComplanitHistoryRepository;
 
             private readonly ILogger<PostRequestComplanitCommand> _logger;
+            private readonly IStringLocalizer<string> _Localizer; 
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
             private readonly IMapper _mapper;
@@ -37,7 +40,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 ILogger<PostRequestComplanitCommand> logger,
                 IAuditService auditService,
                 IMapper mapper,
-                IGRepository<ComplanitHistory> ComplanitHistoryRepository
+                IGRepository<ComplanitHistory> ComplanitHistoryRepository,
+                IStringLocalizer<string> Localizer
             )
             {
                 _RequestComplanitRepository = RequestComplanitRepository;
@@ -46,6 +50,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 _response = new ResponseDTO();
                 _mapper = mapper;
                 _ComplanitHistoryRepository = ComplanitHistoryRepository;
+                _Localizer = Localizer;
 
 
             }
@@ -64,8 +69,10 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             State = Domain.Enums.State.NotDeleted,
                             Description = requestObj.Description,
                             SerialNumber = requestObj.SerialNumber,
-                          //  OfficeId=request.OfficeId,
-                           // RegionId = request.RegionId
+                            Code= GenerateCodeComplaint(),
+                            ComplanitStatus=ComplanitStatus.Submitted
+                            //  OfficeId=request.OfficeId,
+                            // RegionId = request.RegionId
                         };
 
                         foreach (var item in requestObj.AttachmentsComplanit)
@@ -104,7 +111,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     _RequestComplanitRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = "RequestComplanitSavedSuccessfully";
+                    _response.Message = _Localizer["AddedSuccessfully"] ;
                     _response.Result = null;
                     return _response;
                 }
@@ -139,7 +146,18 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     return _response;
                 }
             }
-
+            public  string GenerateCodeComplaint()
+            {
+                var characters = "0123456789";
+                var charsArr = new char[10];
+                var random = new Random();
+                for (int i = 0; i < charsArr.Length; i++)
+                {
+                    charsArr[i] = characters[random.Next(characters.Length)];
+                }
+                var segmentString = new String(charsArr);
+                return segmentString;
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ using Maintenance.Application.Features.Account.Commands.Login;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.Notifications;
+using Maintenance.Application.Helpers.SendSms;
 using Maintenance.Domain.Entities.Auth;
 using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Enums;
@@ -22,10 +23,13 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
         public string[]? AttachmentsComplanitHistory { get; set; }
         public ComplanitStatus? ComplanitStatus { get; set; }
         public long? RequestComplanitId { get; set; }
+        //public string? Code { get; set; }
         class PostRequestComplanit : IRequestHandler<PostApproveComplanitHistoryCommand, ResponseDTO>
         {
-            private readonly IGRepository<ComplanitHistory> _RequestComplanitRepository;
+            private readonly IGRepository<ComplanitHistory> _ComplanitHistoryRepository;
+            private readonly IGRepository<RequestComplanit> _RequestComplanitRepository; 
             private readonly IGRepository<Notification> _NotificationRepository;
+            private readonly IGRepository<RequestComplanitNotification> _RequestComplanitNotificationRepository;
             private readonly ILogger<PostApproveComplanitHistoryCommand> _logger;
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
@@ -34,16 +38,18 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
             private readonly IStringLocalizer<LoginQueryHandler> _localizationProvider;
             public PostRequestComplanit(
 
-                IGRepository<ComplanitHistory> RequestComplanitRepository,
+                IGRepository<ComplanitHistory> ComplanitHistoryRepository,
                 ILogger<PostApproveComplanitHistoryCommand> logger,
                 IAuditService auditService,
                 IMapper mapper,
                 IGRepository<Notification> NotificationRepository,
                 UserManager<User> userManager,
-                IStringLocalizer<LoginQueryHandler> localizationProvider
+                IStringLocalizer<LoginQueryHandler> localizationProvider,
+                IGRepository<RequestComplanit> RequestComplanitRepository,
+                IGRepository<RequestComplanitNotification> RequestComplanitNotificationRepository
             )
             {
-                _RequestComplanitRepository = RequestComplanitRepository;
+                _ComplanitHistoryRepository = ComplanitHistoryRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _auditService = auditService;
                 _response = new ResponseDTO();
@@ -51,14 +57,60 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 _NotificationRepository = NotificationRepository;
                 _userManager = userManager;
                 _localizationProvider = localizationProvider;
+                _RequestComplanitRepository = RequestComplanitRepository;
+                _RequestComplanitNotificationRepository = RequestComplanitNotificationRepository;
             }
             public async Task<ResponseDTO> Handle(PostApproveComplanitHistoryCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
-                  
-                  
-                        var complanitHistory = new ComplanitHistory()
+                   
+                     var complaintSataus =await _ComplanitHistoryRepository.GetAll(c => c.RequestComplanitId == request.RequestComplanitId).ToListAsync();
+                   
+                    var complaint = await _RequestComplanitRepository.GetFirstAsync(c => c.Id == request.RequestComplanitId);
+
+
+                    //  if (complaintSataus.OrderBy(c => c.CreatedBy).Any(c => c.ComplanitStatus == request.ComplanitStatus))
+                    if (complaintSataus!=null && complaintSataus.Count>0)
+                    {
+                        //_response.StatusEnum = StatusEnum.Failed;
+                        //_response.Message = _localizationProvider["This Status Send Befor"];
+                        //_response.Result = null;
+                        //return _response;
+                        var idsHistory = complaintSataus.Select(c => c.Id).ToList();
+
+                        var NotficationList = await _NotificationRepository.GetAll(c => idsHistory.Contains((long)c.ComplanitHistoryId) && c.Read==false).ToListAsync();
+                      
+                        foreach (var item in NotficationList)
+                        {
+                            item.UpdatedOn = DateTime.Now;
+                            item.ReadDate = DateTime.Now;
+                            item.NotificationState = NotificationState.New;
+                            item.Read = true;
+
+                            _NotificationRepository.Update(item);
+                            _NotificationRepository.Save();
+
+                        }
+
+                    }
+
+                    //if (
+                    //    complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled)
+                    //    ||
+                    //    complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended ) ||
+                    //    complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed)
+
+
+                    //    )
+                    //{
+                    //    _response.StatusEnum = StatusEnum.Failed;
+                    //    _response.Message = _localizationProvider["ApproveOrRejectedStatus"];
+                    //    _response.Result = null;
+                    //    return _response;
+                    //}
+
+                    var complanitHistory = new ComplanitHistory()
                         {
                             CreatedBy = _auditService.UserId,
                             CreatedOn = DateTime.Now,
@@ -78,28 +130,16 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             });
                         }
 
-                    await _RequestComplanitRepository.AddAsync(complanitHistory);
+                 
                    
-                    var personalUser = await _userManager.Users.Where(x => x.Id == _auditService.UserId).FirstOrDefaultAsync();
-                   
-                    if (personalUser == null)
-                    {
-                      _response.Message = _localizationProvider["UserNotFound"];
-
-                      _response.StatusEnum = StatusEnum.Failed;
-                      
-                        return _response;
-                    }
                     //Domain.Enums.ComplanitStatus.TechnicianAssigned
                     //The owner and the consultant will recieve a notification contains
                   
 
-                    if (  request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianAssigned 
-                        ||request.ComplanitStatus== Domain.Enums.ComplanitStatus.TechnicianSuspended 
-                        || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled
-                        || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianDone
-                        )
+                    if (  request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianAssigned  )
                     {
+                       
+
                         var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner
                   || x.UserType == UserType.Consultant && x.State == State.NotDeleted).ToListAsync();
                         foreach (var item in users)
@@ -125,21 +165,39 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                               
                                 BodyEn = request.Description,
                                
-                                To=item.Id
-                            };
+                                To=item.Id,
+                             
+                                Read=false,
+                              
+                               Type = NotificationType.Message
+                          };
                           
-                         await NotificationHelper.FCMNotify(notfication, "");
-                        
-                         await  _NotificationRepository.AddAsync(notfication);
+
+                            notfication.ComplanitHistory = complanitHistory;
+
+                            await _NotificationRepository.AddAsync(notfication);
+                            var notificationDto = new NotificationDto()
+                            {
+                                Title=complaint.Code,
+                                Body= _localizationProvider["ResponsesToComplaint"]
+                            };
+
+                             await NotificationHelper.FCMNotify(notificationDto, item.Token);
+                            
                         }
+                      
+                        complaint.UpdatedOn = DateTime.Now;
+
+                        complaint.ComplanitStatus = request.ComplanitStatus;
+
+                        _RequestComplanitRepository.Update(complaint);
                     }
-                    if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterSuspended
-                        || request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterCanceled
+                    if (  request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended
                         || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled
+                        || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed
                         )
                     {
-                        var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner && x.State == State.NotDeleted).ToListAsync();
-                       
+                        var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner || x.UserType == UserType.Consultant && x.State == State.NotDeleted).ToListAsync();
                         foreach (var item in users)
                         {
                             var notfication = new Notification()
@@ -162,30 +220,60 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                                 BodyEn = request.Description,
 
-                                To = item.Id
+                                Read = false,
+
+                                To = item.Id,
+
+                                Type = NotificationType.RequestComplanit
+
+                                
                             };
 
-                            await NotificationHelper.FCMNotify(notfication, "");
-
+                            notfication.ComplanitHistory = complanitHistory;
                             await _NotificationRepository.AddAsync(notfication);
+                            var notificationDto = new NotificationDto()
+                            {
+                                Title = complaint.Code,
+                                Body = _localizationProvider["ResponsesToComplaint"]
+                            };
+
+                            await NotificationHelper.FCMNotify(notificationDto, item.Token);
                         }
                     }
-                    if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.ConsultantApprovalAfterDone)
+                    if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianDone)
                     {
-                        var RequestComplanit = await _RequestComplanitRepository.FindAsync(request.RequestComplanitId);
-                        var clientUser = await _userManager.Users.Where(x => x.Id == RequestComplanit.CreatedBy).FirstOrDefaultAsync();
+                        
+                        
+                       
+                        var clientUser = await _userManager.Users.Where(x => x.Id == complaint.CreatedBy).FirstOrDefaultAsync();
+
+                        complaint.CodeSms= SendSMS.GenerateCode();
+                       
+                        await _ComplanitHistoryRepository.AddAsync(complanitHistory);
+                      
+                        _RequestComplanitRepository.Update(complaint);
                         //var res = SendSMS.SendMessageUnifonic(meass + " : " + clientUser.Code, clientUser.PhoneNumber);
                         //if (res == -1)
                         //{
-                         //    _response.Message = _localizationProvider["ProplemSendCode"];
+                        //    _response.Message = _localizationProvider["ProplemSendCode"];
 
                         //    _response.StatusEnum = StatusEnum.Failed;
                         //    return _response;
                         //}
+                        _ComplanitHistoryRepository.Save();
+
+                        _response.StatusEnum = StatusEnum.SavedSuccessfully;
+                        _response.Message = _localizationProvider["Send Code To Technician"];
+                        _response.Result =
+                            new { 
+                            CodeSms= complaint.CodeSms ,
+                            RequestComplanitId=request.RequestComplanitId
+                            } ;
+                        return _response;
                     }
 
 
-                    _RequestComplanitRepository.Save();
+                    _ComplanitHistoryRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
                     _response.Message = _localizationProvider["AddedSuccessfully"];
