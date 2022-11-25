@@ -23,6 +23,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
         public string[]? AttachmentsComplanitHistory { get; set; }
         public ComplanitStatus? ComplanitStatus { get; set; }
         public long? RequestComplanitId { get; set; }
+        //public string? Code { get; set; }
         class PostRequestComplanit : IRequestHandler<PostApproveComplanitHistoryCommand, ResponseDTO>
         {
             private readonly IGRepository<ComplanitHistory> _ComplanitHistoryRepository;
@@ -65,9 +66,11 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 {
                    
                      var complaintSataus =await _ComplanitHistoryRepository.GetAll(c => c.RequestComplanitId == request.RequestComplanitId).ToListAsync();
+                   
+                    var complaint = await _RequestComplanitRepository.GetFirstAsync(c => c.Id == request.RequestComplanitId);
 
 
-                  //  if (complaintSataus.OrderBy(c => c.CreatedBy).Any(c => c.ComplanitStatus == request.ComplanitStatus))
+                    //  if (complaintSataus.OrderBy(c => c.CreatedBy).Any(c => c.ComplanitStatus == request.ComplanitStatus))
                     if (complaintSataus!=null && complaintSataus.Count>0)
                     {
                         //_response.StatusEnum = StatusEnum.Failed;
@@ -133,10 +136,10 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     //The owner and the consultant will recieve a notification contains
                   
 
-                    if (  request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianAssigned 
-                      
-                        )
+                    if (  request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianAssigned  )
                     {
+                       
+
                         var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner
                   || x.UserType == UserType.Consultant && x.State == State.NotDeleted).ToListAsync();
                         foreach (var item in users)
@@ -173,12 +176,16 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             notfication.ComplanitHistory = complanitHistory;
 
                             await _NotificationRepository.AddAsync(notfication);
+                            var notificationDto = new NotificationDto()
+                            {
+                                Title=complaint.Code,
+                                Body= _localizationProvider["ResponsesToComplaint"]
+                            };
 
-                             await NotificationHelper.FCMNotify(notfication, item.Token);
+                             await NotificationHelper.FCMNotify(notificationDto, item.Token);
                             
                         }
-                        var complaint = await _RequestComplanitRepository.GetFirstAsync(c => c.Id == request.RequestComplanitId);
-
+                      
                         complaint.UpdatedOn = DateTime.Now;
 
                         complaint.ComplanitStatus = request.ComplanitStatus;
@@ -224,22 +231,27 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                             notfication.ComplanitHistory = complanitHistory;
                             await _NotificationRepository.AddAsync(notfication);
-                            await NotificationHelper.FCMNotify(notfication, item.Token);
+                            var notificationDto = new NotificationDto()
+                            {
+                                Title = complaint.Code,
+                                Body = _localizationProvider["ResponsesToComplaint"]
+                            };
+
+                            await NotificationHelper.FCMNotify(notificationDto, item.Token);
                         }
                     }
                     if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianDone)
                     {
                         
                         
-                        var RequestComplanit = await _RequestComplanitRepository.GetFirstAsync(c => c.Id == request.RequestComplanitId);
-
-                        var clientUser = await _userManager.Users.Where(x => x.Id == RequestComplanit.CreatedBy).FirstOrDefaultAsync();
                        
-                        RequestComplanit.CodeSms= SendSMS.GenerateCode();
+                        var clientUser = await _userManager.Users.Where(x => x.Id == complaint.CreatedBy).FirstOrDefaultAsync();
+
+                        complaint.CodeSms= SendSMS.GenerateCode();
                        
                         await _ComplanitHistoryRepository.AddAsync(complanitHistory);
                       
-                        _RequestComplanitRepository.Update(RequestComplanit);
+                        _RequestComplanitRepository.Update(complaint);
                         //var res = SendSMS.SendMessageUnifonic(meass + " : " + clientUser.Code, clientUser.PhoneNumber);
                         //if (res == -1)
                         //{
@@ -254,7 +266,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         _response.Message = _localizationProvider["Send Code To Technician"];
                         _response.Result =
                             new { 
-                            CodeSms= RequestComplanit.CodeSms ,
+                            CodeSms= complaint.CodeSms ,
                             RequestComplanitId=request.RequestComplanitId
                             } ;
                         return _response;

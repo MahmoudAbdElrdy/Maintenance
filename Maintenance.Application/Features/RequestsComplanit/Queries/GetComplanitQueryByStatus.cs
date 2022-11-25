@@ -89,7 +89,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                      .Include(x => x.AttachmentsComplanit)
                      .Include(x => x.ComplanitHistory)
                      .Include(x => x.CheckListRequests).
-                     ThenInclude(x => x.CheckListComplanit.CategoryComplanit)
+                      ThenInclude(x => x.CheckListComplanit.CategoryComplanit)
                      .Protected(x => x.State == State.NotDeleted)
                      .WhereIf(request.RegionId != null && request.RegionId.Count > 0, x => request.RegionId.Contains(x.SerialNumber.Substring(3, 2)))
                      .WhereIf(request.OfficeId != null && request.OfficeId.Count > 0, x => request.OfficeId.Contains(x.SerialNumber.Substring(0, 3)))
@@ -131,8 +131,27 @@ namespace Maintenance.Application.Features.Categories.Queries
                                  )
 
                          }).ToListAsync();
-                  
 
+                    //foreach (var item in res2)
+                    //{
+                    //    var officeName = offices.Where(y => y.Code == item.SerialNumber.Substring(0, 3)).FirstOrDefault();
+                    //    if (officeName != null)
+                    //    {
+                    //        item.location = item.SerialNumber.Length > 0 ? "مركز : " + officeName.Name
+                    //                                                          + " منطقة : " + item.SerialNumber.Substring(3, 2)
+                    //                                                          + " بركس : " + item.SerialNumber.Substring(5, 2)
+                    //                                                          + " غرفة : " + item.SerialNumber.Substring(7, 0) : "";
+                    //    }
+                    //    else
+                    //    {
+                    //        item.location = item.SerialNumber.Length > 0 ? "مركز : " + " "
+                    //                                                         + " منطقة : " + item.SerialNumber.Substring(3, 2)
+                    //                                                         + " بركس : " + item.SerialNumber.Substring(5, 2)
+                    //                                                         + " غرفة : " + item.SerialNumber.Substring(7, 0) : "";
+
+                    //    }
+
+                    //}
 
 
                     var paginatedObjs = await PaginationUtility.Paging(request.PaginatedInputModel, res2.ToList());

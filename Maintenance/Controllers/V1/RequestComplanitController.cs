@@ -15,6 +15,7 @@ namespace Maintenance.Controllers.V1
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class RequestComplanitController : ApiBaseController
     {
         private readonly IMediator _mediator;

@@ -8,7 +8,7 @@ using System.Xml.Linq;
 namespace Maintenance.Controllers.V1
 {
     [ApiVersion("1.0")]
-  //  [Authorize]
+   [Authorize]
     public class UploadFileController : ApiBaseController
     {
         private readonly IWebHostEnvironment _env;

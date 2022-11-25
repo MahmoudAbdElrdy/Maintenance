@@ -4,12 +4,14 @@ using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.Notifications;
 using Maintenance.Domain.Entities.Auth;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Maintenance.Controllers.V1
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class NotificationsController : ApiBaseController
     {
         private readonly IMediator _mediator;
