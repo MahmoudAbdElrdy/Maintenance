@@ -134,27 +134,27 @@ namespace Maintenance.Application.Features.Categories.Queries
 
                          }).ToListAsync();
 
-                    //foreach (var item in res2)
-                    //{
-                    //    var officeName = offices.Where(y => y.Code == item.SerialNumber.Substring(0, 3)).FirstOrDefault();
-                    //    if (officeName != null)
-                    //    {
-                    //        item.location = item.SerialNumber.Length > 0 ? "مركز : " + officeName.Name
-                    //                                                          + " منطقة : " + item.SerialNumber.Substring(3, 2)
-                    //                                                          + " بركس : " + item.SerialNumber.Substring(5, 2)
-                    //                                                          + " غرفة : " + item.SerialNumber.Substring(7, 0) : "";
-                    //    }
-                    //    else
-                    //    {
-                    //        item.location = item.SerialNumber.Length > 0 ? "مركز : " + " "
-                    //                                                         + " منطقة : " + item.SerialNumber.Substring(3, 2)
-                    //                                                         + " بركس : " + item.SerialNumber.Substring(5, 2)
-                    //                                                         + " غرفة : " + item.SerialNumber.Substring(7, 0) : "";
+                    foreach (var item in res2)
+                    {
+                        var officeName = offices.Where(y => y.Code == item.SerialNumber.Substring(0, 3)).FirstOrDefault();
+                        if (officeName != null)
+                        {
+                            item.location = item.SerialNumber.Length > 0 ? "مركز : " + officeName.Name
+                                                                              + " منطقة : " + item.SerialNumber.Substring(3, 2)
+                                                                              + " بركس : " + item.SerialNumber.Substring(5, 2)
+                                                                              + " غرفة : " + item.SerialNumber.Substring(7, 0) : "";
+                        }
+                        else
+                        {
+                            item.location = item.SerialNumber.Length > 0 ? "مركز : " + " "
+                                                                             + " منطقة : " + item.SerialNumber.Substring(3, 2)
+                                                                             + " بركس : " + item.SerialNumber.Substring(5, 2)
+                                                                             + " غرفة : " + item.SerialNumber.Substring(7, 0) : "";
 
-                    //    }
+                        }
 
-                    //}
-                    if(_auditService.UserType == UserType.Technician.ToString()){
+                    }
+                    if (_auditService.UserType == UserType.Technician.ToString()){
                         if (!(request.OfficeId.Count() == 0 && request.CategoryId.Count == 0 && request.RegionId.Count == 0))
                         {
                             var ComplanitFilterExit = await _ComplanitFilterRepository.GetFirstAsync(c => c.CreatedBy == _auditService.UserId);

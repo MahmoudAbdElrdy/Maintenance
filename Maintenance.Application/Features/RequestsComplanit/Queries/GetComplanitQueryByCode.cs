@@ -70,8 +70,8 @@ namespace Maintenance.Application.Features.Categories.Queries
             {
                 try
                 {
-                  
 
+                    var offices = await _room.GetOffices();
                     var res2 = await _RequestComplanitRepository.GetAll(x=>x.Code==request.Code)
 
                      .Include(x => x.AttachmentsComplanit)
@@ -117,26 +117,26 @@ namespace Maintenance.Application.Features.Categories.Queries
 
                       }).ToListAsync();
 
-                    //foreach (var item in res2)
-                    //{
-                    //    var officeName = offices.Where(y => y.Code == item.SerialNumber.Substring(0, 3)).FirstOrDefault();
-                    //    if (officeName != null)
-                    //    {
-                    //        item.location = item.SerialNumber.Length > 0 ? "مركز : " + officeName.Name
-                    //                                                          + " منطقة : " + item.SerialNumber.Substring(3, 2)
-                    //                                                          + " بركس : " + item.SerialNumber.Substring(5, 2)
-                    //                                                          + " غرفة : " + item.SerialNumber.Substring(7, 0) : "";
-                    //    }
-                    //    else
-                    //    {
-                    //        item.location = item.SerialNumber.Length > 0 ? "مركز : " + " "
-                    //                                                         + " منطقة : " + item.SerialNumber.Substring(3, 2)
-                    //                                                         + " بركس : " + item.SerialNumber.Substring(5, 2)
-                    //                                                         + " غرفة : " + item.SerialNumber.Substring(7, 0) : "";
+                    foreach (var item in res2)
+                    {
+                        var officeName = offices.Where(y => y.Code == item.SerialNumber.Substring(0, 3)).FirstOrDefault();
+                        if (officeName != null)
+                        {
+                            item.location = item.SerialNumber.Length > 0 ? "مركز : " + officeName.Name
+                                                                              + " منطقة : " + item.SerialNumber.Substring(3, 2)
+                                                                              + " بركس : " + item.SerialNumber.Substring(5, 2)
+                                                                              + " غرفة : " + item.SerialNumber.Substring(7, 0) : "";
+                        }
+                        else
+                        {
+                            item.location = item.SerialNumber.Length > 0 ? "مركز : " + " "
+                                                                             + " منطقة : " + item.SerialNumber.Substring(3, 2)
+                                                                             + " بركس : " + item.SerialNumber.Substring(5, 2)
+                                                                             + " غرفة : " + item.SerialNumber.Substring(7, 0) : "";
 
-                    //    }
+                        }
 
-                    //}
+                    }
 
 
 
