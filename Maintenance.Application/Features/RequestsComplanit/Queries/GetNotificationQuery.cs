@@ -69,15 +69,16 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
             {
                 try
                 {
-                   
+
+                    var user =await _userRepository.GetFirstAsync(c => c.Id == request.UserId);
 
                     var resx = await _NotficationRepository
                         .GetAllIncluding(c=>c.ComplanitHistory.AttachmentComplanitHistory).
                         Include(c=>c.ComplanitHistory.RequestComplanit)
            
                         .Where(x=>x.To==request.UserId && x.Read == false)
-                        .WhereIf(_auditService.UserType == UserType.Owner.ToString() || _auditService.UserType == UserType.Client.ToString(), x=> x.Type== NotificationType.Message)
-                        .WhereIf(_auditService.UserType == UserType.Consultant.ToString(), x=> x.Type== NotificationType.Message  ||  x.Type == NotificationType.RequestComplanit)
+                        .WhereIf(user.UserType == UserType.Owner || user.UserType == UserType.Client, x=> x.Type== NotificationType.Message)
+                        .WhereIf(user.UserType == UserType.Consultant, x=> x.Type== NotificationType.Message  ||  x.Type == NotificationType.RequestComplanit)
                         .Select(c=>new
                         {
                             Title = c.ComplanitHistory.RequestComplanit.Code,
