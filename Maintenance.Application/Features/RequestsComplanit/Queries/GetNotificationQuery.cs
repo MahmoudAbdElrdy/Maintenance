@@ -4,6 +4,7 @@ using FCM.Net;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.Paginations;
+using Maintenance.Application.Helpers.QueryableExtensions;
 using Maintenance.Domain.Entities.Auth;
 using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Enums;
@@ -22,8 +23,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
             PaginatedInputModel = new PaginatedInputModel();
         }
         public long? UserId { get; set; }
-      //  public long? RequestComplanitId { get; set; } 
-     
+       
+
         public PaginatedInputModel PaginatedInputModel { get; set; }
         class GetAllNotificationUser : IRequestHandler<GetNotificationQuery, ResponseDTO>
         {
@@ -68,13 +69,15 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
             {
                 try
                 {
+                   
 
-                 
                     var resx = await _NotficationRepository
                         .GetAllIncluding(c=>c.ComplanitHistory.AttachmentComplanitHistory).
                         Include(c=>c.ComplanitHistory.RequestComplanit)
            
-                        .Where(x=>x.To==request.UserId && x.Read == false && x.Type== NotificationType.RequestComplanit)
+                        .Where(x=>x.To==request.UserId && x.Read == false)
+                        .WhereIf(_auditService.UserType == UserType.Owner.ToString() || _auditService.UserType == UserType.Client.ToString(), x=> x.Type== NotificationType.Message)
+                        .WhereIf(_auditService.UserType == UserType.Consultant.ToString(), x=> x.Type== NotificationType.Message  ||  x.Type == NotificationType.RequestComplanit)
                         .Select(c=>new
                         {
                             Title = c.ComplanitHistory.RequestComplanit.Code,

@@ -25,8 +25,9 @@ namespace Maintenance.Application.Features.Categories.Queries
         }
 
         public List<long>? CategoryId { get; set; } 
-        public List<string>? RegionId { get; set; }
-        public List<string>? OfficeId { get; set; }  
+        public List<long>? RegionId { get; set; }
+        public List<long>? OfficeId { get; set; }  
+        
         public ComplanitStatus? ComplanitStatus { get; set; }
         public PaginatedInputModel PaginatedInputModel { get; set; }
         class GetAllCategoryComplanit : IRequestHandler<GetComplanitQueryByStatus, ResponseDTO>
@@ -41,7 +42,7 @@ namespace Maintenance.Application.Features.Categories.Queries
             private readonly ResponseDTO _response;
             private readonly IAuditService _auditService;
             private readonly IMapper _mapper;
-          
+            private readonly IGRepository<ComplanitFilter> _ComplanitFilterRepository;
             private readonly IRoom _room;
             public GetAllCategoryComplanit(
              IGRepository<CategoryComplanit> CategoryComplanitRepository,
@@ -52,7 +53,8 @@ namespace Maintenance.Application.Features.Categories.Queries
                 IGRepository<CheckListRequest> CheckListRequestRepository,
                 IGRepository<RequestComplanit> RequestComplanitRepository,
                 IGRepository<CheckListComplanit> CheckListComplanitRepository,
-                IRoom room
+                IRoom room,
+                IGRepository<ComplanitFilter> ComplanitFilterRepository
 
             )
             {
@@ -68,7 +70,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                 _CheckListComplanitRepository = CheckListComplanitRepository;
                 _room = room;
                 _CheckListComplanitRepository = CheckListComplanitRepository;
-
+                _ComplanitFilterRepository = ComplanitFilterRepository;
 
             }
             public async Task<ResponseDTO> Handle(GetComplanitQueryByStatus request, CancellationToken cancellationToken)
@@ -91,8 +93,8 @@ namespace Maintenance.Application.Features.Categories.Queries
                      .Include(x => x.CheckListRequests).
                       ThenInclude(x => x.CheckListComplanit.CategoryComplanit)
                      .Protected(x => x.State == State.NotDeleted)
-                     .WhereIf(request.RegionId != null && request.RegionId.Count > 0, x => request.RegionId.Contains(x.SerialNumber.Substring(3, 2)))
-                     .WhereIf(request.OfficeId != null && request.OfficeId.Count > 0, x => request.OfficeId.Contains(x.SerialNumber.Substring(0, 3)))
+                     .WhereIf(request.RegionId != null && request.RegionId.Count > 0, x => request.RegionId.Contains((long)x.RegionId))
+                     .WhereIf(request.OfficeId != null && request.OfficeId.Count > 0, x => request.OfficeId.Contains((long)x.OfficeId))
                      .WhereIf(request.CategoryId != null && request.CategoryId.Count > 0, x => x.CheckListRequests.Select(c => c.CheckListComplanit).Any(c => CheckListComplanitIds.Contains((long)c.CategoryComplanitId)))
                      .WhereIf(request.ComplanitStatus != null && request.ComplanitStatus > 0,c=>c.ComplanitStatus==request.ComplanitStatus)
 
@@ -100,10 +102,10 @@ namespace Maintenance.Application.Features.Categories.Queries
                          {
                              Code = x.Code,
                              SerialNumber = x.SerialNumber,
-                             location = x.SerialNumber.Length > 0 ? "مركز : " //+ offices.Where(y => y.Code== x.SerialNumber.Substring(0, 3)).FirstOrDefault().Name
-                             + " منطقة : " + x.SerialNumber.Substring(3, 2)
-                             + " بركس : " + x.SerialNumber.Substring(5, 2)
-                             + " غرفة : " + x.SerialNumber.Substring(7, 0) : "",
+                             //location = x.SerialNumber.Length > 0 ? "مركز : " //+ offices.Where(y => y.Code== x.SerialNumber.Substring(0, 3)).FirstOrDefault().Name
+                             //+ " منطقة : " + x.SerialNumber.Substring(3, 2)
+                             //+ " بركس : " + x.SerialNumber.Substring(5, 2)
+                             //+ " غرفة : " + x.SerialNumber.Substring(7, 0) : "",
                              CategoryComplanitLogo = x.CheckListRequests.FirstOrDefault(x => x.State == State.NotDeleted).CheckListComplanit.CategoryComplanit.Logo,
 
 
@@ -152,6 +154,43 @@ namespace Maintenance.Application.Features.Categories.Queries
                     //    }
 
                     //}
+                    if(_auditService.UserType == UserType.Technician.ToString()){
+                        if (!(request.OfficeId.Count() == 0 && request.CategoryId.Count == 0 && request.RegionId.Count == 0))
+                        {
+                            var ComplanitFilterExit = await _ComplanitFilterRepository.GetFirstAsync(c => c.CreatedBy == _auditService.UserId);
+
+                            if (ComplanitFilterExit == null)
+                            {
+                                ComplanitFilterExit = new ComplanitFilter()
+                                {
+                                    CreatedBy = _auditService.UserId,
+                                    CreatedOn = DateTime.Now,
+                                    State = Domain.Enums.State.NotDeleted,
+                                    OfficeId = request.OfficeId.Count > 0 ? string.Join(",", request.OfficeId) : "",
+                                    RegionId = request.RegionId.Count > 0 ? string.Join(",", request.RegionId) : "",
+                                    CategoryComplanitId = request.CategoryId.Count > 0 ? string.Join(",", request.CategoryId) : "",
+
+                                };
+                                await _ComplanitFilterRepository.AddAsync(ComplanitFilterExit);
+                            }
+                            else
+                            {
+                                ComplanitFilterExit.UpdatedOn = DateTime.Now;
+                                ComplanitFilterExit.OfficeId = request.OfficeId.Count>0? string.Join(",", request.OfficeId):"";
+                                ComplanitFilterExit.RegionId = request.RegionId.Count > 0 ? string.Join(",", request.RegionId):"";
+                                ComplanitFilterExit.CategoryComplanitId = request.CategoryId.Count>0? string.Join(",", request.CategoryId):"";
+
+                                _ComplanitFilterRepository.Update(ComplanitFilterExit);
+                            }
+
+
+
+
+                            _ComplanitFilterRepository.Save();
+                        }
+
+                    }
+
 
 
                     var paginatedObjs = await PaginationUtility.Paging(request.PaginatedInputModel, res2.ToList());

@@ -11,7 +11,7 @@ namespace Maintenance.Application.Interfaces
     public interface IRoom
     {
         [Get("/api/v1/Room/GetRoomIdByRoomNumber/{roomNumber}")]
-        Task<long> GetRoomId(long roomNumber);
+        Task<RoomsDTO> GetRoomId(string roomNumber);
         [Get("/api/v1/Office/GetOffices")]
        // Task<List<OfficeDto>> GetOffices();   
         Task<List<OfficeDto>> GetOffices();   
@@ -20,5 +20,16 @@ namespace Maintenance.Application.Interfaces
     {
         public string Name { get; set; }
         public string Code { get; set; } 
+    }
+    public class RoomsDTO
+    {
+        public long? Id { get; set; }
+        public string? RoomNumber { get; set; }
+       // public RoomType RoomType { get; set; }
+        public string? QRImage { get; set; }
+        public long? CarvanId { get; set; }
+        public long? OfficeId { get; set; }
+        public long? RegionId { get; set; }
+
     }
 }

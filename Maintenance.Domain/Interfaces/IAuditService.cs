@@ -8,6 +8,7 @@
     string UserName { get; }
     long UserId { get; }
     string? UserLanguage { get;  }
+    string? UserType { get;  } 
     string? WebToken { get;  }
     }
 }

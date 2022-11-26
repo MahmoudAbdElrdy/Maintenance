@@ -110,7 +110,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     //    return _response;
                     //}
 
-                    var complanitHistory = new ComplanitHistory()
+                        var complanitHistory = new ComplanitHistory()
                         {
                             CreatedBy = _auditService.UserId,
                             CreatedOn = DateTime.Now,
@@ -138,10 +138,11 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                     if (  request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianAssigned  )
                     {
-                       
 
-                        var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner
-                  || x.UserType == UserType.Consultant && x.State == State.NotDeleted).ToListAsync();
+
+                        var users = await _userManager.Users.Where(x => (x.UserType == UserType.Owner
+                                         || x.UserType == UserType.Consultant) && x.State == State.NotDeleted).ToListAsync();
+
                         foreach (var item in users)
                       
                        {
@@ -187,7 +188,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         }
                       
                         complaint.UpdatedOn = DateTime.Now;
-
+                        complaint.UpdatedBy = _auditService.UserId;
                         complaint.ComplanitStatus = request.ComplanitStatus;
 
                         _RequestComplanitRepository.Update(complaint);
@@ -197,7 +198,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed
                         )
                     {
-                        var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner || x.UserType == UserType.Consultant && x.State == State.NotDeleted).ToListAsync();
+                        var users = await _userManager.Users.Where(x => (x.UserType == UserType.Owner
+                                   || x.UserType == UserType.Consultant) && x.State == State.NotDeleted).ToListAsync();
                         foreach (var item in users)
                         {
                             var notfication = new Notification()
@@ -228,7 +230,10 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                                 
                             };
+                            complaint.UpdatedOn = DateTime.Now;
+                            complaint.UpdatedBy = _auditService.UserId;
 
+                            _RequestComplanitRepository.Update(complaint);
                             notfication.ComplanitHistory = complanitHistory;
                             await _NotificationRepository.AddAsync(notfication);
                             var notificationDto = new NotificationDto()
@@ -248,7 +253,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         var clientUser = await _userManager.Users.Where(x => x.Id == complaint.CreatedBy).FirstOrDefaultAsync();
 
                         complaint.CodeSms= SendSMS.GenerateCode();
-                       
+                        complaint.UpdatedOn = DateTime.Now;
+                        complaint.UpdatedBy = _auditService.UserId;
                         await _ComplanitHistoryRepository.AddAsync(complanitHistory);
                       
                         _RequestComplanitRepository.Update(complaint);

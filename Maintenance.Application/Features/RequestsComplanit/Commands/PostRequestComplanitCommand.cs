@@ -1,39 +1,48 @@
-﻿using AutoMapper;
-using Maintenance.Application.Features.RequestsComplanit.Dto;
+﻿using AuthDomain.Entities.Auth;
+using AutoMapper;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
-using Maintenance.Application.Helpers.SendSms;
+using Maintenance.Application.Helpers.Notifications;
+using Maintenance.Application.Helpers.QueryableExtensions;
+using Maintenance.Application.Interfaces;
+using Maintenance.Domain.Entities.Auth;
 using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Enums;
 using Maintenance.Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using Refit;
 
 namespace Maintenance.Application.Features.RequestsComplanit.Commands
 {
     public class PostRequestComplanitCommand : IRequest<ResponseDTO>
     {
-        
-        //public string? Description { get; set; }
-        //public long[]? CheckListsRequest { get; set; }
-        //public string[]? AttachmentsComplanit { get; set; }
-        public List<RequestComplanitDto> requests { get; set; }
-      //  public long? OfficeId { get; set; }
-      //  public long? RegionId { get; set; }
-       
+
+        public string? Description { get; set; }
+        public long[]? CheckListsRequest { get; set; }
+        public string[]? AttachmentsComplanit { get; set; }
+        public string? SerialNumber { get; set; }
+
+        public long? CategoryComplanitId { set; get; }
+        //    public UserType? User { get; set; }
         class PostRequestComplanit : IRequestHandler<PostRequestComplanitCommand, ResponseDTO>
         {
             private readonly IGRepository<RequestComplanit> _RequestComplanitRepository;
 
             private readonly IGRepository<ComplanitHistory> _ComplanitHistoryRepository;
+            private readonly IGRepository<ComplanitFilter> _ComplanitFilterRepository;
 
             private readonly ILogger<PostRequestComplanitCommand> _logger;
             private readonly IStringLocalizer<string> _Localizer; 
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
             private readonly IMapper _mapper;
-          
+            private readonly IRoom _room;
+            private readonly UserManager<User> _userManager;
+            private readonly IGRepository<Notification> _NotificationRepository;
             public PostRequestComplanit(
 
                 IGRepository<RequestComplanit> RequestComplanitRepository,
@@ -41,7 +50,11 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 IAuditService auditService,
                 IMapper mapper,
                 IGRepository<ComplanitHistory> ComplanitHistoryRepository,
-                IStringLocalizer<string> Localizer
+                IStringLocalizer<string> Localizer,
+                IRoom room,
+                IGRepository<Notification> NotificationRepository,
+                UserManager<User> userManager,
+                IGRepository<ComplanitFilter> ComplanitFilterRepository
             )
             {
                 _RequestComplanitRepository = RequestComplanitRepository;
@@ -51,31 +64,57 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 _mapper = mapper;
                 _ComplanitHistoryRepository = ComplanitHistoryRepository;
                 _Localizer = Localizer;
-
-
+                _room = room;
+                _NotificationRepository = NotificationRepository;
+                _userManager = userManager;
+                _ComplanitFilterRepository = ComplanitFilterRepository;
             }
             public async Task<ResponseDTO> Handle(PostRequestComplanitCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
-                    var RequestComplanitList = new List<RequestComplanit>();
-
-                    foreach (var requestObj in request.requests)
+                    RoomsDTO room = new RoomsDTO();
+                    try
                     {
+                        room = await _room.GetRoomId(request.SerialNumber);
+
+                        if (room == null)
+
+                        {
+                            _response.Result = request.SerialNumber;
+
+                            _response.StatusEnum = StatusEnum.Failed;
+
+                            _response.Message = _Localizer["RoomNotFound"].ToString();
+
+                            return _response;
+                        }
+
+                    }
+                    catch (ApiException ex)
+                    {
+                        _response.Result = null;
+
+                        _response.StatusEnum = StatusEnum.Failed;
+
+                        _response.Message = _Localizer["anErrorOccurredPleaseContactSystemAdministrator"];
+                        return _response;
+                    }
+   
                         var RequestComplanit = new RequestComplanit()
                         {
                             CreatedBy = _auditService.UserId,
                             CreatedOn = DateTime.Now,
                             State = Domain.Enums.State.NotDeleted,
-                            Description = requestObj.Description,
-                            SerialNumber = requestObj.SerialNumber,
+                            Description = request.Description,
+                            SerialNumber = request.SerialNumber,
                             Code= GenerateCodeComplaint(),
-                            ComplanitStatus=ComplanitStatus.Submitted
-                            //  OfficeId=request.OfficeId,
-                            // RegionId = request.RegionId
+                            ComplanitStatus=ComplanitStatus.Submitted,
+                            OfficeId=room.OfficeId,
+                            RegionId = room.RegionId
                         };
 
-                        foreach (var item in requestObj.AttachmentsComplanit)
+                       foreach (var item in request.AttachmentsComplanit)
                         {
                             RequestComplanit.AttachmentsComplanit.Add(new AttachmentComplanit()
                             {
@@ -84,7 +123,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                                 CreatedOn = DateTime.Now,
                             });
                         }
-                        foreach (var item in requestObj.CheckListsRequest)
+                       foreach (var item in request.CheckListsRequest)
                         {
                             RequestComplanit.CheckListRequests.Add(new CheckListRequest()
                             {
@@ -93,21 +132,82 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                                 CreatedOn = DateTime.Now,
                             });
                         }
+                     
 
-                        RequestComplanit.ComplanitHistory.Add(new ComplanitHistory()
-                        {
+                      var ComplanitHistory = new ComplanitHistory()
+                       {
                         CreatedBy = _auditService.UserId,
                         CreatedOn = DateTime.Now,
                         State = Domain.Enums.State.NotDeleted,
                         ComplanitStatus = Domain.Enums.ComplanitStatus.Submitted,
-                      
-                        });
-                        RequestComplanitList.Add(RequestComplanit);
 
+                       };
+
+                    //////////
+                    ///
+                    var ComplanitFilterList = await _ComplanitFilterRepository.GetAll().
+                        WhereIf(room.OfficeId!=null && room.OfficeId>0,c=> c.OfficeId.Split(',', StringSplitOptions.None).Contains(room.OfficeId.ToString()))
+                       . WhereIf(room.RegionId!=null && room.RegionId>0,c=> c.OfficeId.Split(',', StringSplitOptions.None).Contains(room.RegionId.ToString()))
+                       . WhereIf(request.CategoryComplanitId!=null&& request.CategoryComplanitId > 0,c=> c.CategoryComplanitId.Split(',', StringSplitOptions.None).Contains(request.CategoryComplanitId.ToString()))
+                      .Select(c => new
+                      {
+                          usersIds = c.CreatedBy
+                      }
+                        )
+                       .ToListAsync();
+
+                    var users = await _userManager.Users.Where(x =>
+                    ( x.UserType == UserType.Owner || x.UserType == UserType.Consultant ||
+
+                    (x.UserType==UserType.Technician && ComplanitFilterList.Select(c=>c.usersIds).Contains(x.Id)) )
+
+                      && x.State == State.NotDeleted).ToListAsync();
+                    foreach (var item in users)
+
+                    {
+                        var notfication = new Notification()
+                        {
+                            CreatedBy = _auditService.UserId,
+
+                            CreatedOn = DateTime.Now,
+
+                            State = Domain.Enums.State.NotDeleted,
+
+                            From = _auditService.UserId,
+
+                            NotificationState = NotificationState.New,
+
+                            SubjectAr = RequestComplanit.Code,
+
+                            SubjectEn = RequestComplanit.Code,
+
+                            BodyAr = _Localizer["ResponsesToComplaint"],
+
+                            BodyEn = _Localizer["ResponsesToComplaint","en"],
+
+                            To = item.Id,
+
+                            Read = false,
+
+                            Type = NotificationType.Message
+                        };
+
+
+                        
+                        var notificationDto = new NotificationDto()
+                        {
+                            Title = RequestComplanit.Code,
+                            Body = _Localizer["ResponsesToComplaint"]
+                        };
+
+                        await NotificationHelper.FCMNotify(notificationDto, item.Token);
+                         ComplanitHistory.Notifications.Add(notfication);
                     }
-                   
+                 
+                    RequestComplanit.ComplanitHistory.Add(ComplanitHistory);
+                      
+                    await _RequestComplanitRepository.AddAsync(RequestComplanit);
 
-                    await _RequestComplanitRepository.AddRangeAsync(RequestComplanitList);
                     _RequestComplanitRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
@@ -117,27 +217,18 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 }
                 catch (Exception ex)
                 {
-                    foreach (var requestObj in request.requests)
-                    {
-                        if (requestObj.AttachmentsComplanit.Length > 0)
-                        {
-                            var folderName = Path.Combine("wwwroot/Uploads/Complanits");
+                   
+               var folderName = Path.Combine("wwwroot/Uploads/Complanits");
 
-                            foreach (var fileRemove in requestObj.AttachmentsComplanit)
-                            {
+               foreach (var fileRemove in request.AttachmentsComplanit)
+                 {
                                 var file = System.IO.Path.Combine(folderName, fileRemove);
                                 try
                                 {
                                     System.IO.File.Delete(file);
                                 }
                                 catch { }
-                            }
-
-
-                        }
-
-                    }
-                       
+                  }
                     _response.StatusEnum = StatusEnum.Exception;
                     _response.Result = null;
                     _response.Message = ex != null && ex.InnerException != null ? ex.InnerException.Message : ex.Message;

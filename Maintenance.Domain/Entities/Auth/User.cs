@@ -18,7 +18,8 @@ namespace AuthDomain.Entities.Auth
         public State State { get ; set ; }
         public long? CreatedBy { get ; set ; }
         public long? UpdatedBy { get ; set ; }
-        public long RoomId { set; get; }
+        public long? OfficeId { get; set; }
+        public long? RegionId { get; set; }
         public string? Code { get; set; }
         public string? DeletedBy { get; set; }
         public DateTime? DeletedDate { get; set; }
