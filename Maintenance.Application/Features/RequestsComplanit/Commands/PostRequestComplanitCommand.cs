@@ -147,15 +147,24 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     ///
 
                     var ComplanitFilterList = await _ComplanitFilterRepository.GetAll(x=>x.State==State.NotDeleted).ToListAsync();
-                     if(room.OfficeId != null && room.OfficeId > 0)
+                    
+                    var ComplanitFilterListTemp = ComplanitFilterList;
+
+                    if (room.OfficeId != null && room.OfficeId > 0)
                     {
                         ComplanitFilterList = ComplanitFilterList.Where(c => c.OfficeId.Split(',', StringSplitOptions.None).Contains(room.OfficeId.ToString())).ToList();
-
+                        if (ComplanitFilterList.Count == 0)
+                        {
+                            ComplanitFilterList = ComplanitFilterListTemp;
+                        }
                     }
                     if (room.RegionId != null && room.RegionId > 0)
                     {
                         ComplanitFilterList = ComplanitFilterList.Where(c => c.RegionId.Split(',', StringSplitOptions.None).Contains(room.RegionId.ToString())).ToList();
-
+                        if (ComplanitFilterList.Count == 0)
+                        {
+                            ComplanitFilterList = ComplanitFilterListTemp;
+                        }
                     }
                     if (request.CategoryComplanitId != null && request.CategoryComplanitId > 0)
                     {
