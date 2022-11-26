@@ -145,23 +145,32 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                     //////////
                     ///
-                    var ComplanitFilterList = await _ComplanitFilterRepository.GetAll().
-                        WhereIf(room.OfficeId!=null && room.OfficeId>0,c=> c.OfficeId.Split(',', StringSplitOptions.None).Contains(room.OfficeId.ToString()))
-                       . WhereIf(room.RegionId!=null && room.RegionId>0,c=> c.OfficeId.Split(',', StringSplitOptions.None).Contains(room.RegionId.ToString()))
-                       . WhereIf(request.CategoryComplanitId!=null&& request.CategoryComplanitId > 0,c=> c.CategoryComplanitId.Split(',', StringSplitOptions.None).Contains(request.CategoryComplanitId.ToString()))
-                      .Select(c => new
-                      {
-                          usersIds = c.CreatedBy
-                      }
-                        )
-                       .ToListAsync();
 
-                    var users = await _userManager.Users.Where(x =>
-                    ( x.UserType == UserType.Owner || x.UserType == UserType.Consultant ||
+                    var ComplanitFilterList = await _ComplanitFilterRepository.GetAll(x=>x.State==State.NotDeleted).ToListAsync();
+                     if(room.OfficeId != null && room.OfficeId > 0)
+                    {
+                        ComplanitFilterList = ComplanitFilterList.Where(c => c.OfficeId.Split(',', StringSplitOptions.None).Contains(room.OfficeId.ToString())).ToList();
 
-                    (x.UserType==UserType.Technician && ComplanitFilterList.Select(c=>c.usersIds).Contains(x.Id)) )
+                    }
+                    if (room.RegionId != null && room.RegionId > 0)
+                    {
+                        ComplanitFilterList = ComplanitFilterList.Where(c => c.RegionId.Split(',', StringSplitOptions.None).Contains(room.RegionId.ToString())).ToList();
 
-                      && x.State == State.NotDeleted).ToListAsync();
+                    }
+                    if (request.CategoryComplanitId != null && request.CategoryComplanitId > 0)
+                    {
+                        ComplanitFilterList = ComplanitFilterList.Where(c => c.CategoryComplanitId.Split(',', StringSplitOptions.None).Contains(request.CategoryComplanitId.ToString())).ToList();
+
+                    }
+
+                    var usersIds = ComplanitFilterList.Select(c => c.CreatedBy).ToList();
+
+                    var users = await _userManager.Users.Where(x => x.State == State.NotDeleted)
+
+                        .WhereIf(usersIds.Count>0, x=> (x.UserType == UserType.Owner || x.UserType == UserType.Consultant ||( x.UserType == UserType.Technician &&ComplanitFilterList.Select(f => f.CreatedBy).Contains(x.Id))))
+                        .WhereIf(usersIds.Count==0, x=> (x.UserType == UserType.Owner || x.UserType == UserType.Consultant ))
+                       
+                        .ToListAsync();
                     foreach (var item in users)
 
                     {
