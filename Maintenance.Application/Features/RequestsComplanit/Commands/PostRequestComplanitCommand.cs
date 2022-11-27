@@ -150,27 +150,34 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     
                     var ComplanitFilterListTemp = ComplanitFilterList;
 
-                    if (room.OfficeId != null && room.OfficeId > 0)
+                    if (room.OfficeId != null && room.OfficeId > 0 && room.RegionId != null && room.RegionId > 0)
                     {
-                        ComplanitFilterList = ComplanitFilterList.Where(c => c.OfficeId.Split(',', StringSplitOptions.None).Contains(room.OfficeId.ToString())).ToList();
+                        ComplanitFilterList = ComplanitFilterList.
+                            Where(
+                            c => c.OfficeId.Split(',', StringSplitOptions.None).Contains(room.OfficeId.ToString())
+                            ||
+                            c.RegionId.Split(',', StringSplitOptions.None).Contains(room.RegionId.ToString())
+                            ||
+                            c.CategoryComplanitId.Split(',', StringSplitOptions.None).Contains(request.CategoryComplanitId.ToString())
+                            ).ToList();
                         if (ComplanitFilterList.Count == 0)
                         {
                             ComplanitFilterList = ComplanitFilterListTemp;
                         }
                     }
-                    if (room.RegionId != null && room.RegionId > 0)
-                    {
-                        ComplanitFilterList = ComplanitFilterList.Where(c => c.RegionId.Split(',', StringSplitOptions.None).Contains(room.RegionId.ToString())).ToList();
-                        if (ComplanitFilterList.Count == 0)
-                        {
-                            ComplanitFilterList = ComplanitFilterListTemp;
-                        }
-                    }
-                    if (request.CategoryComplanitId != null && request.CategoryComplanitId > 0)
-                    {
-                        ComplanitFilterList = ComplanitFilterList.Where(c => c.CategoryComplanitId.Split(',', StringSplitOptions.None).Contains(request.CategoryComplanitId.ToString())).ToList();
+                    //if (room.RegionId != null && room.RegionId > 0)
+                    //{
+                    //    ComplanitFilterList = ComplanitFilterList.Where(c => c.RegionId.Split(',', StringSplitOptions.None).Contains(room.RegionId.ToString())).ToList();
+                    //    if (ComplanitFilterList.Count == 0)
+                    //    {
+                    //        ComplanitFilterList = ComplanitFilterListTemp;
+                    //    }
+                    //}
+                    //if (request.CategoryComplanitId != null && request.CategoryComplanitId > 0)
+                    //{
+                    //    ComplanitFilterList = ComplanitFilterList.Where(c => c.CategoryComplanitId.Split(',', StringSplitOptions.None).Contains(request.CategoryComplanitId.ToString())).ToList();
 
-                    }
+                    //}
 
                     var usersIds = ComplanitFilterList.Select(c => c.CreatedBy).ToList();
 
