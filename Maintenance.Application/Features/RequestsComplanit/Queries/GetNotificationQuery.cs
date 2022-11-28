@@ -91,11 +91,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
                             Subject = _auditService.UserLanguage=="ar"? c.SubjectAr:c.SubjectEn,
                             ComplanitStatus =(int) c.ComplanitHistory.ComplanitStatus,
                             IsRead= c.Read,
-                            
                             ComplanitHistoryId = c.ComplanitHistoryId,
-                         
                             RequestComplanitId = c.ComplanitHistory.RequestComplanitId,
-                             
+                            Code = c.ComplanitHistory.RequestComplanit.Code
 
                         })
                         .ToListAsync();

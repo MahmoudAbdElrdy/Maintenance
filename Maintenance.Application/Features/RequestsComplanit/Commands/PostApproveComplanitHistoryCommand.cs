@@ -65,8 +65,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
             {
                 try
                 {
-                   
-                     var complaintSataus =await _ComplanitHistoryRepository.GetAll(c => c.RequestComplanitId == request.RequestComplanitId &&c.ComplanitStatus!=Domain.Enums.ComplanitStatus.Submitted).ToListAsync();
+                    var usersx = await _userManager.Users.Where(x =>x.State == State.NotDeleted).ToListAsync();
+                    Console.WriteLine(usersx);
+                    var complaintSataus =await _ComplanitHistoryRepository.GetAll(c => c.RequestComplanitId == request.RequestComplanitId &&c.ComplanitStatus!=Domain.Enums.ComplanitStatus.Submitted).ToListAsync();
                    
                     var complaint = await _RequestComplanitRepository.GetFirstAsync(c => c.Id == request.RequestComplanitId);
 
