@@ -146,25 +146,80 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     //////////
                     ///
 
+                    //long? RegionId = null;
+                    //long? OfficeId = null;
+
+                    //if (room.RegionId != null && room.RegionId > 0)
+                    //{
+                    //    var RegionSearch = ComplanitFilterList.Any(c => c.RegionId.Split(',', StringSplitOptions.None).
+                    //    Contains(room.RegionId.ToString()));
+                    //    if (RegionSearch)
+                    //    {
+                    //        RegionId = room.RegionId;
+                    //    }
+
+                    //}
+                    //if (room.OfficeId != null && room.OfficeId > 0)
+                    //{
+                    //    var OfficeSearch = ComplanitFilterList.Any(c => c.OfficeId.Split(',', StringSplitOptions.None).
+                    //    Contains(room.OfficeId.ToString()));
+                    //    if (OfficeSearch)
+                    //    {
+                    //        OfficeId = room.OfficeId;
+                    //    }
+                    //}
+                    //if (request.CategoryComplanitId != null && request.CategoryComplanitId > 0)
+                    //{
+                    //    ComplanitFilterListTemp = ComplanitFilterListTemp.Where(c => c.CategoryComplanitId.Split(',', StringSplitOptions.None).Contains(request.CategoryComplanitId.ToString())).ToList();
+
+                    //}
+
+                    //ComplanitFilterListTemp = ComplanitFilterListTemp.Where(c => c.OfficeId.Split(',', StringSplitOptions.None).Contains(OfficeId.ToString())).ToList();
+
+
+                    //ComplanitFilterListTemp = ComplanitFilterListTemp.Where(c => c.RegionId.Split(',', StringSplitOptions.None).Contains(RegionId.ToString())).ToList();
+
                     var ComplanitFilterList = await _ComplanitFilterRepository.GetAll(x=>x.State==State.NotDeleted).ToListAsync();
                     
                     var ComplanitFilterListTemp = ComplanitFilterList;
 
-                    if (room.OfficeId != null && room.OfficeId > 0 && room.RegionId != null && room.RegionId > 0)
+
+                    long? RegionId = null;
+                    long? OfficeId = null;
+
+                    if (room.RegionId != null && room.RegionId > 0)
                     {
-                        ComplanitFilterList = ComplanitFilterList.
-                            Where(
-                            c => c.OfficeId.Split(',', StringSplitOptions.None).Contains(room.OfficeId.ToString())
-                            ||
-                            c.RegionId.Split(',', StringSplitOptions.None).Contains(room.RegionId.ToString())
-                            ||
-                            c.CategoryComplanitId.Split(',', StringSplitOptions.None).Contains(request.CategoryComplanitId.ToString())
-                            ).ToList();
-                        if (ComplanitFilterList.Count == 0)
+                        var RegionSearch = ComplanitFilterList.Any(c => c.RegionId.Split(',', StringSplitOptions.None).
+                        Contains(room.RegionId.ToString()));
+                        if (RegionSearch)
                         {
-                            ComplanitFilterList = ComplanitFilterListTemp;
+                            RegionId = room.RegionId;
+                        }
+
+                    }
+                    if (room.OfficeId != null && room.OfficeId > 0)
+                    {
+                        var OfficeSearch = ComplanitFilterList.Any(c => c.OfficeId.Split(',', StringSplitOptions.None).
+                        Contains(room.OfficeId.ToString()));
+                        if (OfficeSearch)
+                        {
+                            OfficeId = room.OfficeId;
                         }
                     }
+                    
+                        ComplanitFilterList = ComplanitFilterList.
+                            Where(
+                            c => c.OfficeId.Split(',', StringSplitOptions.None).Contains(OfficeId.ToString())
+                            &&
+                            c.RegionId.Split(',', StringSplitOptions.None).Contains(RegionId.ToString())
+                            &&
+                            c.CategoryComplanitId.Split(',', StringSplitOptions.None).Contains(request.CategoryComplanitId.ToString())
+                            ).ToList();
+                        //if (ComplanitFilterList.Count == 0)
+                        //{
+                        //    ComplanitFilterList = ComplanitFilterListTemp;
+                        //}
+                    
                     //if (room.RegionId != null && room.RegionId > 0)
                     //{
                     //    ComplanitFilterList = ComplanitFilterList.Where(c => c.RegionId.Split(',', StringSplitOptions.None).Contains(room.RegionId.ToString())).ToList();

@@ -56,6 +56,20 @@ namespace Maintenance.Controllers.V1
             }
             return await _mediator.Send(command);
         }
+        [HttpPost("ReadNotification")]
+
+        public async Task<ResponseDTO> ReadNotificationCommand([FromBody] ReadNotificationCommand command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return new ResponseDTO()
+                {
+                    StatusEnum = StatusEnum.FailedToSave,
+                    Message = "error"
+                };
+            }
+            return await _mediator.Send(command);
+        }
         [HttpPost("PostNotification")]
 
         public async Task PostNotificationAsync([FromBody] string Token)

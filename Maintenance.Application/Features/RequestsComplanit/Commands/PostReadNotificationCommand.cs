@@ -65,8 +65,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                   
                     if (
                        ( request.ComplanitStatus==Domain.Enums.ComplanitStatus.TechnicianSuspended ||
-                        request.ComplanitStatus==Domain.Enums.ComplanitStatus.TechnicianCanceled ||
-                        request.ComplanitStatus==Domain.Enums.ComplanitStatus.TechnicianClosed )
+                        request.ComplanitStatus==Domain.Enums.ComplanitStatus.TechnicianCanceled 
+                        )
                         && request.NotificationState == NotificationState.Approved)
                     {
 
@@ -126,8 +126,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     }
                     if (
                        (request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended ||
-                        request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled ||
-                        request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed)
+                        request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled 
+                      )
                        && request.NotificationState == NotificationState.Rejected)
                     {
                        // var itemHostory=await _ComplanitHistoryRepository.GetFirstAsync(c => c.Id == request.RequestComplanitId);

@@ -76,9 +76,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
                         .GetAllIncluding(c=>c.ComplanitHistory.AttachmentComplanitHistory).
                         Include(c=>c.ComplanitHistory.RequestComplanit)
            
-                        .Where(x=>x.To==request.UserId && x.Read == false)
+                        .Where(x=>x.To==request.UserId &&x.State==State.NotDeleted)
                         .WhereIf(user.UserType == UserType.Owner || user.UserType == UserType.Client, x=> x.Type== NotificationType.Message)
-                        .WhereIf(user.UserType == UserType.Consultant, x=> x.Type== NotificationType.Message  ||  x.Type == NotificationType.RequestComplanit)
+                        .WhereIf(user.UserType == UserType.Consultant, x=> (x.Type== NotificationType.Message ) || ( x.Type == NotificationType.RequestComplanit && x.Read==false))
                         .Select(c=>new
                         {
                             Title = c.ComplanitHistory.RequestComplanit.Code,
@@ -90,8 +90,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
                             Body=_auditService.UserLanguage=="ar"? c.BodyEn:c.BodyEn,
                             Subject = _auditService.UserLanguage=="ar"? c.SubjectAr:c.SubjectEn,
                             ComplanitStatus =(int) c.ComplanitHistory.ComplanitStatus,
-
-
+                            IsRead= c.Read,
+                            
                             ComplanitHistoryId = c.ComplanitHistoryId,
                          
                             RequestComplanitId = c.ComplanitHistory.RequestComplanitId,
