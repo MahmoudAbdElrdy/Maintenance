@@ -61,13 +61,14 @@ namespace Infrastructure
 
         public string UserName => _httpContext.HttpContext.User?.Identity?.Name ?? "Anonymous";
         public long UserId => long.Parse((_httpContext.HttpContext.User.Claims.Where(c => c.Type == "userLoginId").SingleOrDefault().Value)) ;
+        public string UserType => ((_httpContext.HttpContext.User.Claims.Where(c => c.Type == "UserType").SingleOrDefault().Value)) ;
         public string RequesterIp => _httpContext.HttpContext.Connection.RemoteIpAddress.ToString();
 
         //   public string UserLanguage { get { return GetUserLanguageAsync().Result; }  } 
         //  public string UserLanguage => _httpContext.HttpContext.User.Claims
         public string UserLanguage => _httpContext.HttpContext.Request.Headers["Language"].ToString()??"ar";
         public string WebToken => _httpContext.HttpContext.Request.Headers["WebToken"].ToString() ?? "Anonymous";
-
+        //public string UserType => _httpContext.HttpContext.Request.Headers["UserType"].ToString();
         //private async System.Threading.Tasks.Task<string> GetUserLanguageAsync()
         //{
         //    var userId = _httpContext.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);

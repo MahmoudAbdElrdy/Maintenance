@@ -21,5 +21,7 @@
   "TechnicianDone": "مكتمل",
   "TechnicianClosed": "مقفول",
   "AllComplanit": "اجمالي عدد البلاغات",
-  "ResponsesToComplaint": "يوجد بلاغ جديد"
+  "ResponsesToComplaint": "يوجد بلاغ جديد",
+  "ApprovedComplaint": " تم قبول البلاغ رقم ",
+  "RejectedComplaint": " تم رفض البلاغ رقم"
 }

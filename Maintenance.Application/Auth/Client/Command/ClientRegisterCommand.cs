@@ -24,8 +24,10 @@ namespace Maintenance.Application.Auth.Client.Command
         public string? PhoneNumber { get; set; }
         public string? IdentityNumber { get; set; }
         public string[]? Roles { get; set; }
-        public long RoomNumber { set; get; }
+  
         public string? Password { get; set; }
+        public long? OfficeId { get; set; }
+        public long? RegionId { get; set; }
     }
     class Handler : IRequestHandler<ClientRegisterCommand, ResponseDTO>
     {
@@ -51,33 +53,7 @@ namespace Maintenance.Application.Auth.Client.Command
             var user = new User();
             try
             {
-                long room =0;
-                //try
-                //{
-                //   room = await _room.GetRoomId(request.RoomNumber);
-                  
-                // if (room == 0)
-                
-                //    {
-                //        _responseDTO.Result = request.RoomNumber;
-
-                //        _responseDTO.StatusEnum = StatusEnum.Failed;
-
-                //        _responseDTO.Message = _stringLocalizer["RoomNotFound"].ToString();
-
-                //        return _responseDTO;
-                //    }
-                   
-                //}
-                //catch (ApiException ex)
-                //{
-                //    _responseDTO.Result = null;
-                   
-                //    _responseDTO.StatusEnum = StatusEnum.Failed;
-                  
-                //    _responseDTO.Message = _stringLocalizer["anErrorOccurredPleaseContactSystemAdministrator"];
-                //    return _responseDTO;
-                //}
+               
                 var checkExsit= await _userManager.Users.Where(x => x.IdentityNumber == request.IdentityNumber).FirstOrDefaultAsync();
                
                 if (checkExsit != null)
@@ -121,9 +97,12 @@ namespace Maintenance.Application.Auth.Client.Command
 
                     IdentityNumber = request.IdentityNumber,
 
-                    RoomId = request.RoomNumber,
 
                     UserType = request.UserType,
+                   
+                    OfficeId=request.OfficeId,
+                   
+                    RegionId=request.RegionId
                     
                 };
                 var result = await _userManager.CreateAsync(user, request.Password);

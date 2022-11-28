@@ -237,7 +237,7 @@
 
         //ConsultantApprovalAfterDone = 8,
     
-        TechnicianClosed = 9,//مقفول
+      //  TechnicianClosed = 9,//مقفول
 
     }
 }

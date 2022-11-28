@@ -27,7 +27,7 @@ namespace Maintenance.Domain.Interfaces
         public DbSet<AttachmentComplanitHistory> AttachmentComplanitHistory { get; set; }
         public DbSet<ComplanitHistory> ComplanitHistory { get; set; }
         public DbSet<CheckListRequest> CheckListRequest { get; set; }
-      
+       public DbSet<ComplanitFilter> ComplanitFilters { get; set; }
         public ChangeTracker ChangeTracker { get; }
 
         public int SaveChanges();

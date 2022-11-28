@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace Maintenance.Application.Features.RequestsComplanit.Commands
 {
@@ -64,19 +65,16 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
             {
                 try
                 {
-                   
-                     var complaintSataus =await _ComplanitHistoryRepository.GetAll(c => c.RequestComplanitId == request.RequestComplanitId).ToListAsync();
+                    var usersx = await _userManager.Users.Where(x =>x.State == State.NotDeleted).ToListAsync();
+                    Console.WriteLine(usersx);
+                    var complaintSataus =await _ComplanitHistoryRepository.GetAll(c => c.RequestComplanitId == request.RequestComplanitId &&c.ComplanitStatus!=Domain.Enums.ComplanitStatus.Submitted).ToListAsync();
                    
                     var complaint = await _RequestComplanitRepository.GetFirstAsync(c => c.Id == request.RequestComplanitId);
 
 
-                    //  if (complaintSataus.OrderBy(c => c.CreatedBy).Any(c => c.ComplanitStatus == request.ComplanitStatus))
                     if (complaintSataus!=null && complaintSataus.Count>0)
                     {
-                        //_response.StatusEnum = StatusEnum.Failed;
-                        //_response.Message = _localizationProvider["This Status Send Befor"];
-                        //_response.Result = null;
-                        //return _response;
+                      
                         var idsHistory = complaintSataus.Select(c => c.Id).ToList();
 
                         var NotficationList = await _NotificationRepository.GetAll(c => idsHistory.Contains((long)c.ComplanitHistoryId) && c.Read==false).ToListAsync();
@@ -87,7 +85,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             item.ReadDate = DateTime.Now;
                             item.NotificationState = NotificationState.New;
                             item.Read = true;
-
+                            item.State = State.Deleted;
                             _NotificationRepository.Update(item);
                             _NotificationRepository.Save();
 
@@ -95,22 +93,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                     }
 
-                    //if (
-                    //    complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled)
-                    //    ||
-                    //    complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended ) ||
-                    //    complaintSataus.Any(x => x.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed)
+                  
 
-
-                    //    )
-                    //{
-                    //    _response.StatusEnum = StatusEnum.Failed;
-                    //    _response.Message = _localizationProvider["ApproveOrRejectedStatus"];
-                    //    _response.Result = null;
-                    //    return _response;
-                    //}
-
-                    var complanitHistory = new ComplanitHistory()
+                        var complanitHistory = new ComplanitHistory()
                         {
                             CreatedBy = _auditService.UserId,
                             CreatedOn = DateTime.Now,
@@ -130,18 +115,15 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             });
                         }
 
-                 
-                   
-                    //Domain.Enums.ComplanitStatus.TechnicianAssigned
-                    //The owner and the consultant will recieve a notification contains
-                  
+                
 
                     if (  request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianAssigned  )
                     {
-                       
 
-                        var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner
-                  || x.UserType == UserType.Consultant && x.State == State.NotDeleted).ToListAsync();
+
+                        var users = await _userManager.Users.Where(x => (x.UserType == UserType.Owner
+                                         || x.UserType == UserType.Consultant) && x.State == State.NotDeleted).ToListAsync();
+
                         foreach (var item in users)
                       
                        {
@@ -187,17 +169,18 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         }
                       
                         complaint.UpdatedOn = DateTime.Now;
-
+                        complaint.UpdatedBy = _auditService.UserId;
                         complaint.ComplanitStatus = request.ComplanitStatus;
 
                         _RequestComplanitRepository.Update(complaint);
                     }
                     if (  request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended
                         || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled
-                        || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianClosed
+                       
                         )
                     {
-                        var users = await _userManager.Users.Where(x => x.UserType == UserType.Owner || x.UserType == UserType.Consultant && x.State == State.NotDeleted).ToListAsync();
+                        var users = await _userManager.Users.Where(x => (x.UserType == UserType.Owner
+                                   || x.UserType == UserType.Consultant) && x.State == State.NotDeleted).ToListAsync();
                         foreach (var item in users)
                         {
                             var notfication = new Notification()
@@ -228,7 +211,10 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                                 
                             };
+                            complaint.UpdatedOn = DateTime.Now;
+                            complaint.UpdatedBy = _auditService.UserId;
 
+                            _RequestComplanitRepository.Update(complaint);
                             notfication.ComplanitHistory = complanitHistory;
                             await _NotificationRepository.AddAsync(notfication);
                             var notificationDto = new NotificationDto()
@@ -248,7 +234,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         var clientUser = await _userManager.Users.Where(x => x.Id == complaint.CreatedBy).FirstOrDefaultAsync();
 
                         complaint.CodeSms= SendSMS.GenerateCode();
-                       
+                        complaint.UpdatedOn = DateTime.Now;
+                        complaint.UpdatedBy = _auditService.UserId;
                         await _ComplanitHistoryRepository.AddAsync(complanitHistory);
                       
                         _RequestComplanitRepository.Update(complaint);

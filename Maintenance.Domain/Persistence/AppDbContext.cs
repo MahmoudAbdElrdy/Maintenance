@@ -28,6 +28,7 @@ namespace Maintenance.Domain.Persistence
         public DbSet<AttachmentComplanitHistory> AttachmentComplanitHistory { get; set; }
         public DbSet<ComplanitHistory> ComplanitHistory { get; set; }
         public DbSet<CheckListRequest> CheckListRequest { get; set; }
+        public DbSet<ComplanitFilter> ComplanitFilters { get; set; }
         public AppDbContext(DbContextOptions options) : base(options)
         {
         }

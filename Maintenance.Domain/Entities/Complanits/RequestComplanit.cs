@@ -23,9 +23,9 @@ namespace Maintenance.Domain.Entities.Complanits
         public long? CreatedBy { set; get; }
         public virtual User Creator { get; set; }
         public string? Description { get; set; }
-        //public long? OfficeId { get; set; }
-       // public long? RegionId { get; set; } 
-        public string SerialNumber { get; set; } 
+        public long? OfficeId { get; set; }
+        public long? RegionId { get; set; } 
+        public string? SerialNumber { get; set; } 
         public string? Code { get; set; }  
         public string? CodeSms { get; set; }
         public ComplanitStatus? ComplanitStatus { get; set; }

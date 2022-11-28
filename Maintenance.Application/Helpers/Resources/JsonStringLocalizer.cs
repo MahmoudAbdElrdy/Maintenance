@@ -35,12 +35,17 @@ namespace dotnet_6_json_localization
         }
         public LocalizedString this[string name, params object[] arguments]
         {
+            //get
+            //{
+            //    var actualValue = this[name];
+            //    return !actualValue.ResourceNotFound
+            //        ? new LocalizedString(name, string.Format(actualValue.Value, arguments), false)
+            //        : actualValue;
+            //}
             get
             {
-                var actualValue = this[name];
-                return !actualValue.ResourceNotFound
-                    ? new LocalizedString(name, string.Format(actualValue.Value, arguments), false)
-                    : actualValue;
+                var value = GetStringLang(name, (string)arguments[0]);
+                return new LocalizedString(name, value ?? name, value == null);
             }
         }
 
@@ -125,7 +130,7 @@ namespace dotnet_6_json_localization
             var fullPath1 = Path.Combine("/Resources", lang + ".json");
             if (_env.IsDevelopment())
             {
-                relativeFilePath = $"D:\\Ahmed_Alaa\\Maintenance\\Maintenance\\Maintenance.Application\\Helpers\\Resources\\{Thread.CurrentThread.CurrentCulture.Name}.json";
+                relativeFilePath = $"D:\\Ahmed_Alaa\\Maintenance\\Maintenance\\Maintenance.Application\\Helpers\\Resources\\{lang}.json";
             }
             else
             {

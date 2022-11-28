@@ -4,6 +4,7 @@ using FCM.Net;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.Paginations;
+using Maintenance.Application.Helpers.QueryableExtensions;
 using Maintenance.Domain.Entities.Auth;
 using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Enums;
@@ -22,8 +23,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
             PaginatedInputModel = new PaginatedInputModel();
         }
         public long? UserId { get; set; }
-      //  public long? RequestComplanitId { get; set; } 
-     
+       
+
         public PaginatedInputModel PaginatedInputModel { get; set; }
         class GetAllNotificationUser : IRequestHandler<GetNotificationQuery, ResponseDTO>
         {
@@ -69,12 +70,15 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
                 try
                 {
 
-                 
+                    var user =await _userRepository.GetFirstAsync(c => c.Id == request.UserId);
+
                     var resx = await _NotficationRepository
                         .GetAllIncluding(c=>c.ComplanitHistory.AttachmentComplanitHistory).
                         Include(c=>c.ComplanitHistory.RequestComplanit)
            
-                        .Where(x=>x.To==request.UserId && x.Read == false && x.Type== NotificationType.RequestComplanit)
+                        .Where(x=>x.To==request.UserId &&x.State==State.NotDeleted)
+                        .WhereIf(user.UserType == UserType.Owner || user.UserType == UserType.Client, x=> x.Type== NotificationType.Message)
+                        .WhereIf(user.UserType == UserType.Consultant, x=> (x.Type== NotificationType.Message ) || ( x.Type == NotificationType.RequestComplanit && x.Read==false))
                         .Select(c=>new
                         {
                             Title = c.ComplanitHistory.RequestComplanit.Code,
@@ -86,12 +90,10 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
                             Body=_auditService.UserLanguage=="ar"? c.BodyEn:c.BodyEn,
                             Subject = _auditService.UserLanguage=="ar"? c.SubjectAr:c.SubjectEn,
                             ComplanitStatus =(int) c.ComplanitHistory.ComplanitStatus,
-
-
+                            IsRead= c.Read,
                             ComplanitHistoryId = c.ComplanitHistoryId,
-                         
                             RequestComplanitId = c.ComplanitHistory.RequestComplanitId,
-                             
+                            Code = c.ComplanitHistory.RequestComplanit.Code
 
                         })
                         .ToListAsync();
