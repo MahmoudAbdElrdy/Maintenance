@@ -81,19 +81,19 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
                         .WhereIf(user.UserType == UserType.Consultant, x=> (x.Type== NotificationType.Message ) || ( x.Type == NotificationType.RequestComplanit && x.Read==false))
                         .Select(c=>new
                         {
-                            Title = c.ComplanitHistory.RequestComplanit.Code,
-                            Description = c.ComplanitHistory.Description,
-                            AttachmentComplanitHistory = c.ComplanitHistory.AttachmentComplanitHistory.Select(m => m.Path),
+                            Title =c.ComplanitHistory!=null? c.ComplanitHistory.RequestComplanit.Code:"",
+                            Description = c.ComplanitHistory != null ? c.ComplanitHistory.Description:"",
+                            AttachmentComplanitHistory = c.ComplanitHistory.AttachmentComplanitHistory != null ? c.ComplanitHistory.AttachmentComplanitHistory.Select(m => m.Path):null,
                             NotificationType = c.Type,
                             NotificationId =c.Id,
                             NotificationState = (int) c.NotificationState,
                             Body=_auditService.UserLanguage=="ar"? c.BodyEn:c.BodyEn,
                             Subject = _auditService.UserLanguage=="ar"? c.SubjectAr:c.SubjectEn,
-                            ComplanitStatus =(int) c.ComplanitHistory.ComplanitStatus,
+                            ComplanitStatus = c.ComplanitHistory!=null?(int) c.ComplanitHistory.ComplanitStatus:0,
                             IsRead= c.Read,
-                            ComplanitHistoryId = c.ComplanitHistoryId,
-                            RequestComplanitId = c.ComplanitHistory.RequestComplanitId,
-                            Code = c.ComplanitHistory.RequestComplanit.Code
+                            ComplanitHistoryId = c.ComplanitHistory != null ? c.ComplanitHistoryId:null,
+                            RequestComplanitId = c.ComplanitHistory!=null? c.ComplanitHistory.RequestComplanitId:null,
+                            Code = c.ComplanitHistory != null ? c.ComplanitHistory.RequestComplanit.Code:null
 
                         })
                         .ToListAsync();
