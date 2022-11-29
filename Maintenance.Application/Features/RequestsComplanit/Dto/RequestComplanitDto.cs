@@ -12,6 +12,14 @@ namespace Maintenance.Application.Features.RequestsComplanit.Dto
 
 
     }
+    public class RequestComplanitListDto
+    {
+
+        public string? Description { get; set; }
+        public long[]? CheckListsRequest { get; set; }
+        public string[]? AttachmentsComplanit { get; set; }
+        public long? CategoryComplanitId { set; get; }
+    }
     public class FilterComplanitDto
     {
        public int PageNumber { get; set; } 

@@ -112,6 +112,20 @@ namespace Maintenance.Controllers.V1
                 };
             }
             return await _mediator.Send(command);
+        }  
+        [HttpPost("PostListRequestComplanitCommand")]
+
+        public async Task<ResponseDTO> PostListRequestComplanitCommand([FromBody] PostListRequestComplanitCommand command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return new ResponseDTO()
+                {
+                    StatusEnum = StatusEnum.FailedToSave,
+                    Message = "error"
+                };
+            }
+            return await _mediator.Send(command);
         } 
         [HttpPost("PostComplanitHistory")]
 
