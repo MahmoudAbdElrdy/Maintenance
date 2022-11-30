@@ -41,6 +41,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
             private readonly IGRepository<ComplanitHistory> _ComplanitHistoryRepository;
             private readonly IGRepository<ComplanitFilter> _ComplanitFilterRepository;
+            private readonly IGRepository<CheckListRequest> _CheckListRequestRepository;
+            private readonly IGRepository<AttachmentComplanit> _AttachmentComplanitRepository;
+            
 
             private readonly ILogger<PostRequestComplanitCommand> _logger;
             private readonly IStringLocalizer<string> _Localizer; 
@@ -54,7 +57,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                 IGRepository<RequestComplanit> RequestComplanitRepository,
                 ILogger<PostRequestComplanitCommand> logger,
-                IAuditService auditService,
+                IGRepository<CheckListRequest> checkListRequestRepository,
+                IGRepository<AttachmentComplanit> attachmentComplanitRepository,
+            IAuditService auditService,
                 IMapper mapper,
                 IGRepository<ComplanitHistory> ComplanitHistoryRepository,
                 IStringLocalizer<string> Localizer,
@@ -64,6 +69,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 IGRepository<ComplanitFilter> ComplanitFilterRepository
             )
             {
+                _AttachmentComplanitRepository = attachmentComplanitRepository;
+                _CheckListRequestRepository = checkListRequestRepository;
                 _RequestComplanitRepository = RequestComplanitRepository;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _auditService = auditService;
@@ -168,21 +175,28 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     foreach (var item in request.AttachmentsComplanit)
                         {
                         var itemPath = Upload.SaveFile(item, RequestComplanit.Id);
-                        RequestComplanit.AttachmentsComplanit.Add(new AttachmentComplanit()
+                        _AttachmentComplanitRepository.Add(new AttachmentComplanit()
                             {
                                 Path = itemPath,
                                 CreatedBy = foundedUsers.Id,
                                 CreatedOn = DateTime.Now,
+                                RequestComplanitId = RequestComplanit.Id,
+                                State= Domain.Enums.State.NotDeleted,
+                                Name = item.Name
                             });
+                        _AttachmentComplanitRepository.Save();
                         }
                        foreach (var item in request.CheckListsRequest)
                         {
-                            RequestComplanit.CheckListRequests.Add(new CheckListRequest()
+                            _CheckListRequestRepository.Add(new CheckListRequest()
                             {
                                 CheckListComplanitId = item,
                                 CreatedBy = foundedUsers.Id,
                                 CreatedOn = DateTime.Now,
+                                State = Domain.Enums.State.NotDeleted,
+                                RequestComplanitId= RequestComplanit.Id,
                             });
+                        _CheckListRequestRepository.Save();
                         }
                      
 
@@ -192,9 +206,11 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         CreatedOn = DateTime.Now,
                         State = Domain.Enums.State.NotDeleted,
                         ComplanitStatus = Domain.Enums.ComplanitStatus.Submitted,
+                        RequestComplanitId = RequestComplanit.Id
 
                        };
-
+                    _ComplanitHistoryRepository.Add(ComplanitHistory);
+                    _ComplanitHistoryRepository.Save();
                 
                     var ComplanitFilterList = await _ComplanitFilterRepository.GetAll(x=>x.State==State.NotDeleted).ToListAsync();
                     
