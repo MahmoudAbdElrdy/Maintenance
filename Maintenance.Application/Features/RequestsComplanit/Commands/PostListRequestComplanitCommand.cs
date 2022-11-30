@@ -115,9 +115,10 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             State = Domain.Enums.State.NotDeleted,
                             Description = requestObj.Description,
                             SerialNumber = request.SerialNumber,
-                            Code = GenerateCodeComplaint()
-                            // o=room.OfficeId,
-                            // RegionId = room.RegionId
+                            Code = GenerateCodeComplaint(),
+                            ComplanitStatus = ComplanitStatus.Submitted,
+                            OfficeId = room.OfficeId,
+                            RegionId = room.RegionId
                         };
 
                         foreach (var item in requestObj.AttachmentsComplanit)
