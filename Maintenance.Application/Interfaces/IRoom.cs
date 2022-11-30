@@ -18,8 +18,9 @@ namespace Maintenance.Application.Interfaces
     }
     public class OfficeDto
     {
-        public string Name { get; set; }
-        public string Code { get; set; } 
+        public string NameAr { get; set; }
+        public string NameEn { get; set; }
+        public string Code { get; set; }
     }
     public class RoomsDTO
     {

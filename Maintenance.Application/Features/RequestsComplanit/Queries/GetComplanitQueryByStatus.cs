@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Xml.Linq;
 
 namespace Maintenance.Application.Features.Categories.Queries
 {
@@ -139,17 +140,20 @@ namespace Maintenance.Application.Features.Categories.Queries
                         var officeName = offices.Where(y => y.Code == item.SerialNumber.Substring(0, 3)).FirstOrDefault();
                         if (officeName != null)
                         {
-                            item.location = item.SerialNumber.Length > 0 ? "مركز : " + officeName.Name
+                            var name = _auditService.UserLanguage == "ar" ? officeName.NameAr : officeName.NameEn;
+                          
+                            item.location = item.SerialNumber.Length > 0 ? "مركز : " + name
                                                                               + " منطقة : " + item.SerialNumber.Substring(3, 2)
                                                                               + " بركس : " + item.SerialNumber.Substring(5, 2)
-                                                                              + " غرفة : " + item.SerialNumber.Substring(7, 0) : "";
+                                                                              + " غرفة : " + item.SerialNumber.Substring(6, 2) : "";
                         }
                         else
                         {
-                            item.location = item.SerialNumber.Length > 0 ? "مركز : " + " "
-                                                                             + " منطقة : " + item.SerialNumber.Substring(3, 2)
-                                                                             + " بركس : " + item.SerialNumber.Substring(5, 2)
-                                                                             + " غرفة : " + item.SerialNumber.Substring(7, 0) : "";
+
+                            item.location = item.SerialNumber.Length > 0 ? "مركز : " + ""
+                                                                                + " منطقة : " + item.SerialNumber.Substring(3, 2)
+                                                                                + " بركس : " + item.SerialNumber.Substring(5, 2)
+                                                                                + " غرفة : " + item.SerialNumber.Substring(6, 2) : "";
 
                         }
 
