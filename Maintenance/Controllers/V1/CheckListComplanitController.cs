@@ -49,6 +49,16 @@ namespace Maintenance.Controllers.V1
                 CategoryComplanitId = categoryComplanitId
             });
         }
+        
+        [HttpGet("GetChecksByCategoryId/{categoryComplanitId}")]
+        [AllowAnonymous]
+        public async Task<ResponseDTO> GetAllByCategory(long categoryComplanitId)
+        {
+            return await _mediator.Send(new GetCheckListsComplanitByCategoryIdQuery()
+            {
+                CategoryComplanitId = categoryComplanitId
+            });
+        }
 
         [HttpGet]
         [Route("{id}")]

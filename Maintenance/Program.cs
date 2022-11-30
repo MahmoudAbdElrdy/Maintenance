@@ -43,7 +43,25 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
+
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowCors",
+        builder =>
+        {
+            builder
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .WithOrigins("http://broadcastmp-001-site3.itempurl.com/")
+                        .SetIsOriginAllowed((host) => true)
+                        .AllowCredentials();
+        });
+});
+
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllersWithViews();
 AppSettings appSettings = new AppSettings();
