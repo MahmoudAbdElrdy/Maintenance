@@ -1,5 +1,7 @@
 ﻿using Maintenance.Application.Auth.Client.Command;
 using Maintenance.Application.Auth.UpdateToken.Command;
+using Maintenance.Application.Features.Users.Queries.CheckCodeApplyJob;
+using Maintenance.Application.Features.Users.Queries.GenerateCodeApplyJob;
 using Maintenance.Application.Helper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -31,6 +33,25 @@ namespace Maintenance.Controllers.V1
         public async Task<ResponseDTO> UpdateToken([FromBody] UpdateTokenCommand command) 
         {
             return await _mediator.Send(command);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("GenerateCodeApplyJob")]
+        public async Task<ResponseDTO> GenerateCodeApplyJob([FromBody] GetGenerateCodeApplyJobQuery command)
+        {
+            return await _mediator.Send(command);
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("CheckCodeApplyJob")]
+        public async Task<ResponseDTO> CheckCodeApplyJob(string nationalId, string code)
+        {
+            return await _mediator.Send(new CheckCodeApplyJobQuery()
+            {
+                NationalId = nationalId,
+                Code = code
+            });
         }
     }
 }

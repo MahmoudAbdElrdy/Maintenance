@@ -29,7 +29,7 @@ namespace Maintenance.Domain.Entities.Complanits
         public string? Code { get; set; }  
         public string? CodeSms { get; set; }
         public ComplanitStatus? ComplanitStatus { get; set; }
-      
+        
         public virtual ICollection<CheckListRequest> CheckListRequests { get; set; } = new List<CheckListRequest>();
         public virtual ICollection<AttachmentComplanit> AttachmentsComplanit { get; set; } = new List<AttachmentComplanit>();
         public virtual ICollection<ComplanitHistory> ComplanitHistory { get; set; } = new List<ComplanitHistory>();

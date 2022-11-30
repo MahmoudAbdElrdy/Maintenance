@@ -3,7 +3,6 @@ using Maintenance.Application.Features.Categories.Queries;
 using Maintenance.Application.Helper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Maintenance.Controllers.V1
@@ -34,6 +33,13 @@ namespace Maintenance.Controllers.V1
                     PageSize = pageSize
                 },
             });
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("GetAllCategories")]
+        public async Task<ResponseDTO> GetAll()
+        {
+            return await _mediator.Send(new GetAllCategoriesComplanitsQuery(){});
         }
 
         [HttpGet]

@@ -111,56 +111,66 @@ namespace Maintenance.Application.Helpers.SendSms
     }
     public class SMSService
     {
-        public int SendMessageUnifonic(string message, string toNumber)
+
+        public async Task<int> SendMessageUnifonic(string message, string toNumber)
         {
             try
             {
-                var AppSid = "Yqb3hxK3pPgJnorip1ZFc6e8mDbeKV";
+                var AppSid = "kBYwlwBLTnQDMx1DjJFOk40Y8uvjMg";
                 var SenderID = "Camelclub";
                 var Body = message;
                 var Recipient = toNumber;
 
-                var url1 = "https://api.unifonic.com/rest/Messages/Send";
-                using (var client = new HttpClient())
+                var url1 = $"https://api.goinfinito.me/unified/v2/send?clientid=camelclube8p4oqiimngqr0n&clientpassword=b0ob1q431yb3k7u42i1wsssyv8yb7z53&to={Recipient}&from=CamelClub&text={message}";
+
+                using var client = new HttpClient();
+                var content = await client.GetAsync(url1);
+
+                if (content.IsSuccessStatusCode)
                 {
-                    var sbsRequest = new
-                    {
-                        AppSid = AppSid,
-                        Recipient = Recipient,
-                        Body = Body,
-                        SenderID = SenderID,
-                    };
-                    //var apiResult = jss.Deserialize<dynamic>(jsonMessage);
-
-                    //var jsonRequest = jss.SerializeObject(sbsRequest);
-                    var jsonRequest = JsonConvert.SerializeObject(sbsRequest);
-                    var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
-                    var httpResponse = client.PostAsync(url1, content);
-
-
-                    if (httpResponse.Result.IsSuccessStatusCode)
-                    {
-                        using (var requestResponse = httpResponse.Result.Content)
-                        {
-                            var responseStr = requestResponse.ReadAsStringAsync().Result;
-                            if (!string.IsNullOrWhiteSpace(responseStr))
-                            {
-                                //string s = responseStr.Replace(@"\", string.Empty);
-                                //string final = s.Trim().Substring(1, (s.Length) - 2);
-                                var sendingResult = JsonConvert.DeserializeObject<UnifonicResult>(responseStr);
-
-                                if (sendingResult.data.Status == "Sent" || sendingResult.data.Status == "Queued" || sendingResult.data.Status == "Scheduled")
-                                {
-                                    return 0;
-                                }
-                                else
-                                {
-                                    return 10;
-                                }
-                            }
-                        }
-                    }
+                    return 1;
                 }
+
+                //using (var client = new HttpClient())
+                //{
+                //    var sbsRequest = new
+                //    {
+                //        AppSid = AppSid,
+                //        Recipient = Recipient,
+                //        Body = Body,
+                //        SenderID = SenderID,
+                //    };
+                //    //var apiResult = jss.Deserialize<dynamic>(jsonMessage);
+
+                //    //var jsonRequest = jss.SerializeObject(sbsRequest);
+                //    var jsonRequest = JsonConvert.SerializeObject(sbsRequest);
+                //    var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+                //    var httpResponse = client.PostAsync(url1, content);
+
+
+                //    if (httpResponse.Result.IsSuccessStatusCode)
+                //    {
+                //        using (var requestResponse = httpResponse.Result.Content)
+                //        {
+                //            var responseStr = requestResponse.ReadAsStringAsync().Result;
+                //            if (!string.IsNullOrWhiteSpace(responseStr))
+                //            {
+                //                //string s = responseStr.Replace(@"\", string.Empty);
+                //                //string final = s.Trim().Substring(1, (s.Length) - 2);
+                //                var sendingResult = JsonConvert.DeserializeObject<UnifonicResult>(responseStr);
+
+                //                if (sendingResult.data.Status == "Sent" || sendingResult.data.Status == "Queued" || sendingResult.data.Status == "Scheduled")
+                //                {
+                //                    return 0;
+                //                }
+                //                else
+                //                {
+                //                    return 10;
+                //                }
+                //            }
+                //        }
+                //    }
+                //}
 
                 return 10;
             }
@@ -171,7 +181,6 @@ namespace Maintenance.Application.Helpers.SendSms
                 return -1;
             }
         }
-
     }
     public class UnifonicResult
     {

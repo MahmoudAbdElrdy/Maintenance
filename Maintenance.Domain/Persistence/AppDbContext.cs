@@ -15,9 +15,9 @@ namespace Maintenance.Domain.Persistence
       UserRole,IdentityUserLogin<long>, IdentityRoleClaim<long>, IdentityUserToken<long>>, IDatabaseContext
 
     {
-
        
         public DbSet<Permission> Permissions { get; set; }
+        public DbSet<TemporaryUser> TemporaryUsers { get; set; }
         public DbSet<PermissionRole> PermissionRoles { get; set; }
         public DbSet<CategoryComplanit> CategoriesComplanit { get; set; }
         public DbSet<CheckListComplanit> CheckListsComplanit { get; set; }

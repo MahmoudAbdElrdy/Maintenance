@@ -171,5 +171,16 @@ namespace Maintenance.Controllers.V1
             }
             return await _mediator.Send(command);
         }
+
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("addRequest")]
+        public async Task<ResponseDTO> AddRequestForm([FromForm] PostRequestComplanitWebCommand command)
+        {
+            command.AttachmentsComplanit = Request.Form.Files;
+            return await _mediator.Send(command);
+        }
+
     }
 }
