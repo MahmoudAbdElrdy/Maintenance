@@ -49,6 +49,7 @@ namespace Maintenance.Application.Features.Users.Queries.GenerateCodeApplyJob
                 {
                     temporaryUser.Code =GenerateCode();
                     temporaryUser.PhoneNumber = request.MobileNumber;
+                    temporaryUser.NationalId = Convert.ToInt32(request.NationalId);
 
                     var serviceSMs = new SMSService();
                     var resultSms =await serviceSMs.SendMessageUnifonic("رمز التحقق من الجوال : " + temporaryUser.Code, temporaryUser.PhoneNumber);
