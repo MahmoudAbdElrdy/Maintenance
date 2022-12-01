@@ -62,7 +62,8 @@ namespace Maintenance.Application.Features.Account.Queries.CheckLogin
 
                 userLogin.Code = GenerateCode();
 
-                var result = SendSMS.SendMessageUnifonic("رمز الدخول الخاص للنظام : " + userLogin.Code, userLogin.PhoneNumber);
+                var smsService = new SMSService();
+                var result = await smsService.SendMessageUnifonic("رمز الدخول الخاص للنظام : " + userLogin.Code, userLogin.PhoneNumber);
                 if (result == -1)
                 {
                     _response.Message = "حدث خطا فى ارسال الكود";
