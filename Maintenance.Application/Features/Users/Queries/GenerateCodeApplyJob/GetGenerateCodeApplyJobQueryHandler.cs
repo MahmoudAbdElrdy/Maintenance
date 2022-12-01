@@ -25,11 +25,11 @@ namespace Maintenance.Application.Features.Users.Queries.GenerateCodeApplyJob
         {
             try
             {
-                var temporaryUser =  _temporaryUserRepository.GetAll(x => x.NationalId.ToString() == request.NationalId).FirstOrDefault();
+                var temporaryUser =  _temporaryUserRepository.GetAll(x => x.NationalId == request.NationalId).FirstOrDefault();
                 if (temporaryUser == null)
                 {
                     var temp = new TemporaryUser();
-                    temp.NationalId = long.Parse(request.NationalId);
+                    temp.NationalId = request.NationalId;
                     temp.Code = GenerateCode();
                     temp.PhoneNumber = request.MobileNumber;
 
@@ -49,7 +49,7 @@ namespace Maintenance.Application.Features.Users.Queries.GenerateCodeApplyJob
                 {
                     temporaryUser.Code =GenerateCode();
                     temporaryUser.PhoneNumber = request.MobileNumber;
-                    temporaryUser.NationalId = Convert.ToInt32(request.NationalId);
+                    temporaryUser.NationalId = (request.NationalId);
 
                     var serviceSMs = new SMSService();
                     var resultSms =await serviceSMs.SendMessageUnifonic("رمز التحقق من الجوال : " + temporaryUser.Code, temporaryUser.PhoneNumber);
