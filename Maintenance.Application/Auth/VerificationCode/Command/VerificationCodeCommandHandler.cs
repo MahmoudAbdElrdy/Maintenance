@@ -65,19 +65,41 @@ namespace Maintenance.Application.Auth.VerificationCode.Command
 
                     return _response;
                 }
-                var userCode = await _userManager.Users.Where(x => x.Id == request.UserId && x.Code == request.Code).FirstOrDefaultAsync();
-
-                if (userCode == null)
+                var userCode = new User();
+                if ((bool)request.IsRegister)
                 {
-                    _response.StatusEnum = StatusEnum.Failed;
+                    userCode = await _userManager.Users.Where(x => x.Id == request.UserId && x.Code == request.Code).FirstOrDefaultAsync();
+                    if (userCode == null)
+                    {
+                        _response.StatusEnum = StatusEnum.Failed;
+
+                        _response.Message = _localizationProvider["codeNotCorrect"];
+
+                        return _response;
+                    }
+
+                    userCode.IsVerifyCode = true;
                   
-                    _response.Message = _localizationProvider["codeNotCorrect"];
-
-                    return _response;
+                    await _userManager.UpdateAsync(userCode);
                 }
-            
+                else
+                {
+                    userCode = await _userManager.Users.Where(x => x.Id == request.UserId && x.Code == request.Code && x.IsVerifyCode == true).FirstOrDefaultAsync();
+                 
+                    if (userCode == null)
+                    {
+                        _response.StatusEnum = StatusEnum.Failed;
 
-                var authorizedUserDto = new AuthorizedUserDTO
+                        _response.Message = _localizationProvider["NotVerficiation"];
+
+                        return _response;
+                    }
+                }
+
+              
+               
+
+                    var authorizedUserDto = new AuthorizedUserDTO
                 {
                     User = _mapper.Map<UserDto>(userLogin),
                     Token = GenerateJSONWebToken(userLogin),

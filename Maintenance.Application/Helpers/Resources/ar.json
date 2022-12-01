@@ -23,5 +23,7 @@
   "AllComplanit": "اجمالي عدد البلاغات",
   "ResponsesToComplaint": "يوجد بلاغ جديد",
   "ApprovedComplaint": " تم قبول البلاغ رقم ",
-  "RejectedComplaint": " تم رفض البلاغ رقم"
+  "RejectedComplaint": " تم رفض البلاغ رقم",
+  "NotVerficiation": "غير مفعل",
+  "SendCodeToTechnician": "الرجاء اعطاء الكود للفني"
 }

@@ -23,5 +23,7 @@
   "AllComplanit": "All  Complanits",
   "ResponsesToComplaint": "There is a new complaint",
   "ApprovedComplaint": "Approved Complaint Number",
-  "RejectedComplaint": "Rejected Complaint Number"
+  "RejectedComplaint": "Rejected Complaint Number",
+  "NotVerficiation": "Not Verficiation",
+  "SendCodeToTechnician": "SendCodeToTechnician"
 }

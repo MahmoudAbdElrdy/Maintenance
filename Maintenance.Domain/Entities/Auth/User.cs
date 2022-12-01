@@ -26,6 +26,7 @@ namespace AuthDomain.Entities.Auth
         public string? Token { get; set; }
         public string? WebToken { get; set; }
         public virtual ICollection<RequestComplanit> RequestComplanits { get; set; } = new List<RequestComplanit>();
+        public bool? IsVerifyCode { get; set; } 
 
     }
 
