@@ -30,7 +30,7 @@ namespace Maintenance.Application.Features.Users.Queries.CheckCodeApplyJob
                 if (temporaryUser == null)
                 {
 
-                    _response.Message = "الرقم القومي غير موجود";
+                    _response.Message = "الرقم الهوية غير موجود";
                     _response.StatusEnum = StatusEnum.Failed;
                     return _response;
                 }
