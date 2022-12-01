@@ -83,6 +83,18 @@ namespace Maintenance.Application.Features.Account.Commands.Login
                     _response.StatusEnum = StatusEnum.Failed;
                     return _response;
                 }
+                var personalVefiy = await _userManager.Users.Where(x => x.IdentityNumber == request.IdentityNumber && x.IsVerifyCode == true).FirstOrDefaultAsync();
+               
+                if (personalVefiy == null)
+                {
+
+
+                    _response.Message = _localizationProvider["NotVerficiation"];
+
+                    _response.StatusEnum = StatusEnum.Failed;
+                    return _response;
+                }
+
                 var userHasValidPassword = await _userManager.CheckPasswordAsync(personalUser, request.Password);
 
                 if (!userHasValidPassword)
@@ -95,22 +107,23 @@ namespace Maintenance.Application.Features.Account.Commands.Login
 
                 }
                 personalUser.Code = SendSMS.GenerateCode();
-                //var meass = _localizationProvider.Localize("Mobileverificationcode", _auditService.UserLanguage);
+             
+                var meass = _localizationProvider["Mobileverificationcode"];
 
-                //var res = SendSMS.SendMessageUnifonic(meass + " : " + personalUser.Code, personalUser.PhoneNumber);
-                //if (res == -1)
-                //{
+                var res = SendSMS.SendMessageUnifonic(meass + " : " + personalUser.Code, personalUser.PhoneNumber);
+                if (res == -1)
+                {
 
-                //    if (await _userManager.FindByNameAsync(personalUser.UserName) != null)
-                //    {
-                //        await _userManager.DeleteAsync(personalUser);
-                //    }
+                    //if (await _userManager.FindByNameAsync(personalUser.UserName) != null)
+                    //{
+                    //    await _userManager.DeleteAsync(personalUser);
+                    //}
 
-                //    _response.Message = _localizationProvider.Localize("ProplemSendCode", _auditService.UserLanguage);
+                    _response.Message = _localizationProvider["ProplemSendCode"];
 
-                //    _response.StatusEnum = StatusEnum.Failed;
-                //    return _response;
-                //}
+                    _response.StatusEnum = StatusEnum.Failed;
+                    return _response;
+                }
                 await _userManager.UpdateAsync(personalUser);
                 var authorizedUserDto = new AuthorizedUserDTO
                 {
