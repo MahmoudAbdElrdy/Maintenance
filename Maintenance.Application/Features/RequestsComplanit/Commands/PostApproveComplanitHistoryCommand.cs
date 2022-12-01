@@ -238,7 +238,9 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                       
                         _RequestComplanitRepository.Update(complaint);
                         var meass = _localizationProvider["SendCodeToTechnician"];
-                        var res = SendSMS.SendMessageUnifonic(meass + " : " + complaint.CodeSms, clientUser.PhoneNumber);
+
+                        var smsService = new SMSService();
+                        var res = await smsService.SendMessageUnifonic(meass + " : " + complaint.CodeSms, clientUser.PhoneNumber);
                         if (res == -1)
                         {
 

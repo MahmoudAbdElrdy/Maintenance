@@ -110,7 +110,8 @@ namespace Maintenance.Application.Features.Account.Commands.Login
              
                 var meass = _localizationProvider["Mobileverificationcode"];
 
-                var res = SendSMS.SendMessageUnifonic(meass + " : " + personalUser.Code, personalUser.PhoneNumber);
+                var smsService = new SMSService();
+                var res =await smsService.SendMessageUnifonic(meass + " : " + personalUser.Code, personalUser.PhoneNumber);
                 if (res == -1)
                 {
 
