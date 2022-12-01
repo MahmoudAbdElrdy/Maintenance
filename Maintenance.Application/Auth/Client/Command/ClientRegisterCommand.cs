@@ -129,12 +129,16 @@ namespace Maintenance.Application.Auth.Client.Command
                 }
                
                 user.Code = SendSMS.GenerateCode();
+
+                var smsService = new SMSService();
+
+                
                 //  var meass= _localizationProvider.Localize("Mobileverificationcode", _auditService.UserLanguage);
                var meass = _stringLocalizer["Mobileverificationcode"];
-               var res = SendSMS.SendMessageUnifonic(meass + " : " + user.Code, user.PhoneNumber);
+               var res =await smsService.SendMessageUnifonic(meass + " : " + user.Code, user.PhoneNumber);
                 if (res == -1)
                 {
-
+                        
                     if (await _userManager.FindByNameAsync(user.UserName) != null)
                     {
                         await _userManager.DeleteAsync(user);

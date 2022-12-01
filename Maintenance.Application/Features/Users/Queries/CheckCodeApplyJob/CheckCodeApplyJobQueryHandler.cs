@@ -25,7 +25,7 @@ namespace Maintenance.Application.Features.Users.Queries.CheckCodeApplyJob
         {
             try
             {
-                var temporaryUser =  _temporaryUserRepository.GetAll(x => x.NationalId.ToString() == request.NationalId).FirstOrDefault();
+                var temporaryUser =  _temporaryUserRepository.GetAll(x => x.NationalId == request.NationalId).FirstOrDefault();
                 
                 if (temporaryUser == null)
                 {

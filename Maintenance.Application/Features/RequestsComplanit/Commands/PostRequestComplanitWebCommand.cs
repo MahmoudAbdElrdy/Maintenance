@@ -45,7 +45,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
             private readonly IGRepository<AttachmentComplanit> _AttachmentComplanitRepository;
             
 
-            private readonly ILogger<PostRequestComplanitCommand> _logger;
+            private readonly ILogger<PostRequestComplanit> _logger;
             private readonly IStringLocalizer<string> _Localizer; 
             private readonly ResponseDTO _response;
             public readonly IAuditService _auditService;
@@ -66,13 +66,14 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 IRoom room,
                 IGRepository<Notification> NotificationRepository,
                 UserManager<User> userManager,
-                IGRepository<ComplanitFilter> ComplanitFilterRepository
+                IGRepository<ComplanitFilter> ComplanitFilterRepository,ILoggerFactory logFactory
             )
             {
+                _logger = logFactory.CreateLogger<PostRequestComplanit>();
+
                 _AttachmentComplanitRepository = attachmentComplanitRepository;
                 _CheckListRequestRepository = checkListRequestRepository;
                 _RequestComplanitRepository = RequestComplanitRepository;
-                _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _auditService = auditService;
                 _response = new ResponseDTO();
                 _mapper = mapper;
@@ -111,18 +112,21 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                         _response.StatusEnum = StatusEnum.Failed;
 
+                        _logger.LogError(ex, ex.Message, ex != null && ex.InnerException != null ? ex.InnerException.Message : "");
                         _response.Message = _Localizer["anErrorOccurredPleaseContactSystemAdministrator"];
                         return _response;
                     }
 
 
 
-                    var foundedUsers = await _userManager.Users.Where(x => x.IdentityNumber == request.ApplicantNationalId).FirstOrDefaultAsync();
+                    var foundedUsers = await _userManager.Users.Where(x => x.IdentityNumber == request.ApplicantNationalId 
+                    || x.PhoneNumber == request.ApplicantPhoneNumber).FirstOrDefaultAsync();
                     if (foundedUsers != null)
                     {
                         foundedUsers.IdentityNumber = request.ApplicantNationalId;
                         foundedUsers.PhoneNumber = request.ApplicantPhoneNumber;
                         foundedUsers.FullName = request.ApplicantName;
+                        _userManager.UpdateAsync(foundedUsers);
                     }
                     else
                     {
@@ -148,7 +152,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         {
                             _response.Result = null;
                             _response.StatusEnum = StatusEnum.Exception;
-                            _response.Message = "anErrorOccurredPleaseContactSystemAdministrator";
+                            _logger.LogError(result.Errors.FirstOrDefault().Description);
+                            _response.Message = result.Errors.FirstOrDefault().Description;
                             //   _responseDTO.Message = _localizationProvider.Localize("anErrorOccurredPleaseContactSystemAdministrator", _auditService.UserLanguage);
                             return _response;
                         }
@@ -298,7 +303,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                       
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = _Localizer["AddedSuccessfully"] ;
+                    _response.Message = "AddedSuccessfully" ;
                     _response.Result = null;
                     return _response;
                 }
@@ -320,7 +325,6 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     _response.Result = null;
                     _response.Message = ex != null && ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                     _logger.LogError(ex, ex.Message, ex != null && ex.InnerException != null ? ex.InnerException.Message : "");
-
                     return _response;
                 }
             }

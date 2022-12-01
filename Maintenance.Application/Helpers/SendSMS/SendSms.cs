@@ -130,48 +130,6 @@ namespace Maintenance.Application.Helpers.SendSms
                 {
                     return 1;
                 }
-
-                //using (var client = new HttpClient())
-                //{
-                //    var sbsRequest = new
-                //    {
-                //        AppSid = AppSid,
-                //        Recipient = Recipient,
-                //        Body = Body,
-                //        SenderID = SenderID,
-                //    };
-                //    //var apiResult = jss.Deserialize<dynamic>(jsonMessage);
-
-                //    //var jsonRequest = jss.SerializeObject(sbsRequest);
-                //    var jsonRequest = JsonConvert.SerializeObject(sbsRequest);
-                //    var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
-                //    var httpResponse = client.PostAsync(url1, content);
-
-
-                //    if (httpResponse.Result.IsSuccessStatusCode)
-                //    {
-                //        using (var requestResponse = httpResponse.Result.Content)
-                //        {
-                //            var responseStr = requestResponse.ReadAsStringAsync().Result;
-                //            if (!string.IsNullOrWhiteSpace(responseStr))
-                //            {
-                //                //string s = responseStr.Replace(@"\", string.Empty);
-                //                //string final = s.Trim().Substring(1, (s.Length) - 2);
-                //                var sendingResult = JsonConvert.DeserializeObject<UnifonicResult>(responseStr);
-
-                //                if (sendingResult.data.Status == "Sent" || sendingResult.data.Status == "Queued" || sendingResult.data.Status == "Scheduled")
-                //                {
-                //                    return 0;
-                //                }
-                //                else
-                //                {
-                //                    return 10;
-                //                }
-                //            }
-                //        }
-                //    }
-                //}
-
                 return 10;
             }
             catch (Exception ex)
