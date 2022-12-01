@@ -79,6 +79,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
                         .Where(x=>x.To==request.UserId &&x.State==State.NotDeleted)
                         .WhereIf(user.UserType == UserType.Owner || user.UserType == UserType.Client, x=> x.Type== NotificationType.Message)
                         .WhereIf(user.UserType == UserType.Consultant, x=> (x.Type== NotificationType.Message ) || ( x.Type == NotificationType.RequestComplanit && x.Read==false))
+                        .OrderByDescending(c=>c.CreatedOn)
                         .Select(c=>new
                         {
                             Title =c.ComplanitHistory!=null? c.ComplanitHistory.RequestComplanit.Code:"",
@@ -93,8 +94,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Queries
                             IsRead= c.Read,
                             ComplanitHistoryId = c.ComplanitHistory != null ? c.ComplanitHistoryId:null,
                             RequestComplanitId = c.ComplanitHistory!=null? c.ComplanitHistory.RequestComplanitId:null,
-                            Code = c.ComplanitHistory != null ? c.ComplanitHistory.RequestComplanit.Code:null
-
+                            Code = c.ComplanitHistory != null ? c.ComplanitHistory.RequestComplanit.Code:null,
+                            CreatedOn = c.CreatedOn
                         })
                         .ToListAsync();
 

@@ -29,23 +29,7 @@ namespace Maintenance.Controllers.V1
         }
 
 
-        [HttpGet]
-        public async Task<ResponseDTO> GetAll(int pageNumber, int pageSize, long CategoryId, long RegionId, long OfficeId)
-        {
-            return await _mediator.Send(new GetAllComplanitQueryByRegionId()
-            {
-                PaginatedInputModel = new Application.Helpers.Paginations.PaginatedInputModel()
-                {
-                    PageNumber = pageNumber,
-                    PageSize = pageSize,
-                    
-                },
-                CategoryId= CategoryId,
-                RegionId= RegionId,
-                OfficeId=OfficeId
-            });
-        }
-
+      
         [HttpPost("GetComplanitsByStatus")]
         public async Task<ResponseDTO> GetComplanitsByStatus([FromBody] FilterComplanitDto filterComplanit)
         {

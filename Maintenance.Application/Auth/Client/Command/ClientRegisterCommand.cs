@@ -54,7 +54,7 @@ namespace Maintenance.Application.Auth.Client.Command
             try
             {
                
-                var checkExsit= await _userManager.Users.Where(x => x.IdentityNumber == request.IdentityNumber).FirstOrDefaultAsync();
+                var checkExsit= await _userManager.Users.Where(x => x.IdentityNumber == request.IdentityNumber && x.IsVerifyCode == true).FirstOrDefaultAsync();
                
                 if (checkExsit != null)
                 {
@@ -65,29 +65,35 @@ namespace Maintenance.Application.Auth.Client.Command
                     _responseDTO.Message = _stringLocalizer["NationalNumberFoundBefore"];
                     return _responseDTO;
                 }
-                var phoneExsit = await _userManager.Users.Where(x => x.PhoneNumber == request.PhoneNumber).FirstOrDefaultAsync();
-               
-                if (phoneExsit != null)
+                var checkExsitRegister = await _userManager.Users.Where(x => x.IdentityNumber == request.IdentityNumber &&( x.IsVerifyCode == false || x.IsVerifyCode == null)).FirstOrDefaultAsync();
+                if (checkExsitRegister != null)
                 {
-                    _responseDTO.Result = null;
-                    _responseDTO.StatusEnum = StatusEnum.Failed;
-                    _responseDTO.Message = _stringLocalizer["PhoneNumberFoundBefore"];
-                  //  _responseDTO.Message = _localizationProvider.Localize("PhoneNumberFoundBefore", _auditService.UserLanguage);
-
-                    return _responseDTO;
+                    await _userManager.DeleteAsync(checkExsitRegister);
+                  
                 }
+                //var phoneExsit = await _userManager.Users.Where(x => x.PhoneNumber == request.PhoneNumber).FirstOrDefaultAsync();
 
-                 user = new User()
+                //if (phoneExsit != null)
+                //{
+                //    _responseDTO.Result = null;
+                //    _responseDTO.StatusEnum = StatusEnum.Failed;
+                //    _responseDTO.Message = _stringLocalizer["PhoneNumberFoundBefore"];
+                //  //  _responseDTO.Message = _localizationProvider.Localize("PhoneNumberFoundBefore", _auditService.UserLanguage);
+
+                //    return _responseDTO;
+                //}
+
+                user = new User()
                 {
                     UserName = request.IdentityNumber,
 
-                    Email = request.PhoneNumber+"@Gamil.com",
-                  
+                    Email = request.PhoneNumber + "@Gamil.com",
+
                     FullName = request.FullName,
 
                     PhoneNumber = request.PhoneNumber,
 
-                    NormalizedEmail = request.PhoneNumber+ "@Gamil.com",
+                    NormalizedEmail = request.PhoneNumber + "@Gamil.com",
 
                     NormalizedUserName = request.IdentityNumber,
 
@@ -99,11 +105,12 @@ namespace Maintenance.Application.Auth.Client.Command
 
 
                     UserType = request.UserType,
-                   
-                    OfficeId=request.OfficeId,
-                   
-                    RegionId=request.RegionId
-                    
+
+                    OfficeId = request.OfficeId,
+
+                    RegionId = request.RegionId,
+                    IsVerifyCode = false
+
                 };
                 var result = await _userManager.CreateAsync(user, request.Password);
                 if (!result.Succeeded)
@@ -124,20 +131,20 @@ namespace Maintenance.Application.Auth.Client.Command
                 user.Code = SendSMS.GenerateCode();
                 //  var meass= _localizationProvider.Localize("Mobileverificationcode", _auditService.UserLanguage);
                var meass = _stringLocalizer["Mobileverificationcode"];
-                //var res = SendSMS.SendMessageUnifonic(meass +" : " + user.Code, user.PhoneNumber);
-                //if (res == -1)
-                //{
+               var res = SendSMS.SendMessageUnifonic(meass + " : " + user.Code, user.PhoneNumber);
+                if (res == -1)
+                {
 
-                //    if (await _userManager.FindByNameAsync(user.UserName) != null)
-                //    {
-                //        await _userManager.DeleteAsync(user);
-                //    }
+                    if (await _userManager.FindByNameAsync(user.UserName) != null)
+                    {
+                        await _userManager.DeleteAsync(user);
+                    }
 
-                //    _responseDTO.Message = _localizationProvider.Localize("ProplemSendCode", _auditService.UserLanguage);
+                    _responseDTO.Message = _stringLocalizer["ProplemSendCode"];
 
-                //    _responseDTO.StatusEnum = StatusEnum.Failed;
-                //    return _responseDTO;
-                //}
+                    _responseDTO.StatusEnum = StatusEnum.Failed;
+                    return _responseDTO;
+                }
                 await _userManager.UpdateAsync(user);
             }
             catch (Exception ex)

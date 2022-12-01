@@ -229,8 +229,6 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianDone)
                     {
                         
-                        
-                       
                         var clientUser = await _userManager.Users.Where(x => x.Id == complaint.CreatedBy).FirstOrDefaultAsync();
 
                         complaint.CodeSms= SendSMS.GenerateCode();
@@ -239,14 +237,17 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         await _ComplanitHistoryRepository.AddAsync(complanitHistory);
                       
                         _RequestComplanitRepository.Update(complaint);
-                        //var res = SendSMS.SendMessageUnifonic(meass + " : " + clientUser.Code, clientUser.PhoneNumber);
-                        //if (res == -1)
-                        //{
-                        //    _response.Message = _localizationProvider["ProplemSendCode"];
+                        var meass = _localizationProvider["SendCodeToTechnician"];
+                        var res = SendSMS.SendMessageUnifonic(meass + " : " + complaint.CodeSms, clientUser.PhoneNumber);
+                        if (res == -1)
+                        {
 
-                        //    _response.StatusEnum = StatusEnum.Failed;
-                        //    return _response;
-                        //}
+
+                            _response.Message = _localizationProvider["ProplemSendCode"];
+
+                            _response.StatusEnum = StatusEnum.Failed;
+                            return _response;
+                        }
                         _ComplanitHistoryRepository.Save();
 
                         _response.StatusEnum = StatusEnum.SavedSuccessfully;

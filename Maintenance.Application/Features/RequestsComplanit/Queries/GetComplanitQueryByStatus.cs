@@ -98,8 +98,8 @@ namespace Maintenance.Application.Features.Categories.Queries
                      .WhereIf(request.OfficeId != null && request.OfficeId.Count > 0, x => request.OfficeId.Contains((long)x.OfficeId))
                      .WhereIf(request.CategoryId != null && request.CategoryId.Count > 0, x => x.CheckListRequests.Select(c => c.CheckListComplanit).Any(c => CheckListComplanitIds.Contains((long)c.CategoryComplanitId)))
                      .WhereIf(request.ComplanitStatus != null && request.ComplanitStatus > 0,c=>c.ComplanitStatus==request.ComplanitStatus)
-
-                         .Select(x => new ComplanitDto
+                      .OrderByDescending(c => c.CreatedOn)
+                      .Select(x => new ComplanitDto
                          {
                              Code = x.Code,
                              SerialNumber = x.SerialNumber,
