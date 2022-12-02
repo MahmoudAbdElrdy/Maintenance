@@ -91,7 +91,8 @@ namespace Maintenance.Application.Features.Categories.Queries
                        
                      .Include(x => x.Creator)
                      .Include(x => x.AttachmentsComplanit)
-                     .Include(x => x.ComplanitHistory)
+                     .Include(x => x.ComplanitHistory).
+                     ThenInclude(c=>c.Creator)
                      .Include(x => x.CheckListRequests).
                       ThenInclude(x => x.CheckListComplanit.CategoryComplanit)
                      .Protected(x => x.State == State.NotDeleted)
@@ -102,13 +103,14 @@ namespace Maintenance.Application.Features.Categories.Queries
                       && (
                      request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled||
                      request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianDone||
-                     request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended
-                  
+                     request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended||
+                     request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianAssigned
+
                      ),
                      c => c.ComplanitStatus
                      == request.ComplanitStatus)
                      .WhereIf(request.ComplanitStatus != null 
-                     &&( request.ComplanitStatus==Domain.Enums.ComplanitStatus.Submitted || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianAssigned),
+                     &&( request.ComplanitStatus==Domain.Enums.ComplanitStatus.Submitted ),
                      c =>c.ComplanitStatus
                      == Domain.Enums.ComplanitStatus.Submitted 
                      || c.ComplanitStatus
@@ -143,16 +145,33 @@ namespace Maintenance.Application.Features.Categories.Queries
                                  Description = _auditService.UserLanguage == "ar" ? s.CheckListComplanit.DescriptionAr : s.CheckListComplanit.DescriptionEn,
 
                              }
-                                 ),
+                             ),
                              UserDto=new UserDto()
                              {
                                  FullName = x.Creator!=null? x.Creator.FullName:"",
                                  IdentityNumber = x.Creator!=null? x.Creator.IdentityNumber : "",
                                  PhoneNumber = x.Creator!=null? x.Creator.PhoneNumber : "",
                                  UserId =x.Creator!=null? x.Creator.Id : null,
-                             }
+                             },
+                             TechnicianDescription = x.ComplanitHistory != null ? 
+                             x.ComplanitHistory.OrderByDescending(x => x.CreatedOn).
+                             FirstOrDefault(
 
-                         }).ToListAsync();
+                                 (c=>c.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended||
+                                c.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled||
+                                 c.ComplanitStatus ==Domain.Enums.ComplanitStatus.TechnicianDone
+                                 &&c.ComplanitStatus==x.ComplanitStatus
+                                 )
+                             ).Description:"",
+                             TechnicianName = x.ComplanitHistory !=null ? x.ComplanitHistory.
+                             OrderByDescending(x => x.CreatedOn).FirstOrDefault(
+                                 c => c.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended ||
+                                c.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled ||
+                                 c.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianDone
+                                   && c.ComplanitStatus == x.ComplanitStatus
+                                 ).Creator.FullName:""
+
+                      }).ToListAsync();
 
                     foreach (var item in res2)
                     {
@@ -181,6 +200,13 @@ namespace Maintenance.Application.Features.Categories.Queries
 
 
                         }
+                        if (item.ComplanitStatus ==(int) Domain.Enums.ComplanitStatus.TechnicianAssigned ||
+                                item.ComplanitStatus == (int)Domain.Enums.ComplanitStatus.Submitted )
+                        {
+                            item.TechnicianDescription = "";
+                            item.TechnicianName = "";
+                        }
+
 
                     }
                     if (_auditService.UserType == UserType.Technician.ToString()){

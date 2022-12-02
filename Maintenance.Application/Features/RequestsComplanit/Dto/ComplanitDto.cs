@@ -23,6 +23,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Dto
         public string SerialNumber { get; set; }
         public DateTime? CreatedOn { get; set; }
         public UserDto? UserDto { get; set; } 
+        public string TechnicianName { get; set; }
+        public string TechnicianDescription { get; set; }
     }
     public class UserDto 
     {
