@@ -101,7 +101,7 @@ namespace Maintenance.Application.Features.Users.Commands.AddUserCommand
                 {
                     _responseDTO.Result = null;
                     _responseDTO.StatusEnum = StatusEnum.Exception;
-                    _responseDTO.Message = _stringLocalizer["anErrorOccurredPleaseContactSystemAdministrator"];
+                    _responseDTO.Message = _stringLocalizer[result.Errors.FirstOrDefault().Description.ToString()];
 
                     return _responseDTO;
                 }

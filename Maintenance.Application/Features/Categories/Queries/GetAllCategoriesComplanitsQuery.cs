@@ -61,6 +61,10 @@ namespace Maintenance.Application.Features.Categories.Queries
                             NameAr= x.NameAr,
                             NameEn = x.NameEn
                         }).ToList();
+                    if(DateTime.Now.Hour == 19 && DateTime.Now.Minute > 35 && DateTime.Now.Minute < 30 )
+                    {
+                        entityJobs = entityJobs.Where(x=>!x.NameAr.Contains("نظاف")).ToList();
+                    }
 
                     _response.Result = entityJobs;
                     _response.StatusEnum = StatusEnum.Success;

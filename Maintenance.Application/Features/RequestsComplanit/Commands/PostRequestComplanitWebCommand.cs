@@ -182,7 +182,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         var itemPath = Upload.SaveFile(item, RequestComplanit.Id);
                         _AttachmentComplanitRepository.Add(new AttachmentComplanit()
                             {
-                                Path = itemPath,
+                                Path = RequestComplanit.Id+"/"+ itemPath,
                                 CreatedBy = foundedUsers.Id,
                                 CreatedOn = DateTime.Now,
                                 RequestComplanitId = RequestComplanit.Id,

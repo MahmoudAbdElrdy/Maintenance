@@ -16,7 +16,10 @@ namespace Maintenance.Application.Features.RequestsComplanit.Dto
         public List<CheckListComplanitDto> CheckListComplanit { get; set; }
         public string[] AttachmentsComplanit { get; set; }
         public int? ComplanitStatus { get; set; }
-        public string location { get; set; } 
+        public string OfficeName { get; set; } 
+        public string RegionName { get; set; } 
+        public string CarvanNumber { get; set; } 
+        public string RoomNumber { get; set; } 
         public string SerialNumber { get; set; }
         public DateTime? CreatedOn { get; set; }
         public UserDto? UserDto { get; set; } 

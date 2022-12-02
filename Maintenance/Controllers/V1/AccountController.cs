@@ -1,5 +1,6 @@
 ﻿using Maintenance.Application.Auth.VerificationCode.Command;
 using Maintenance.Application.Features.Account.Commands.Login;
+using Maintenance.Application.Features.Account.Queries.CheckLogin;
 using Maintenance.Application.Helper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -25,6 +26,14 @@ namespace Maintenance.Controllers.V1
         [HttpPost]
         [Route("Login")]
         public async Task<ResponseDTO> Login([FromBody] LoginQuery command)
+        {
+            return await _mediator.Send(command);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("CheckLogin")]
+        public async Task<ResponseDTO> CheckLogin([FromBody] CheckLoginQuery command)
         {
             return await _mediator.Send(command);
         }
