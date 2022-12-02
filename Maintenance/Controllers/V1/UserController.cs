@@ -1,8 +1,10 @@
 ﻿using Maintenance.Application.Auth.Client.Command;
 using Maintenance.Application.Auth.UpdateToken.Command;
 using Maintenance.Application.Features.Users.Commands.AddUserCommand;
+using Maintenance.Application.Features.Users.Commands.DeleteUserCommand;
 using Maintenance.Application.Features.Users.Queries.CheckCodeApplyJob;
 using Maintenance.Application.Features.Users.Queries.GenerateCodeApplyJob;
+using Maintenance.Application.Features.Users.Queries.GetUserByIdQuery;
 using Maintenance.Application.Features.Users.Queries.GetUsersQuery;
 using Maintenance.Application.Helper;
 using Maintenance.Domain.Enums;
@@ -60,11 +62,22 @@ namespace Maintenance.Controllers.V1
         [HttpGet]
         [AllowAnonymous]
         [Route("GetUsers")]
-        public async Task<ResponseDTO> GetUsers(UserType userType)
+        public async Task<ResponseDTO> GetUsers(UserType userType,string Name)
         {
             return await _mediator.Send(new GetUsersQuery()
             {
+                Name = Name,
                 UserType = userType
+            });
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("GetUserById/{Id}")]
+        public async Task<ResponseDTO> GetUserById(long Id)
+        {
+            return await _mediator.Send(new GetUserByIdQuery()
+            {
+                Id = Id
             });
         }
 
@@ -76,6 +89,15 @@ namespace Maintenance.Controllers.V1
             return await _mediator.Send(command);
         }
 
-        
+
+        [HttpDelete]
+        [AllowAnonymous]
+        [Route("deleteUser/{id}")]
+        public async Task<ResponseDTO> DeleteUser(long id)
+        {
+            return await _mediator.Send(new DeleteUserCommand() { Id = id } );
+        }
+
+
     }
 }
