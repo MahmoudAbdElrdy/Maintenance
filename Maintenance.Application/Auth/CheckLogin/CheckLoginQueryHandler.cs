@@ -2,6 +2,7 @@
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
 using Maintenance.Application.Helpers.SendSms;
+using Maintenance.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +32,8 @@ namespace Maintenance.Application.Features.Account.Queries.CheckLogin
         {
             try
             {
-                var personalUser = await _userManager.Users.Where(x => x.IdentityNumber == request.IdentityNumber).FirstOrDefaultAsync();
+                var personalUser = await _userManager.Users.Where(x => x.IdentityNumber == request.IdentityNumber
+                && (x.UserType==UserType.Owner || x.UserType == UserType.Consultant)).FirstOrDefaultAsync();
                 if (personalUser == null)
                 {
 

@@ -57,7 +57,7 @@ namespace Maintenance.Application.Features.Users.Queries.GetUsersQuery
 
             _responseDTO.Message = "usersRetrievedSuccessfully";
 
-            _responseDTO.StatusEnum = StatusEnum.SavedSuccessfully;
+            _responseDTO.StatusEnum = StatusEnum.Success;
 
             return _responseDTO;
 

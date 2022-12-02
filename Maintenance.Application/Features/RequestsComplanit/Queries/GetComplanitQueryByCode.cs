@@ -123,19 +123,23 @@ namespace Maintenance.Application.Features.Categories.Queries
                         if (officeName != null)
                         {
                             var name = _auditService.UserLanguage == "ar" ? officeName.NameAr : officeName.NameEn;
-
-                            item.location = item.SerialNumber.Length > 0 ? "مركز : " + name
-                                                                              + " منطقة : " + item.SerialNumber.Substring(3, 2)
-                                                                              + " بركس : " + item.SerialNumber.Substring(5, 2)
-                                                                              + " غرفة : " + item.SerialNumber.Substring(6, 2) : "";
+                            if (item.SerialNumber.Length > 0)
+                            {
+                                item.OfficeName = name;
+                                item.RegionName = item.SerialNumber.Substring(3, 2);
+                                item.CarvanNumber = item.SerialNumber.Substring(5, 2);
+                                item.RoomNumber = item.SerialNumber.Substring(7, 1);
+                            }
                         }
                         else
                         {
 
-                            item.location = item.SerialNumber.Length > 0 ? "مركز : " + ""
-                                                                                + " منطقة : " + item.SerialNumber.Substring(3, 2)
-                                                                                + " بركس : " + item.SerialNumber.Substring(5, 2)
-                                                                                + " غرفة : " + item.SerialNumber.Substring(6, 2) : "";
+                            if (item.SerialNumber.Length > 0)
+                            {
+                                item.RegionName = item.SerialNumber.Substring(3, 2);
+                                item.CarvanNumber = item.SerialNumber.Substring(5, 2);
+                                item.RoomNumber = item.SerialNumber.Substring(7, 1);
+                            }
 
                         }
 

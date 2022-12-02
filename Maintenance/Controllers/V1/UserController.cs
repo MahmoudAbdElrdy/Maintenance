@@ -70,26 +70,9 @@ namespace Maintenance.Controllers.V1
 
         [HttpPost]
         [AllowAnonymous]
-        [Route("AddTechnican")]
-        public async Task<ResponseDTO> GenerateCodeApplyJob([FromBody] AddUserCommand command)
+        [Route("AddUser")]
+        public async Task<ResponseDTO> AddUser([FromBody] AddUserCommand command)
         {
-            command.UserType = Domain.Enums.UserType.Technician;
-            return await _mediator.Send(command);
-        }
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("AddOwner")]
-        public async Task<ResponseDTO> AddOwner([FromBody] AddUserCommand command)
-        {
-            command.UserType = Domain.Enums.UserType.Owner;
-            return await _mediator.Send(command);
-        }
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("AddConsultant")]
-        public async Task<ResponseDTO> AddConsultant([FromBody] AddUserCommand command)
-        {
-            command.UserType = Domain.Enums.UserType.Consultant;
             return await _mediator.Send(command);
         }
 

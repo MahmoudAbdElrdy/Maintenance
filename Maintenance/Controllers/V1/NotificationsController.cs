@@ -71,17 +71,17 @@ namespace Maintenance.Controllers.V1
             return await _mediator.Send(command);
         }
         [HttpPost("PostNotification")]
-
+        [AllowAnonymous]
         public async Task PostNotificationAsync([FromBody] string Token)
         {
-            var tokken = "fwAE0Y95QLOkhl2Gw0Hf9s:APA91bFKjvu9X-dlIETVAdW90MvXMiX9SHFV3Wzso1CG7IaRpJ8OZlei-ksx6hQ2yOvqJJfpeVUm5IXz-uABbrmYbkRZtjYs8fposHVkv4vyZoMYoM6F2XS3b76kDrypTmT5Gak2R7sy";
+            var tokken = "dCLEhqEiQ26fYT1S6l6GLA:APA91bE81TrIoumpW9ZhE9tx6OmWL5qgmpVlenFqnFODlBX-vDmFLlOQkJLUWrGOIM4jGD2ADHi30Jn8VFdLhJQiA8FraP3QOTQJ5jfq15jVvK6KgAxqzsLjsgbjTGg3QzAUjVmyj99v";
             var notfication = new NotificationDto()
             {
                 Body = "AAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHMMMMMMMMMMMMMMMMMMMMMMMMEEEEEEEEEEEEEEDDDDDDd",
                 Title="SSSSSSSSSSHHHHHHHHHHHHHRRRRRRRRRR",
                 
             };
-            await NotificationHelper.FCMNotify(notfication, Token);
+            await NotificationHelper.FCMNotify(notfication, tokken);
         }
     }
 }
