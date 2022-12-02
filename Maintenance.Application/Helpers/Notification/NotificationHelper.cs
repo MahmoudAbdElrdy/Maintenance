@@ -109,7 +109,7 @@ namespace Maintenance.Application.Helpers.Notifications
                         {
                             Title = notification.Title,
                             Body = notification.Body,
-                            Sound = "sound.caf",
+                            //Sound = "sound.caf",
 
                         },
                         Priority = FCMNet.Priority.High,

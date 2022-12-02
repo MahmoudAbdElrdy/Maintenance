@@ -1,13 +1,7 @@
 ﻿using AutoMapper;
 using Maintenance.Domain.Entities.Complanits;
 using Maintenance.Domain.Enums;
-using Maintenance.Domain.Interfaces;
 using Maintenance.Domain.Mapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Maintenance.Application.Features.RequestsComplanit.Dto
 {
@@ -25,6 +19,15 @@ namespace Maintenance.Application.Features.RequestsComplanit.Dto
         public string location { get; set; } 
         public string SerialNumber { get; set; }
         public DateTime? CreatedOn { get; set; }
+        public UserDto? UserDto { get; set; } 
+    }
+    public class UserDto 
+    {
+        public long? UserId { get; set; }
+        public string? FullName { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? IdentityNumber { get; set; }
+
     }
     public class CheckListComplanitDto:IHaveCustomMapping
     {

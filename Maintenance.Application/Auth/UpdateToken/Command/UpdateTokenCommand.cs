@@ -78,6 +78,7 @@ namespace Maintenance.Application.Auth.UpdateToken.Command
                         User = _mapper.Map<UserDto>(userLogin),
                         Token = null,
                     };
+                    userLogin.UpdatedOn = DateTime.Now;
                     await _userManager.UpdateAsync(userLogin);
                     _response.StatusEnum = StatusEnum.Success;
 
