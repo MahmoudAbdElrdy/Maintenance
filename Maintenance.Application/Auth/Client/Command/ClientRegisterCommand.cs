@@ -109,6 +109,7 @@ namespace Maintenance.Application.Auth.Client.Command
                     OfficeId = request.OfficeId,
 
                     RegionId = request.RegionId,
+
                     IsVerifyCode = false
 
                 };
