@@ -2,6 +2,7 @@
 using AutoMapper;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
+using Maintenance.Application.Helpers.CodeRandom;
 using Maintenance.Application.Helpers.Notifications;
 using Maintenance.Application.Helpers.QueryableExtensions;
 using Maintenance.Application.Helpers.UploadHelper;
@@ -158,6 +159,12 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         }
 
                     }
+
+
+                    var lastComplanit = await _RequestComplanitRepository.GetAll().OrderByDescending(c => c.Id).FirstOrDefaultAsync();
+
+                    var lastCode = GenerateRandomNumber.GetSerial(Convert.ToInt64(lastComplanit != null ? lastComplanit.Code : "0"));
+
                     var RequestComplanit = new RequestComplanit()
                     {
                         CreatedBy = foundedUsers.Id,
@@ -165,7 +172,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         State = Domain.Enums.State.NotDeleted,
                         Description = request.Description,
                         SerialNumber = request.SerialNumber,
-                        Code = GenerateCodeComplaint(),
+                        Code = lastCode,
                         ComplanitStatus = ComplanitStatus.Submitted,
                         OfficeId = room.OfficeId,
                         RegionId = room.RegionId
