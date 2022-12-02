@@ -98,7 +98,21 @@ namespace Maintenance.Application.Features.Categories.Queries
                      .WhereIf(request.RegionId != null && request.RegionId.Count > 0, x => request.RegionId.Contains((long)x.RegionId))
                      .WhereIf(request.OfficeId != null && request.OfficeId.Count > 0, x => request.OfficeId.Contains((long)x.OfficeId))
                      .WhereIf(request.CategoryId != null && request.CategoryId.Count > 0, x => x.CheckListRequests.Select(c => c.CheckListComplanit).Any(c => CheckListComplanitIds.Contains((long)c.CategoryComplanitId)))
-                     .WhereIf(request.ComplanitStatus != null && request.ComplanitStatus > 0,c=>c.ComplanitStatus==request.ComplanitStatus)
+                     .WhereIf(request.ComplanitStatus != null
+                      && (
+                     request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled||
+                     request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianDone||
+                     request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended
+                  
+                     ),
+                     c => c.ComplanitStatus
+                     == request.ComplanitStatus)
+                     .WhereIf(request.ComplanitStatus != null 
+                     &&( request.ComplanitStatus==Domain.Enums.ComplanitStatus.Submitted || request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianAssigned),
+                     c =>c.ComplanitStatus
+                     == Domain.Enums.ComplanitStatus.Submitted 
+                     || c.ComplanitStatus
+                     == Domain.Enums.ComplanitStatus.TechnicianAssigned)
                       .OrderByDescending(c => c.CreatedOn)
                       .Select(x => new ComplanitDto
                          {

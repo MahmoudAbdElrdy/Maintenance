@@ -3,6 +3,7 @@ using AutoMapper;
 using Maintenance.Application.Features.RequestsComplanit.Dto;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
+using Maintenance.Application.Helpers.CodeRandom;
 using Maintenance.Application.Helpers.Notifications;
 using Maintenance.Application.Helpers.QueryableExtensions;
 using Maintenance.Application.Interfaces;
@@ -105,9 +106,15 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         return _response;
                     }
                     var RequestComplanitList = new List<RequestComplanit>();
+                    var lastComplanit = await _RequestComplanitRepository.GetAll().OrderByDescending(c => c.Id).FirstOrDefaultAsync();
+
+                    var lastCode = GenerateRandomNumber.GetSerial(Convert.ToInt64(lastComplanit != null ? lastComplanit.Code : "0"));
+  
 
                     foreach (var requestObj in request.requests)
                     {
+                        
+
                         var RequestComplanit = new RequestComplanit()
                         {
                             CreatedBy = _auditService.UserId,
@@ -115,12 +122,12 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             State = Domain.Enums.State.NotDeleted,
                             Description = requestObj.Description,
                             SerialNumber = request.SerialNumber,
-                            Code = GenerateCodeComplaint(),
+                            Code = lastCode,
                             ComplanitStatus = ComplanitStatus.Submitted,
                             OfficeId = room.OfficeId,
                             RegionId = room.RegionId
                         };
-
+                      
                         foreach (var item in requestObj.AttachmentsComplanit)
                         {
                             RequestComplanit.AttachmentsComplanit.Add(new AttachmentComplanit()
@@ -250,6 +257,8 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         RequestComplanit.ComplanitHistory.Add(ComplanitHistory);
 
                         await _RequestComplanitRepository.AddAsync(RequestComplanit);
+                        // code = RequestComplanit.Code;
+                        lastCode = GenerateRandomNumber.GetSerial(Convert.ToInt64(lastComplanit != null ? RequestComplanit.Code : "0"));
                     }
 
                   

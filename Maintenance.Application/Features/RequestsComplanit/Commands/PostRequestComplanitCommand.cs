@@ -1,7 +1,9 @@
 ﻿using AuthDomain.Entities.Auth;
 using AutoMapper;
+using MailKit.Search;
 using Maintenance.Application.GenericRepo;
 using Maintenance.Application.Helper;
+using Maintenance.Application.Helpers.CodeRandom;
 using Maintenance.Application.Helpers.Notifications;
 using Maintenance.Application.Helpers.QueryableExtensions;
 using Maintenance.Application.Interfaces;
@@ -27,6 +29,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
         public string? SerialNumber { get; set; }
 
         public long? CategoryComplanitId { set; get; }
+        public long[]? CategoryComplanit { get; set; }
         //    public UserType? User { get; set; }
         class PostRequestComplanit : IRequestHandler<PostRequestComplanitCommand, ResponseDTO>
         {
@@ -100,15 +103,19 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         _response.Message = _Localizer["anErrorOccurredPleaseContactSystemAdministrator"];
                         return _response;
                     }
-   
-                        var RequestComplanit = new RequestComplanit()
+                    var lastComplanit =await  _RequestComplanitRepository.GetAll().OrderByDescending(c=>c.Id).FirstOrDefaultAsync();
+                  
+                    var lastCode = GenerateRandomNumber.GetSerial(Convert.ToInt64(lastComplanit!=null?lastComplanit.Code:"0"));
+
+                    var RequestComplanit = new RequestComplanit()
                         {
                             CreatedBy = _auditService.UserId,
                             CreatedOn = DateTime.Now,
                             State = Domain.Enums.State.NotDeleted,
                             Description = request.Description,
                             SerialNumber = request.SerialNumber,
-                            Code= GenerateCodeComplaint(),
+                           // Code= GenerateCodeComplaint(),
+                            Code= lastCode,
                             ComplanitStatus=ComplanitStatus.Submitted,
                             OfficeId=room.OfficeId,
                             RegionId = room.RegionId
@@ -143,42 +150,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                        };
 
-                    //////////
-                    ///
-
-                    //long? RegionId = null;
-                    //long? OfficeId = null;
-
-                    //if (room.RegionId != null && room.RegionId > 0)
-                    //{
-                    //    var RegionSearch = ComplanitFilterList.Any(c => c.RegionId.Split(',', StringSplitOptions.None).
-                    //    Contains(room.RegionId.ToString()));
-                    //    if (RegionSearch)
-                    //    {
-                    //        RegionId = room.RegionId;
-                    //    }
-
-                    //}
-                    //if (room.OfficeId != null && room.OfficeId > 0)
-                    //{
-                    //    var OfficeSearch = ComplanitFilterList.Any(c => c.OfficeId.Split(',', StringSplitOptions.None).
-                    //    Contains(room.OfficeId.ToString()));
-                    //    if (OfficeSearch)
-                    //    {
-                    //        OfficeId = room.OfficeId;
-                    //    }
-                    //}
-                    //if (request.CategoryComplanitId != null && request.CategoryComplanitId > 0)
-                    //{
-                    //    ComplanitFilterListTemp = ComplanitFilterListTemp.Where(c => c.CategoryComplanitId.Split(',', StringSplitOptions.None).Contains(request.CategoryComplanitId.ToString())).ToList();
-
-                    //}
-
-                    //ComplanitFilterListTemp = ComplanitFilterListTemp.Where(c => c.OfficeId.Split(',', StringSplitOptions.None).Contains(OfficeId.ToString())).ToList();
-
-
-                    //ComplanitFilterListTemp = ComplanitFilterListTemp.Where(c => c.RegionId.Split(',', StringSplitOptions.None).Contains(RegionId.ToString())).ToList();
-
+                  
                     var ComplanitFilterList = await _ComplanitFilterRepository.GetAll(x=>x.State==State.NotDeleted).ToListAsync();
                     
                     var ComplanitFilterListTemp = ComplanitFilterList;
@@ -207,39 +179,23 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         }
                     }
                     
-                        ComplanitFilterList = ComplanitFilterList.
-                            Where(
-                            c => c.OfficeId.Split(',', StringSplitOptions.None).Contains(OfficeId.ToString())
+                    ComplanitFilterList = ComplanitFilterList.
+                    Where(
+                   c => c.OfficeId.Split(',', StringSplitOptions.None).Contains(OfficeId.ToString())
                             &&
-                            c.RegionId.Split(',', StringSplitOptions.None).Contains(RegionId.ToString())
+                  c.RegionId.Split(',', StringSplitOptions.None).Contains(RegionId.ToString())
                             &&
-                            c.CategoryComplanitId.Split(',', StringSplitOptions.None).Contains(request.CategoryComplanitId.ToString())
+                   c.CategoryComplanitId.Split(',', StringSplitOptions.None).Contains(request.CategoryComplanitId.ToString())
                             ).ToList();
-                        //if (ComplanitFilterList.Count == 0)
-                        //{
-                        //    ComplanitFilterList = ComplanitFilterListTemp;
-                        //}
-                    
-                    //if (room.RegionId != null && room.RegionId > 0)
-                    //{
-                    //    ComplanitFilterList = ComplanitFilterList.Where(c => c.RegionId.Split(',', StringSplitOptions.None).Contains(room.RegionId.ToString())).ToList();
-                    //    if (ComplanitFilterList.Count == 0)
-                    //    {
-                    //        ComplanitFilterList = ComplanitFilterListTemp;
-                    //    }
-                    //}
-                    //if (request.CategoryComplanitId != null && request.CategoryComplanitId > 0)
-                    //{
-                    //    ComplanitFilterList = ComplanitFilterList.Where(c => c.CategoryComplanitId.Split(',', StringSplitOptions.None).Contains(request.CategoryComplanitId.ToString())).ToList();
-
-                    //}
+                       
 
                     var usersIds = ComplanitFilterList.Select(c => c.CreatedBy).ToList();
 
                     var users = await _userManager.Users.Where(x => x.State == State.NotDeleted)
 
-                        .WhereIf(usersIds.Count>0, x=> (x.UserType == UserType.Owner || x.UserType == UserType.Consultant ||( x.UserType == UserType.Technician &&ComplanitFilterList.Select(f => f.CreatedBy).Contains(x.Id))))
-                        .WhereIf(usersIds.Count==0, x=> (x.UserType == UserType.Owner || x.UserType == UserType.Consultant ))
+                   .WhereIf(usersIds.Count>0, x=> (x.UserType == UserType.Owner || x.UserType == UserType.Consultant ||( x.UserType == UserType.Technician &&ComplanitFilterList.Select(f => f.CreatedBy).Contains(x.Id))))
+                      
+                   .WhereIf(usersIds.Count==0, x=> (x.UserType == UserType.Owner || x.UserType == UserType.Consultant ))
                        
                         .ToListAsync();
                     foreach (var item in users)
@@ -329,6 +285,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                 var segmentString = new String(charsArr);
                 return segmentString;
             }
+          
         }
     }
 }
