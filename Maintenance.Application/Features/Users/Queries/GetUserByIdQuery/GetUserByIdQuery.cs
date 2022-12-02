@@ -8,48 +8,39 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 
-namespace Maintenance.Application.Features.Users.Queries.GetUsersQuery
+namespace Maintenance.Application.Features.Users.Queries.GetUserByIdQuery
 {
-    public class GetUsersQuery : IRequest<ResponseDTO>
+    public class GetUserByIdQuery : IRequest<ResponseDTO>
     {
-        public UserType UserType { get; set; }
-        public string Name { get; set; }
+        public long Id { get; set; }
     }
-    class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, ResponseDTO>
+    class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, ResponseDTO>
     {
         private readonly UserManager<User> _userManager;
         private readonly ResponseDTO _responseDTO;
-        private readonly IAuditService _auditService;
-        private readonly IStringLocalizer<GetUsersQuery> _stringLocalizer;
-        public GetUsersQueryHandler(UserManager<User> userManager, IStringLocalizer<GetUsersQuery> stringLocalizer, IAuditService auditService)
+        private readonly IStringLocalizer<GetUserByIdQuery> _stringLocalizer;
+        public GetUserByIdQueryHandler(UserManager<User> userManager, IStringLocalizer<GetUserByIdQuery> stringLocalizer)
         {
             _userManager = userManager;
             _responseDTO = new ResponseDTO();
-            _auditService = auditService;
             _stringLocalizer = stringLocalizer;
         }
-        public async Task<ResponseDTO> Handle(GetUsersQuery request, CancellationToken cancellationToken)
+        public async Task<ResponseDTO> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
         {
             var user = new User();
             try
             {
 
-                var models = await _userManager.Users.Where(x => x.UserType == request.UserType && x.State != State.Deleted
-                
-                
-                
-                &&(string.IsNullOrEmpty(request.Name) || (x.FullName.Contains(request.Name)) 
-                || x.IdentityNumber.Contains(request.Name)||x.PhoneNumber.Contains(request.Name))).ToListAsync();
+                var models = await _userManager.Users.Where(x => x.Id == request.Id && x.State != State.Deleted).ToListAsync();
 
                 var users = models.Select(x => new UsersDTO()
                 {
-                    Id = x.Id,
                     FullName = x.FullName,
                     IdentityNumber = x.IdentityNumber,
                     OfficeId = x.OfficeId,
                     PhoneNumber = x.PhoneNumber,
                     RegionId = x.RegionId,
-                }).ToList();
+                }).FirstOrDefault();
 
                 _responseDTO.Result = users;
             }
@@ -62,7 +53,7 @@ namespace Maintenance.Application.Features.Users.Queries.GetUsersQuery
 
             }
 
-            _responseDTO.Message = "usersRetrievedSuccessfully";
+            _responseDTO.Message = "userRetrievedSuccessfully";
 
             _responseDTO.StatusEnum = StatusEnum.Success;
 

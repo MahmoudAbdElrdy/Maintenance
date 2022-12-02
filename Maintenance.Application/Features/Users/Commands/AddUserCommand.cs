@@ -7,6 +7,7 @@ using Maintenance.Application.Helpers.SendSms;
 using Maintenance.Application.Interfaces;
 using Maintenance.Domain.Enums;
 using Maintenance.Domain.Interfaces;
+using Maintenance.Infrastructure.Migrations;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -70,7 +71,7 @@ namespace Maintenance.Application.Features.Users.Commands.AddUserCommand
 
                 user = new User()
                 {
-                    UserName = request.IdentityNumber,
+                    UserName = request.IdentityNumber.Replace(" ",string.Empty),
 
                     Email = request.PhoneNumber + "@Gamil.com",
 
@@ -93,7 +94,9 @@ namespace Maintenance.Application.Features.Users.Commands.AddUserCommand
 
                     OfficeId = request.OfficeId,
 
-                    RegionId = request.RegionId
+                    RegionId = request.RegionId,
+                    IsVerifyCode = true,
+
 
                 };
                 var result = await _userManager.CreateAsync(user, request.Password);
