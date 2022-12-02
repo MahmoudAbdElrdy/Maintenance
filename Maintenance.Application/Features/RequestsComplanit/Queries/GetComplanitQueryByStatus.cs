@@ -88,7 +88,8 @@ namespace Maintenance.Application.Features.Categories.Queries
                     }
 
                     var res2 = await _RequestComplanitRepository.GetAll()
-
+                       
+                     .Include(x => x.Creator)
                      .Include(x => x.AttachmentsComplanit)
                      .Include(x => x.ComplanitHistory)
                      .Include(x => x.CheckListRequests).
@@ -103,10 +104,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                          {
                              Code = x.Code,
                              SerialNumber = x.SerialNumber,
-                             //location = x.SerialNumber.Length > 0 ? "مركز : " //+ offices.Where(y => y.Code== x.SerialNumber.Substring(0, 3)).FirstOrDefault().Name
-                             //+ " منطقة : " + x.SerialNumber.Substring(3, 2)
-                             //+ " بركس : " + x.SerialNumber.Substring(5, 2)
-                             //+ " غرفة : " + x.SerialNumber.Substring(7, 0) : "",
+                         
                              CategoryComplanitLogo = x.CheckListRequests.FirstOrDefault(x => x.State == State.NotDeleted).CheckListComplanit.CategoryComplanit.Logo,
 
 
@@ -131,7 +129,14 @@ namespace Maintenance.Application.Features.Categories.Queries
                                  Description = _auditService.UserLanguage == "ar" ? s.CheckListComplanit.DescriptionAr : s.CheckListComplanit.DescriptionEn,
 
                              }
-                                 )
+                                 ),
+                             UserDto=new UserDto()
+                             {
+                                 FullName = x.Creator!=null? x.Creator.FullName:"",
+                                 IdentityNumber = x.Creator!=null? x.Creator.IdentityNumber : "",
+                                 PhoneNumber = x.Creator!=null? x.Creator.PhoneNumber : "",
+                                 UserId =x.Creator!=null? x.Creator.Id : null,
+                             }
 
                          }).ToListAsync();
 

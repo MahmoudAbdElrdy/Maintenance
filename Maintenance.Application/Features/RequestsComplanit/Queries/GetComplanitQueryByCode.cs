@@ -74,6 +74,7 @@ namespace Maintenance.Application.Features.Categories.Queries
                     var offices = await _room.GetOffices();
                     var res2 = await _RequestComplanitRepository.GetAll(x=>x.Code==request.Code)
 
+                     .Include(x => x.Creator)
                      .Include(x => x.AttachmentsComplanit)
                      .Include(x => x.ComplanitHistory)
                      .Include(x => x.CheckListRequests).
@@ -113,7 +114,14 @@ namespace Maintenance.Application.Features.Categories.Queries
                                  Description = _auditService.UserLanguage == "ar" ? s.CheckListComplanit.DescriptionAr : s.CheckListComplanit.DescriptionEn,
 
                              }
-                                 )
+                                 ) ,
+                          UserDto = new UserDto()
+                            {
+                                     FullName = x.Creator != null ? x.Creator.FullName : "",
+                                     IdentityNumber = x.Creator != null ? x.Creator.IdentityNumber : "",
+                                     PhoneNumber = x.Creator != null ? x.Creator.PhoneNumber : "",
+                                     UserId = x.Creator != null ? x.Creator.Id : null,
+                           }
 
                       }).ToListAsync();
 
