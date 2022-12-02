@@ -118,14 +118,14 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
 
 
-                    var foundedUsers = await _userManager.Users.Where(x => x.IdentityNumber == request.ApplicantNationalId 
-                    || x.PhoneNumber == request.ApplicantPhoneNumber).FirstOrDefaultAsync();
+                    var foundedUsers = _userManager.Users.Where(x => x.IdentityNumber == request.ApplicantNationalId 
+                    || x.PhoneNumber == request.ApplicantPhoneNumber).FirstOrDefault();
                     if (foundedUsers != null)
                     {
                         foundedUsers.IdentityNumber = request.ApplicantNationalId;
                         foundedUsers.PhoneNumber = request.ApplicantPhoneNumber;
                         foundedUsers.FullName = request.ApplicantName;
-                        _userManager.UpdateAsync(foundedUsers);
+                        await _userManager.UpdateAsync(foundedUsers);
                     }
                     else
                     {
@@ -241,7 +241,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                     //ComplanitFilterListTemp = ComplanitFilterListTemp.Where(c => c.RegionId.Split(',', StringSplitOptions.None).Contains(RegionId.ToString())).ToList();
 
-                    var ComplanitFilterList = await _ComplanitFilterRepository.GetAll(x => x.State == State.NotDeleted).ToListAsync();
+                    var ComplanitFilterList =  _ComplanitFilterRepository.GetAll(x => x.State == State.NotDeleted).ToList();
 
                     var ComplanitFilterListTemp = ComplanitFilterList;
 
@@ -268,7 +268,14 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             OfficeId = room.OfficeId;
                         }
                     }
-                    var categories = string.Join(",", request.CheckCategoriesRequest);
+                    string categories = request.CheckCategoriesRequest.Length > 0 ? request.CheckCategoriesRequest[0]:"";
+                    foreach (var item in request.CheckCategoriesRequest)
+                    {
+                        if(!categories.Contains(item))
+                        {
+                            categories = categories + "," + item;
+                        }
+                    }
 
                     ComplanitFilterList = ComplanitFilterList.
                         Where(
@@ -299,12 +306,12 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                     var usersIds = ComplanitFilterList.Select(c => c.CreatedBy).ToList();
 
-                    var users = await _userManager.Users.Where(x => x.State == State.NotDeleted)
+                    var users = _userManager.Users.Where(x => x.State == State.NotDeleted)
 
                         .WhereIf(usersIds.Count > 0, x => (x.UserType == UserType.Owner || x.UserType == UserType.Consultant || (x.UserType == UserType.Technician && ComplanitFilterList.Select(f => f.CreatedBy).Contains(x.Id))))
                         .WhereIf(usersIds.Count == 0, x => (x.UserType == UserType.Owner || x.UserType == UserType.Consultant))
 
-                        .ToListAsync();
+                        .ToList();
                     foreach (var item in users)
 
                     {
@@ -349,7 +356,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
                     RequestComplanit.ComplanitHistory.Add(ComplanitHistory);
 
-                    await _RequestComplanitRepository.AddAsync(RequestComplanit);
+                    _RequestComplanitRepository.Add(RequestComplanit);
 
                     _RequestComplanitRepository.Save();
 

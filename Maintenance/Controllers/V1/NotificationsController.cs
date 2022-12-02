@@ -74,14 +74,13 @@ namespace Maintenance.Controllers.V1
         [AllowAnonymous]
         public async Task PostNotificationAsync([FromBody] string Token)
         {
-            var tokken = "dCLEhqEiQ26fYT1S6l6GLA:APA91bE81TrIoumpW9ZhE9tx6OmWL5qgmpVlenFqnFODlBX-vDmFLlOQkJLUWrGOIM4jGD2ADHi30Jn8VFdLhJQiA8FraP3QOTQJ5jfq15jVvK6KgAxqzsLjsgbjTGg3QzAUjVmyj99v";
             var notfication = new NotificationDto()
             {
                 Body = "AAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHMMMMMMMMMMMMMMMMMMMMMMMMEEEEEEEEEEEEEEDDDDDDd",
                 Title="SSSSSSSSSSHHHHHHHHHHHHHRRRRRRRRRR",
                 
             };
-            await NotificationHelper.FCMNotify(notfication, tokken);
+            await NotificationHelper.FCMNotify(notfication, Token);
         }
     }
 }
