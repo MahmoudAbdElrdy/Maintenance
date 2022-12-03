@@ -104,8 +104,7 @@ namespace Maintenance.Application.Helpers.Notifications
                     msg = new FCMNet.Message
                     {
                         RegistrationIds = new List<string> { userFcmToken },
-
-                        Data = new FCMNet.Notification
+                        Notification = new FCMNet.Notification
                         {
                             Title = notification.Title,
                             Body = notification.Body,

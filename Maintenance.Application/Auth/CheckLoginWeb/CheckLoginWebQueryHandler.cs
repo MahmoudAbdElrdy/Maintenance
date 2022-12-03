@@ -90,7 +90,7 @@ namespace Maintenance.Application.Features.Account.Queries.CheckLoginWeb
                 // await _userManager.UpdateAsync(userLogin);
                 _response.StatusEnum = StatusEnum.Success;
 
-                _response.Message = _localizationProvider["mobileVerficiationSuccess"];
+                _response.Message = "mobileVerficiationSuccess";
 
                 _response.Result = authorizedUserDto;
             }
