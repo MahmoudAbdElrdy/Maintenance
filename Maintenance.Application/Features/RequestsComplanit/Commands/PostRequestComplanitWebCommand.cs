@@ -275,14 +275,6 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             OfficeId = room.OfficeId;
                         }
                     }
-                    string categories = request.CheckCategoriesRequest.Length > 0 ? request.CheckCategoriesRequest[0]:"";
-                    foreach (var item in request.CheckCategoriesRequest)
-                    {
-                        if(!categories.Contains(item))
-                        {
-                            categories = categories + "," + item;
-                        }
-                    }
 
                     ComplanitFilterList = ComplanitFilterList.
                         Where(
@@ -290,7 +282,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                         &&
                         c.RegionId.Split(',', StringSplitOptions.None).Contains(RegionId.ToString())
                         &&
-                        c.CategoryComplanitId.Contains(categories.ToString())
+                         request.CheckCategoriesRequest.Any(a=> c.CategoryComplanitId.Contains(a))
                         ).ToList();
                     //if (ComplanitFilterList.Count == 0)
                     //{
@@ -368,8 +360,7 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                     _RequestComplanitRepository.Save();
 
                     _response.StatusEnum = StatusEnum.SavedSuccessfully;
-                    _response.Message = _Localizer["AddedSuccessfully"];
-                    _response.Result = null;
+                    _response.Message = "AddedSuccessfully";
                     return _response;
                 }
                 catch (Exception ex)
