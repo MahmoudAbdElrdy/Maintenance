@@ -107,10 +107,20 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                            // notfication.ComplanitHistory = complanitHistory;
 
                             await _NotificationRepository.AddAsync(notfication);
+                            string body = "";
+                            if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended)
+                            {
+                                body = _localizationProvider["ToTechnicianSuspendedApproved"] + " " + complanit.Code;
+                            }
+                            else if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled)
+                            {
+                                body = _localizationProvider["ToTechnicianCanceledApproved"] + " " + complanit.Code;
+                            }
+
                             var notificationDto = new NotificationDto()
                             {
                                 Title = complanit.Code,
-                                Body = _localizationProvider["ApprovedComplaint"] +"  "+ complanit.Code
+                                Body = body
                             };
 
                             await NotificationHelper.FCMNotify(notificationDto, item.Token);
@@ -187,10 +197,20 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                            // await _ComplanitHistoryRepository.AddAsync(complanitHistory);
 
                             await _NotificationRepository.AddAsync(notfication);
+                            string body = "";
+                            if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended)
+                            {
+                                body = _localizationProvider["ToTechnicianSuspendedRejected"] + " " + complanit.Code;
+                            }
+                            else if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled)
+                            {
+                                body = _localizationProvider["ToTechnicianCanceledRejected"] + " " + complanit.Code;
+                            }
+
                             var notificationDto = new NotificationDto()
                             {
                                 Title = complanit.Code,
-                                Body = _localizationProvider["RejectedComplaint"] + "  " + complanit.Code
+                                Body = body
                             };
 
                             await NotificationHelper.FCMNotify(notificationDto, item.Token);

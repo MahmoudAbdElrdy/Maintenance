@@ -217,10 +217,20 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             _RequestComplanitRepository.Update(complaint);
                             notfication.ComplanitHistory = complanitHistory;
                             await _NotificationRepository.AddAsync(notfication);
+                            string body = "";
+                            if(request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianSuspended)
+                            {
+                                 body = _localizationProvider["ToConsultantSuspended"] + " " + complaint.Code;
+                            }
+                            else if (request.ComplanitStatus == Domain.Enums.ComplanitStatus.TechnicianCanceled)
+                            {
+                                body = _localizationProvider["ToConsultantCanceled"] + " " + complaint.Code;
+                            }
+                         
                             var notificationDto = new NotificationDto()
                             {
                                 Title = complaint.Code,
-                                Body = _localizationProvider["ResponsesToComplaint"]
+                                Body = body
                             };
 
                             await NotificationHelper.FCMNotify(notificationDto, item.Token);
@@ -238,9 +248,10 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                       
                         _RequestComplanitRepository.Update(complaint);
                         var meass = _localizationProvider["SendCodeToTechnician"];
-
+                        var meass2 = _localizationProvider["MessageToTechnician"];
+                        var message = meass + " : " + complaint.CodeSms + " " + meass2;
                         var smsService = new SMSService();
-                        var res = await smsService.SendMessageUnifonic(meass + " : " + complaint.CodeSms, clientUser.PhoneNumber);
+                        var res = await smsService.SendMessageUnifonic(message, clientUser.PhoneNumber);
                         if (res == -1)
                         {
 

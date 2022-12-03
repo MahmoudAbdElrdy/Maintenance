@@ -25,5 +25,13 @@
   "ApprovedComplaint": "Approved Complaint Number",
   "RejectedComplaint": "Rejected Complaint Number",
   "NotVerficiation": "Not Verficiation",
-  "SendCodeToTechnician": "SendCodeToTechnician"
+  "SendCodeToTechnician": "Code Close Complaint",
+  "MessageToTechnician": "Provide the technician with a code in case the fault is fully repaired",
+  "ToConsultantSuspended": "A request to Suspend Code Number ",
+  "ToConsultantCanceled": "A request to Canceled Code Number ",
+  "ToTechnicianSuspendedApproved": "The Suspended has been Approved Code Number",
+  "ToTechnicianCanceledApproved": "The Canceled has been  Approved Code Number",
+  "ToTechnicianSuspendedRejected": "The Suspended has been Rejected Code Number",
+  "ToTechnicianCanceledRejected": "The Suspended has been Rejected Code Number"
+
 }
