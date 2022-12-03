@@ -25,5 +25,12 @@
   "ApprovedComplaint": " تم قبول البلاغ رقم ",
   "RejectedComplaint": " تم رفض البلاغ رقم",
   "NotVerficiation": "غير مفعل",
-  "SendCodeToTechnician": "الرجاء اعطاء الكود للفني"
+  "SendCodeToTechnician": " رمز اغلاق البلاغ ",
+  "MessageToTechnician": "قم بتزويد الفني برمز في حال اصلاح العطل بشكب كامل",
+  "ToConsultantSuspended": "تم استلام طلب تعليق بلاغ رقم ",
+  "ToConsultantCanceled": "تم استلام طلب الغاء بلاغ رقم ",
+  "ToTechnicianSuspendedApproved": "تم الموافقة علي تعليق بلاغ ",
+  "ToTechnicianCanceledApproved": "تم الموافقة علي الغاء بلاغ",
+  "ToTechnicianSuspendedRejected": "تم رفض طلب  تعليق بلاغ",
+  "ToTechnicianCanceledRejected": "تم رفض طلب  الغاء بلاغ"
 }
