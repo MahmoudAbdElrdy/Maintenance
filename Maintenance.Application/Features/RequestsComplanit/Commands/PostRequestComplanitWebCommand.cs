@@ -34,7 +34,6 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
         public string? SerialNumber { get; set; }
         public string? OfficeId { get; set; }
         public string? RegionId { get; set; }
-        public string? ApplicantNationalId { get; set; }
         public string? ApplicantPhoneNumber { get; set; }
         public string? ApplicantName { get; set; }
 
@@ -119,11 +118,11 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
 
 
 
-                    var foundedUsers = _userManager.Users.Where(x => x.IdentityNumber == request.ApplicantNationalId 
+                    var foundedUsers = _userManager.Users.Where(x => x.IdentityNumber == request.ApplicantPhoneNumber
                     || x.PhoneNumber == request.ApplicantPhoneNumber).FirstOrDefault();
                     if (foundedUsers != null)
                     {
-                        foundedUsers.IdentityNumber = request.ApplicantNationalId;
+                        foundedUsers.IdentityNumber = request.ApplicantPhoneNumber;
                         foundedUsers.PhoneNumber = request.ApplicantPhoneNumber;
                         foundedUsers.FullName = request.ApplicantName;
                         await _userManager.UpdateAsync(foundedUsers);
@@ -136,14 +135,14 @@ namespace Maintenance.Application.Features.RequestsComplanit.Commands
                             CreatedBy = null,
                             Email = request.ApplicantPhoneNumber + "@Gamil.com",
                             FullName = request.ApplicantName,
-                            IdentityNumber = request.ApplicantNationalId,
+                            IdentityNumber = request.ApplicantPhoneNumber,
                             OfficeId = Convert.ToInt32(request.OfficeId),
                             RegionId = Convert.ToInt32(request.RegionId),
                             UserType = UserType.Client,
                             PhoneNumber = request.ApplicantPhoneNumber,
-                            UserName = request.ApplicantNationalId,
+                            UserName = request.ApplicantPhoneNumber,
                             State = State.NotDeleted,
-                            NormalizedUserName = request.ApplicantNationalId,
+                            NormalizedUserName = request.ApplicantPhoneNumber,
                             NormalizedEmail = request.ApplicantPhoneNumber + "@Gamil.com",
                         };
 
